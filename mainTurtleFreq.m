@@ -5,7 +5,7 @@ stock = 'MENT';
 
 FAKER = 1;
 REALER = 0;
-PLOT = 1;
+PLOT = 0;
 
 signal = signalGenerator(stock, FAKER, REALER, PLOT);
 
