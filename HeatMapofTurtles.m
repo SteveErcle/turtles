@@ -1,50 +1,6 @@
 clear all; close all; clc;
 
-X = [];
-Y = [];
-Z = [];
-surfer = [];
 
-% for i = 1:10
-%     x = (1:100).';
-%     y = i*x.^2+3;
-%     z = i*ones(100,1);
-%     X = [X;x];
-%     Y = [Y;y];
-%     Z = [Z;z];
-%     
-%     i
-%     surfer = [surfer; y'];
-%     
-% end
-% 
-% [m,n] = size(surfer);
-% 
-% x = 1:n;
-% y = 1:m;
-% 
-% figure()
-% surf(x,y,surfer)
-% 
-% pause;
-
-% 
-% % figure()
-% % scatter3(X,Y,Z)
-% % 
-% figure()
-% surf(surfer)
-
-% [XX, YY] = meshgrid(X,Y);
-% 
-% ZZ = 
-% 
-% figure()
-% surf(XX,YY,ZZ);
-% 
-% axis tight;
-% shading interp;
-% colorbar;
 
 
 
