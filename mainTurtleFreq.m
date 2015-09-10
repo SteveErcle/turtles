@@ -11,4 +11,4 @@ signal = signalGenerator(stock, FAKER, REALER, PLOT);
 
 % [totalX] = twoDMapOfTurtles(signal);
 
-HeatMapofTurtles(signal);
+% HeatMapofTurtles(signal);

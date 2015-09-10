@@ -6,8 +6,8 @@ x1ph = signal;
 fs = 1;
 surfer = [];
 
-LowX1 = 300;
-HighX1 = 1200;
+LowX1 = 100;
+HighX1 = 1650;
 
 shifterSize = 1;
 
@@ -21,6 +21,8 @@ for k = 1:shifterSize:1000
     X1 = abs(fft(x1));
     X1 = X1(1:ceil(length(X1)/2));
     
+    X1 = X1/(ss/4);
+    
     Xt = 0:length(X1)-1;
     P = fs./ (Xt*(fs/length(x1)));
     [pkt It] = findpeaks(X1);
@@ -30,7 +32,7 @@ for k = 1:shifterSize:1000
 end
 
 
-axisP = [60, 100, 200];
+axisP = [60, 100, 250];
 I = [0,0,0];
 maxerP = [0, 0 ,0];
 
