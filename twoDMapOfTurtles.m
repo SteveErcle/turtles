@@ -1,7 +1,7 @@
-function [] = twoDMapOfTurtles(signal)
+function [totalX] = twoDMapOfTurtles(signal)
 
 
-shiftSize = 100;
+shiftSize = 1;
 sampleSize = 1000;
 
 figure();
@@ -15,7 +15,7 @@ x1ph = signal;
 totalX = [];
 
 
-for sampleSize = 1000 : 500 : 1000
+for sampleSize = 500 : 1 : 500
     
     leftOver = 2000-sampleSize;
     hsvNum = leftOver/shiftSize
@@ -24,8 +24,8 @@ for sampleSize = 1000 : 500 : 1000
     
     for k = 1 : shiftSize : leftOver
         
-        k
-                
+        k;
+        
         x1 = x1ph(k:sampleSize+k);
         ss = length(x1);
         x1 = x1.*hanning(length(x1))';
@@ -38,40 +38,42 @@ for sampleSize = 1000 : 500 : 1000
         [pkt It] = findpeaks(X1);
         
         totalX = [totalX; X1];
-        
-   
-      
-        
-      
+
 %         plot(P(LowX1:HighX1), sum(totalX(:,LowX1:HighX1)), 'color',col(icl,:))
 %         hold on;
 %         
-    
+        
         plot(P(LowX1:HighX1), X1(LowX1:HighX1), 'color',col(icl,:))
         hold on;
         
         icl = icl + 1;
         
-        
-        %         for j = 1:length(It)
-        %             if It(j) < 1650
-        %                 text( P(It(j)), X1(It(j)), [num2str(P(It(j)))] );
-        %             end
-        %         end
-        
-        
-        
-        axis([8 150 0 2000])
+        axis([8 150 0 1000])
         title(num2str(k));
+    
         
-%         pause;
-
     end
     
-% end
-
-
-plot(P(LowX1:HighX1), sum(totalX(:,LowX1:HighX1)), 'k')
-hold on;
-
+    % end
+    
+    
+    % plot(P(LowX1:HighX1), sum(totalX(:,LowX1:HighX1)), 'k')
+    % hold on;
+    
 end
+
+
+
+
+
+
+
+
+
+
+%         for j = 1:length(It)
+%             if It(j) < 1650
+%                 text( P(It(j)), X1(It(j)), [num2str(P(It(j)))] );
+%             end
+%         end
+

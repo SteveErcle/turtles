@@ -4,6 +4,7 @@ function [] = HeatMapofTurtles(signal)
 x1ph = signal;
 
 fs = 1;
+surfer = [];
 
 LowX1 = 300;
 HighX1 = 1200;
