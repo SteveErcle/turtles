@@ -1,7 +1,7 @@
 function [totalX] = twoDMapOfTurtles(signal)
 
 
-shiftSize = 1;
+shiftSize = 50;
 sampleSize = 1000;
 
 figure();
@@ -15,7 +15,7 @@ x1ph = signal;
 totalX = [];
 
 
-for sampleSize = 500 : 1 : 500
+for sampleSize = 1000 : 1 : 1000
     
     leftOver = 2000-sampleSize;
     hsvNum = leftOver/shiftSize
@@ -45,7 +45,7 @@ for sampleSize = 500 : 1 : 500
         
         plot(P(LowX1:HighX1), X1(LowX1:HighX1), 'color',col(icl,:))
         hold on;
-        
+%         
         icl = icl + 1;
         
         axis([8 150 0 1000])
@@ -57,8 +57,8 @@ for sampleSize = 500 : 1 : 500
     % end
     
     
-    % plot(P(LowX1:HighX1), sum(totalX(:,LowX1:HighX1)), 'k')
-    % hold on;
+    plot(P(LowX1:HighX1), sum(totalX(:,LowX1:HighX1)), 'k')
+    hold on;
     
 end
 
