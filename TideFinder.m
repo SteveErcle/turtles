@@ -1,8 +1,7 @@
 function [theta] = TideFinder(signal, PLOT, A, P)
 
 
-
-theta = zeros(P,1);
+theta = [0 0 0 0 0]% zeros(length(P),1);
 
 modLen = 200;
 tideSig = signal(1:201);
@@ -13,6 +12,8 @@ t = 0:modLen;
 sqre = [];
 sqreTot = [];
 
+
+% signal = Filterer(signal);
 
 for w = 1:3
     for i = 1:length(theta)
@@ -25,7 +26,7 @@ for w = 1:3
             for k = 1:length(theta)
                 model = model + A(k)*cos(2*pi*1/P(k)*t + theta(k));
             end
-            
+     
             errorTerm = [sum((tideSig - model).^2), theta];
             sqre = [sqre; errorTerm];
             
@@ -37,8 +38,6 @@ for w = 1:3
         
     end
 end
-
-
 
 
 model = mean(tideSig);
