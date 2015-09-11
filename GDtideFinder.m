@@ -1,15 +1,13 @@
-function [theta,cost] = TideFinderGD(signal, PLOT, A, P)
+function [theta] = GDtideFinder(signal, PLOT, A, P)
+
+signal = Filterer(signal);
 
 theta = zeros(length(P),1);
 
-modLen = 200;
-tideSig = signal(1:201);
+modLen = 100;
+tideSig = signal(1:modLen+1);
 
-res = .01;
 t = 0:modLen;
-
-sqre = [];
-sqreTot = [];
 
 
 cfHdle  = @(theta)costFuncLSE(t,tideSig',mean(tideSig),length(A),A,P,theta);
@@ -30,11 +28,10 @@ figure()
 plot(signal,'r')
 
 figure()
-plot(cost);
-
-figure()
 plot(model,'b');
 hold on;
 plot(tideSig,'r');
+title('Grad Descent')
+
 
 end 

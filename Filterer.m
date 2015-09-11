@@ -1,7 +1,6 @@
 
 function [signalFilt] = Filterer(signal)
 
-
 deg_filt = 5;               % Enter order of filterg
 norm_freqz = 0.3;           % Enter strength of filter
 

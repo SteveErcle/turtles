@@ -1,10 +1,13 @@
-function [theta] = TideFinder(signal, PLOT, A, P)
+function [theta] = BFtideFinder(signal, PLOT, A, P)
 
 
-theta = [0 0 0 0 0]% zeros(length(P),1);
+signal = Filterer(signal);
 
-modLen = 200;
-tideSig = signal(1:201);
+theta = zeros(1,length(P))
+
+modLen = 500;
+tideSig = signal(1:modLen+1);
+tideSigd = diff(tideSig);
 
 res = .01;
 t = 0:modLen;
@@ -12,8 +15,9 @@ t = 0:modLen;
 sqre = [];
 sqreTot = [];
 
+size(tideSig)
+size(t)
 
-% signal = Filterer(signal);
 
 for w = 1:3
     for i = 1:length(theta)
@@ -27,7 +31,9 @@ for w = 1:3
                 model = model + A(k)*cos(2*pi*1/P(k)*t + theta(k));
             end
      
-            errorTerm = [sum((tideSig - model).^2), theta];
+            modeld = diff(model);
+            
+            errorTerm = [sum((tideSigd - modeld).^2), theta];
             sqre = [sqre; errorTerm];
             
         end
@@ -57,5 +63,6 @@ figure()
 plot(model,'b');
 hold on;
 plot(tideSig,'r');
+title('Brute Force');
 
 end 

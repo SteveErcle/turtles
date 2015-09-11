@@ -1,5 +1,5 @@
 
-function [signal] = signalGenerator(stock, FAKER, REALER, PLOT, A, P, ph)
+function [signal] = signalGenerator(stock, RANSTEP, FAKER, REALER, PLOT, A, P, ph)
 
 % 
 % FAKER = 0;
@@ -46,9 +46,9 @@ for i = 1:length(rander)
     end
 end
 
-
-x1 = x1+stepper'+rander';
-
+if RANSTEP == 1
+    x1 = x1+stepper'+rander';
+end
 
 if FAKER == 1
     signal = x1;
