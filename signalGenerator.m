@@ -1,5 +1,5 @@
 
-function [signal] = signalGenerator(stock, FAKER, REALER, PLOT)
+function [signal] = signalGenerator(stock, FAKER, REALER, PLOT, A, P, ph)
 
 % 
 % FAKER = 0;
@@ -16,11 +16,8 @@ yMtxAll = yMtxAll(past-2:present-2,:);
 
 yc = yMtxAll(:,6);
 
-A = [0.5, 1, 1.5, 2, 4, 7]/4;
 % A = [1, 2, .1, 5, 4, 0.9]/3
-% P = [24, 31, 52, 84, 122, 543]
-P = [24, 31, 52, 84, 122, 543];  %.* (rand(6,1)).'
-ph = [1.5, 2.4, 0.4, 1.2 , .9, 1.2];
+% P = [24, 31, 52, 84, 122, 543]  %.* (rand(6,1)).'
 x1 = 12;
 
 t = 0 : 2000;
@@ -32,7 +29,7 @@ end
 
 stepper = zeros(length(t),1);
 
-sSizee = [1920, 1802, 1403, 1332, 1000,900, 740, 600, 450, 325, 230, 100];
+sSizee = [1975, 1930, 1857, 1332, 1000,900, 740, 600, 450, 180, 140, 50];
 sAmp =  [7, 10, 3, -15, -5, -2, 8 ,3, 0, 4, 9, 7]/4;
 
 for i = 1:length(sSizee)
