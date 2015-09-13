@@ -2,7 +2,8 @@
 function [] = HeatMapofTurtles(signal)
 
 x1ph = signal;
-
+sampleSize = 1500;
+leftOver = 2000-sampleSize;
 fs = 1;
 surfer = [];
 
@@ -12,9 +13,9 @@ HighX1 = 1650;
 shifterSize = 1;
 
 
-for k = 1:shifterSize:1000
+for k = 1:shifterSize:leftOver
     
-    x1 = x1ph(k:1000+k);
+    x1 = x1ph(k:sampleSize+k);
     ss = length(x1);
     x1 = x1.*hanning(length(x1))';
     x1 = [x1 zeros(1, 20000)];
@@ -32,7 +33,7 @@ for k = 1:shifterSize:1000
 end
 
 
-axisP = [60, 100, 250];
+axisP = [50, 125, 200];
 I = [0,0,0];
 maxerP = [0, 0 ,0];
 
@@ -70,7 +71,7 @@ ax1 = figure()%subplot(3,1,1);
 surf( P(LowX1:HighX1) , y , surfer )
 set(gca,'xlim',[10 axisP(1)])
 set(gca,'zlim',[0, maxerP(1)*1.1])
-caxis([0, maxerP(1)])
+caxis([0, maxerP(1)*1.1])
 shading interp;
 colorbar;
 az = 0;
@@ -81,7 +82,7 @@ ax2 = figure()%subplot(3,1,2);
 surf( P(LowX1:HighX1) , y , surfer )
 set(gca,'xlim',[axisP(1) axisP(2)])
 set(gca,'zlim',[0, maxerP(2)*1.1])
-caxis([0, maxerP(2)])
+caxis([0, maxerP(2)]*1.1)
 shading interp;
 colorbar;
 az = 0;
@@ -92,7 +93,7 @@ ax3 = figure()%subplot(3,1,3);
 surf( P(LowX1:HighX1) , y , surfer )
 set(gca,'xlim',[axisP(2) axisP(3)])
 set(gca,'zlim',[0, maxerP(3)*1.1])
-caxis([0, maxerP(3)])
+caxis([0, maxerP(3)]*1.1)
 shading interp;
 colorbar;
 az = 0;

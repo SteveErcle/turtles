@@ -1,11 +1,10 @@
-function [theta] = BFtideFinder(signal, PLOT, A, P)
+function [theta] = BFtideFinder(signal, modLen, PLOT, A, P)
 
 
 signal = Filterer(signal);
 
 theta = zeros(1,length(P))
 
-modLen = 500;
 tideSig = signal(1:modLen+1);
 tideSigd = diff(tideSig);
 
@@ -53,11 +52,11 @@ end
 
 if PLOT == 1
 
-figure()
-plot(signal,'r')
-
-figure()
-plot(sqreTot(:,1))
+% figure()
+% plot(signal,'r')
+% 
+% figure()
+% plot(sqreTot(:,1))
 
 figure()
 plot(model,'b');
