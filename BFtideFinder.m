@@ -55,11 +55,11 @@ if PLOT == 1
 % figure()
 % plot(signal,'r')
 % 
-% figure()
-% plot(sqreTot(:,1))
+figure()
+plot(sqreTot(:,1))
 
 figure()
-plot(model,'b');
+plot(model,'k');
 hold on;
 plot(tideSig,'r');
 title('Brute Force');

@@ -24,10 +24,10 @@ signal = signalGenerator(stock, RANSTEP, FAKER, REALER, 0, A, P, ph);
 modLen = 200;
 
 % verify bin is working
-
+% 
 % LowX1 = 1;
 % HighX1 = 500;
-% sampleSize = 500;
+% sampleSize = 1000;
 % shiftSize = 1;
 % x1ph = signal;
 % 
@@ -91,14 +91,14 @@ modLen = 200;
 % axis tight
 % shading interp;
 % colorbar;
-% set(gca,'xlim',[20 100])
+% set(gca,'xlim',[20 400])
 % shading interp;
 % colorbar;
 % 
 % az = 0;
 % el = 90;
 % view(az, el);
-
+% 
 figure()
 plot(signal)
 
@@ -111,7 +111,7 @@ plot(signal)
 
 % [totalX] = twoDMapOfTurtles(signal);
 
-% HeatMapofTurtles(signal);
+HeatMapofTurtles(signal);
 
 % [theta] = BFtideFinder(signal, modLen, PLOT,  A, P);
 

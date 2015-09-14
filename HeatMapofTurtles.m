@@ -2,7 +2,7 @@
 function [] = HeatMapofTurtles(signal)
 
 x1ph = signal;
-sampleSize = 1500;
+sampleSize = 1990;
 leftOver = 2000-sampleSize;
 fs = 1;
 surfer = [];
