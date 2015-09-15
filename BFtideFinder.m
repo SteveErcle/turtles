@@ -1,21 +1,16 @@
-function [theta] = BFtideFinder(signal, modLen, PLOT, A, P)
+function [theta] = BFtideFinder(filt_signal_mod_against, A, P)
+
+tideFiltered = filt_signal_mod_against;
+tideFiltd = diff(tideFiltered);
 
 
-signal = Filterer(signal);
-
-theta = zeros(1,length(P))
-
-tideSig = signal(1:modLen+1);
-tideSigd = diff(tideSig);
+theta = zeros(1,length(P));
+t = 1:length(tideFiltered);
 
 res = .01;
-t = 0:modLen;
 
 sqre = [];
 sqreTot = [];
-
-size(tideSig)
-size(t)
 
 
 for w = 1:3
@@ -25,14 +20,14 @@ for w = 1:3
             
             theta(i) = j;
             
-            model = mean(tideSig);
+            model = mean(tideFiltered);
             for k = 1:length(theta)
                 model = model + A(k)*cos(2*pi*1/P(k)*t + theta(k));
             end
      
             modeld = diff(model);
             
-            errorTerm = [sum((tideSigd - modeld).^2), theta];
+            errorTerm = [sum((tideFiltd - modeld).^2), theta];
             sqre = [sqre; errorTerm];
             
         end
@@ -44,24 +39,5 @@ for w = 1:3
     end
 end
 
-
-model = mean(tideSig);
-for k = 1:length(theta)
-    model = model + A(k)*cos(2*pi*1/P(k)*t + theta(k));
-end
-
-if PLOT == 1
-
-% figure()
-% plot(signal,'r')
-% 
-figure()
-plot(sqreTot(:,1))
-
-figure()
-plot(model,'k');
-hold on;
-plot(tideSig,'r');
-title('Brute Force');
 
 end 
