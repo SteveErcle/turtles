@@ -53,7 +53,11 @@ plotPred(sigPred, modLen, model_predict);
 title('BF')
 
 
+[Total] = percentReturn(sigPred, modLen, model_predict, 1, 0)
 
-% HeatMapofTurtles(signal);
+
+
+
+HeatMapofTurtles(signal);
 % [totalX] = twoDMapOfTurtles(signal);
 % [theta] = BFtideFinder(signal, modLen, PLOT,  A, P);

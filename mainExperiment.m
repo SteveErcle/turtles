@@ -7,7 +7,7 @@ clear all; close all; clc;
 
 stock = 'ABT';
 
-RANSTEP = 1;
+RANSTEP = 0;
 FAKER = 0;
 REALER = 1;
 PLOT = 1;
@@ -15,7 +15,7 @@ PLOT = 1;
 
 filt = 0.3;
 modLen = 178;
-predLen = 50;
+predLen = 1;
 
 surfer = [];
 
@@ -41,13 +41,13 @@ plot(signal)
 
 figure()
 
-col = hsv(50);
+col = hsv(100);
 icl = 1;
 
+perRet = [];
 
 
-
-for day = 601:1:650
+parfor day = 601:1:700
 
 
 sigMod  = signalFilt(day : day  + modLen);
@@ -61,27 +61,33 @@ sigPred = signalFilt(day : day  + modLen+predLen);
 % [model_predict] = modelConstruction(sigPred, modLen, theta, A, P);
 % plotPred(sigPred, modLen, model_predict);
 % title('GD')
-
-
+% 
+% 
 [theta] = BFtideFinder(sigMod, A, P);
 [model_predict] = modelConstruction(sigPred, modLen, theta, A, P);
 % plotPred(sigPred, modLen, model_predict);
 
-t = 1:length(model_predict);
-
-plot(day+t, sigPred, 'k')
-hold on;
-plot(day+t(1:modLen),model_predict(1:modLen), 'color',col(icl,:))
-hold on;
-plot(day+t(modLen:end),model_predict(modLen:end), 'color',col(icl,:))
-hold on;
-icl = icl + 1;
+% t = 1:length(model_predict);
+% 
+% plot(day+t, sigPred, 'k')
+% hold on;
+% plot(day+t(1:modLen),model_predict(1:modLen), 'color',col(icl,:))
+% hold on;
+% plot(day+t(modLen:end),model_predict(modLen:end), 'color',col(icl,:))
+% hold on;
+% icl = icl + 1;
 
 
 title('BF')
 hold on;
 
 surfer = [surfer; model_predict];
+
+Total = percentReturn(sigPred, modLen, model_predict, 1, 0)
+
+perRet = [perRet; Total];
+
+
     
 
 end 
@@ -99,6 +105,8 @@ az = 0;
 el = 90;
 view(az, el);
 
+figure()
+plot(perRet)
 
 
 % [totalX] = twoDMapOfTurtles(signal);
