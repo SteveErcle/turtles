@@ -3,14 +3,15 @@ clear all; close all; clc;
 
 stock = 'ABT';
 
+
 RANSTEP = 0;
 FAKER = 0;
 REALER = 1;
 PLOT = 1;
 
-filt = 0.3;
-modLen = 200;
-predLen = 50;
+filt = 0.15;
+modLen = 500;
+predLen = 100;
 day = 1;
 
 if FAKER == 1
@@ -34,11 +35,42 @@ signal = signalGenerator(stock, RANSTEP, FAKER, REALER, 0, A, P, ph);
 signalFilt = getFiltered(signal, filt);
 
 
+%% ----
+
+deg_filt = 5;                   % Enter order of filter
+norm_freqz = 0.005;  % Enter strength of filter
+
+[b a] = butter(deg_filt,norm_freqz, 'high');
+signalHIGH = filtfilt(b,a,signal);
+
+% signalFilt = signalHIGH;
+
+signalFilt = getFiltered(signalHIGH, filt);
+
+% plot(signalHIGH)
+% 
+% hold on;
+% 
+% plot(signal,'r')
+
+
+%%
+
+
+
+
 sigMod  = signalFilt(day : day  + modLen);
 sigPred = signalFilt(day : day  + modLen+predLen);
+sigUnFilt = signal(day : day  + modLen+predLen);
+
+
+
+
 
 figure()
 plot(signal)
+hold on;
+plot(signalFilt,'k')
 
 figure()
 [theta] = GDtideFinder(sigMod, A, P);
@@ -46,18 +78,70 @@ figure()
 plotPred(sigPred, modLen, model_predict);
 title('GD')
 
+evalGD = Evaluator(sigPred, modLen, model_predict);
+evalGD.Total = evalGD.percentReturn()
+
+% hold on;
+% plot(sigUnFilt,'color',[0,0.65,0]);
+
+
+
+% figure(10)
+% plot(diff(sigPred),'r');
+% hold on;
+% plot(diff(model_predict),'k');
+
+
+
+    
+
+
+
+
 figure()
 [theta] = BFtideFinder(sigMod, A, P);
 [model_predict] = modelConstruction(sigPred, modLen, theta, A, P);
 plotPred(sigPred, modLen, model_predict);
 title('BF')
 
+evalBF = Evaluator(sigPred, modLen, model_predict);
+evalBF.Total = evalBF.percentReturn()
 
-[Total] = percentReturn(sigPred, modLen, model_predict, 1, 0)
+% hold on;
+% plot(sigUnFilt,'color',[0,0.65,0]);
+
+% 
+% figure(11)
+% plot(diff(sigPred),'r');
+% hold on;
+% plot(diff(model_predict),'k');
+% 
+% 
+
+
+% B = [];
+% 
+% sigPred;
+% model_predict;
+% 
+% A = sigPred
+% Z = model_predict
+% newB = [];
+% for i = 2:length(sigPred)
+%     B =  [B; (A(i) - A(i-1))];
+%     newB = [newB; (Z(i) - Z(i-1))];
+%     
+% end 
+% 
+% figure()
+% plot(B,'r')
+% hold on;
+% plot(newB,'b');
 
 
 
 
-HeatMapofTurtles(signal);
+
+HeatMapofTurtles(signalFilt);
 % [totalX] = twoDMapOfTurtles(signal);
 % [theta] = BFtideFinder(signal, modLen, PLOT,  A, P);

@@ -1,4 +1,6 @@
-function [Total] = percentReturn(obj, sigPred, modLen, model_predict, stop_loss, one_trade)
+function [Total] = percentReturn(obj)
+
+% , sigPred, modLen, model_predict, stop_loss, one_trade)
 
 
 %% Finds the percent return from long buys and short sales
@@ -19,6 +21,13 @@ function [Total] = percentReturn(obj, sigPred, modLen, model_predict, stop_loss,
 % yhl(:,2) = yHIGH; %dataH_fut;
 % yhl(:,3) = yLOW; %dataL_fut;
 
+
+sigPred = obj.sigPred;
+modLen = obj.modLen;
+model_predict = obj.model_predict;
+stop_loss = obj.stop_loss;
+one_trade = obj.one_trade;
+
 sigPred = sigPred(modLen:end);
 
 y = sigPred;
@@ -30,7 +39,7 @@ yhl(:,3) = sigPred;
 eq_test = model_predict(modLen:end);
 
 
-[tagged,imax,imin] = peakAndTrough(eq_test);
+[tagged,imax,imin] = obj.peakAndTrough(eq_test);
 
 actual = [];
 tagged;

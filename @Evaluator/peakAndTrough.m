@@ -1,5 +1,5 @@
 
-function [tagged,s_imax,s_imin] = peakAndTrough(graph)
+function [tagged,s_imax,s_imin] = peakAndTrough(obj, graph)
 
 %% Finds the index of peak and troughs
 % Organizes to be pasted to percentReturn();
