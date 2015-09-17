@@ -1,5 +1,6 @@
 clear all; close all; clc;
 
+fprintf('i like boys\n') %Ead's contribution
 
 stock = 'ABT';
 
