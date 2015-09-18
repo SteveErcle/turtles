@@ -22,6 +22,8 @@ classdef Evaluator
            
        end
        
+       
+       
       [Total] = percentReturn(obj);
       
       [tagged,s_imax,s_imin] = peakAndTrough(obj, graph);
