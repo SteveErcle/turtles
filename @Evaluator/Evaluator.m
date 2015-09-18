@@ -8,6 +8,7 @@ classdef Evaluator
        stop_loss = 1;
        one_trade = 0;
        Total;
+       Type;
        
    end
    

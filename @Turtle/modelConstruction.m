@@ -1,4 +1,4 @@
-function [model_predict] = modelConstruction(filt_signal_mod_and_pred_against, modLen, theta, A, P)
+function [model_predict] = modelConstruction(obj,theta)
 
 %% Constructs a sinosoid
 % Input the unfilted total signal (including part to predict against)
@@ -6,6 +6,11 @@ function [model_predict] = modelConstruction(filt_signal_mod_and_pred_against, m
 % prediction for 10 days
 
 
+filt_signal_mod_and_pred_against = obj.sigPred;
+modLen = obj.modLen;
+A = obj.A;
+P = obj.P;
+ 
 tideFiltered = filt_signal_mod_and_pred_against;
 
 avg = mean(tideFiltered(1:modLen));

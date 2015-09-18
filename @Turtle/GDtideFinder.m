@@ -1,9 +1,13 @@
-function [theta] = GDtideFinder(filt_signal_mod_against, A, P)
+function [theta] = GDtideFinder(obj)
 
 %% Finds the phases (thetas) 
 % finds phases for the given filtered signal of model length
 % amplitudes and periods
 % example: input a signal of 200 days, finds phases for those 200 days
+
+filt_signal_mod_against = obj.sigMod;
+A = obj.A;
+P = obj.P;
 
 tideFiltered = filt_signal_mod_against;
 

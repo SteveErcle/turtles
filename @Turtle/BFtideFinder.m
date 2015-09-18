@@ -1,4 +1,10 @@
-function [theta] = BFtideFinder(filt_signal_mod_against, A, P)
+function [theta] = BFtideFinder(obj)
+
+
+filt_signal_mod_against = obj.sigMod;
+A = obj.A;
+P = obj.P;
+
 
 tideFiltered = filt_signal_mod_against;
 tideFiltd = diff(tideFiltered);
