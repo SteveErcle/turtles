@@ -32,7 +32,7 @@ SigObj = SignalGenerator(stock, present, signal_length, RANSTEP, FAKER, REALER, 
 ix = [];
 
 
-daz = 537;
+daz = 623;
 
 day = daz;
 
@@ -41,11 +41,14 @@ signal = SigObj.getSignal();
 signalFilt = getFiltered(signal, filt, 'high');
 signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
 
-sigMod  = signalFilt(day : day  + modLen);
+sigModUf = signal(day : day  + modLen);
+sigMod = getFiltered(sigModUf, filt, 'high');
+sigMod = getFiltered(sigModUf, 0.123, 'low')+15;
+
 sigPred = signalFilt(day : day  + modLen+predLen);
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
-pred1.type = 1;
+pred1.type = 2;
 evalBF1 = pred1.predictTurtle('BF');
 evalBF1.Total;
 evalBF1.DVE();
@@ -67,7 +70,7 @@ sigPred = signalFilt(day : day  + modLen+predLen);
 % sigUnFiltPred = signal(day : day  + modLen+predLen);
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
-pred1.type = 1;
+pred1.type = 2;
 evalBF1 = pred1.predictTurtle('BF');
 evalBF1.Total;
 evalBF1.DVE();
