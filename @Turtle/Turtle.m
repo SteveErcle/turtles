@@ -34,7 +34,7 @@ classdef Turtle
             eval = Evaluator(obj.sigPred, obj.modLen, model_predict);
             eval.Total = eval.percentReturn();
             eval.Type = eval_Type_String;
-            eval.model_predict = model_predict;
+    
             
         end
         

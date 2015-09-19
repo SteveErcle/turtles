@@ -14,7 +14,7 @@ present = 2100;
 signal_length = 2000;
 modLen = 1000;
 predLen = 100;
-day = 500;
+day = 250;
 
 if FAKER == 1
     A = [0.5, 1, 1.5, 2, 4, 7]/4
@@ -83,7 +83,7 @@ lse2 = sum((dmp-dsp).^2)
 evalBF.Total
 
 %% Peak Tester
-close all
+% close all
 clc
 EadStock = evalBF.sigPred;
 EadModel = evalBF.model_predict;
@@ -108,13 +108,89 @@ axis([0,1150,0.95,1])
 indices = [];
 for s = Modindexpeak
     [c index] = min(abs(Sigindexpeak-s));
-    indices = [indices; s-Sigindexpeak(index)]
+    indices = [indices; s-Sigindexpeak(index)];
 end
+
+% Wrapped MME into Evaluator class. There were some problems with the edges
+% of the data so some pre processing was necessary (always finding first
+% and last data point as a max or min when they were just the end of the
+% data
+
+sigPred = evalBF.sigPred;
+model_predict = evalBF.model_predict;
+
+
+ for i = 1:2
+               
+               if i == 1
+                   [Modindex,Modindexpeak,Modindextrough] = evalBF.peakAndTrough(model_predict(1:modLen));
+                   [Sigindex,Sigindexpeak,Sigindextrough] = evalBF.peakAndTrough(sigPred(1:modLen));
+               else
+                   [Modindex,Modindexpeak,Modindextrough] = evalBF.peakAndTrough(model_predict(modLen:end));
+                   [Sigindex,Sigindexpeak,Sigindextrough] = evalBF.peakAndTrough(sigPred(modLen:end));
+               end
+               
+               MME1 = [];
+               MME2 = [];
+               
+               if Modindexpeak(1) > Modindextrough(1)
+                   Modindextrough(1) = [];
+               else
+                   Modindexpeak(1) = [];
+               end
+               
+               if Modindexpeak(end) < Modindextrough(end)
+                   Modindextrough(end) = [];
+               else
+                   Modindexpeak(end) = [];
+               end
+               
+               if Sigindexpeak(1) > Sigindextrough(1)
+                   Sigindextrough(1) = [];
+               else
+                   Sigindexpeak(1) = [];
+               end
+               
+               if Sigindexpeak(end) < Sigindextrough(end)
+                   Sigindextrough(end) = [];
+               else
+                   Sigindexpeak(end) = [];
+               end
+               
+     
+               for m = Modindexpeak
+                   MME1 = [MME1; (min(abs((m - Sigindexpeak))))];
+               end
+               
+               for m = Modindextrough
+                   MME2 = [MME2; (min(abs((m - Sigindextrough))))];
+               end
+               
+               if i == 1
+                   modMME1 = MME1;
+                   modMME2 = MME2;
+               else
+                   predMME1 = MME1;
+                   predMME2 = MME2;
+               end
+ end 
+ 
+ % Wrapped version below. evalBF.MME() returns the model MME and the
+ % predMME (squared error).
+
+ [evalBF.modMME, evalBF.predMME] = evalBF.MME()
+ 
+ 
+ % Answer not correlating to good answer because sometimes the
+ % signal has more or less peaks. Maybe we have to filter the answer one
+ % more time to get equal number of peaks and troughs
+
+
 
 %%
 
 
- HeatMapofTurtles(signalFilt);
+%  HeatMapofTurtles(signalFilt);
 % [totalX] = twoDMapOfTurtles(signal);
 
 %% Thoughts

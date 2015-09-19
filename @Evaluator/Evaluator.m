@@ -9,6 +9,8 @@ classdef Evaluator
        one_trade = 0;
        Total;
        Type;
+       modMME;
+       predMME;
        
    end
    
@@ -22,11 +24,16 @@ classdef Evaluator
            
        end
        
-       
-       
+           
       [Total] = percentReturn(obj);
       
+      [modMME, predMME, modMMElist, predMMElist] = MME(obj);
+      
+      
+      
       [tagged,s_imax,s_imin] = peakAndTrough(obj, graph);
+      
+      
        
    end  
     

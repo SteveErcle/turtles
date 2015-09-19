@@ -33,14 +33,20 @@ for w = 1:3
      
             modeld = diff(model);
             
-            errorTerm = [sum((tideFiltd - modeld).^2), theta];
+            cost = sum((tideFiltd - modeld).^2);
+            
+%             cost = sum(((tideFiltd - modeld).^2).* linspace(1,3,length(modeld)));
+            
+            errorTerm = [cost, theta];
             sqre = [sqre; errorTerm];
+            
             
         end
         
         theta(i) = sqre(find(sqre == min(sqre(:,1))),i+1);
         sqreTot = [sqreTot; sqre];
         sqre = [];
+        
         
     end
 end
