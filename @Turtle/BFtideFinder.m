@@ -44,7 +44,7 @@ for w = 1:2
             logGrowth(end) = logGrowth(end-1);
 
             offset = 1;
-            scale  = 50;
+            scale  = 100;
             
             adjuster = offset + scale*(logGrowth-min(logGrowth))/(range(logGrowth));
             
