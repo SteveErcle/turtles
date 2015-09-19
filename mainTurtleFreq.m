@@ -32,7 +32,7 @@ SigObj = SignalGenerator(stock, present, signal_length, RANSTEP, FAKER, REALER, 
 ix = [];
 
 
-daz = 529;
+daz = 537;
 
 day = daz;
 
@@ -67,7 +67,7 @@ sigPred = signalFilt(day : day  + modLen+predLen);
 % sigUnFiltPred = signal(day : day  + modLen+predLen);
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
-pred1.type = 2;
+pred1.type = 1;
 evalBF1 = pred1.predictTurtle('BF');
 evalBF1.Total;
 evalBF1.DVE();
