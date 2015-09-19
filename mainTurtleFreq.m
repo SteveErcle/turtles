@@ -13,8 +13,8 @@ filt = 0.005;
 present = 2400;
 signal_length = 2300;
 modLen = 1000;
-predLen = 25;
-day = 1000;
+predLen = 100;
+day = 230;
 
 if FAKER == 1
     A = [0.5, 1, 1.5, 2, 4, 7]/4
@@ -30,6 +30,7 @@ SigObj = SignalGenerator(stock, present, signal_length, RANSTEP, FAKER, REALER, 
 
 %% Run
 
+
 signal = SigObj.getSignal();
 
 signalFilt = getFiltered(signal, filt, 'high');
@@ -43,33 +44,36 @@ sigMod  = signalFilt(day : day  + modLen);
 sigPred = signalFilt(day : day  + modLen+predLen);
 sigUnFiltPred = signal(day : day  + modLen+predLen);
 
-
-pred = Turtle(sigMod, sigPred, modLen, A, P);
-
-evalBF = pred.predictTurtle('BF');
-evalBF.Total
-
-
-FindFiltIntensity = Evaluator(1,1,evalBF.model_predict);
-
-[tag1] = FindFiltIntensity.peakAndTrough(FindFiltIntensity.model_predict);
-target_num_of_extrema = length(tag1)
-
-signal = SigObj.getSignal();
-signalHighPass = getFiltered(signal, filt, 'high');
-sigHigh = signalHighPass(day : day  + modLen+predLen)+15;
+pred1 = Turtle(sigMod, sigPred, modLen, A, P);
+pred1.type = 1;
+evalBF1 = pred1.predictTurtle('BF');
+evalBF1.Total
+evalBF1.DVE()
 
 
-for filt_intensity = 0.075: 0.001:0.175
-    sigHighLow = getFiltered(sigHigh, filt_intensity, 'low');
-    [tag1, max1, min1] = FindFiltIntensity.peakAndTrough(sigHighLow);
-    if abs(length(tag1) - target_num_of_extrema) <= 1
-        found_filt_intensity = filt_intensity;
-        break
-    end
-end
+sigPred = evalBF1.sigPred;
+model_predict = evalBF1.model_predict;
 
-found_filt_intensity
+mp = model_predict(modLen:end);
+sp = sigPred(modLen:end);
+
+[Modindex,Modindexpeak,Modindextrough] = evalBF1.peakAndTrough(mp);
+[Sigindex,Sigindexpeak,Sigindextrough] = evalBF1.peakAndTrough(sp);
+
+Sigindex
+Modindex
+
+% pred2 = Turtle(sigMod, sigPred, modLen, A, P);
+% pred2.type = 2;
+% evalBF2 = pred2.predictTurtle('BF');
+% evalBF2.Total
+% evalBF2.DVE()
+
+
+hold on;
+plot(sigUnFiltPred-8,'c')
+
+
 
 % HeatMapofTurtles(signalFilt);
 % [totalX] = twoDMapOfTurtles(signal);
@@ -77,5 +81,8 @@ found_filt_intensity
 %% Thoughts
 
 % Find best method for determining phases
+% BF finder parfor and w = 1:3 or 1:2
+
 % test against a control
-% creat evaluator
+
+

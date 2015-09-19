@@ -45,43 +45,27 @@ clear all
 close all
 clc
 
-
-stock = 'ABT';
-
-
-RANSTEP = 0;
-FAKER = 0;
-REALER = 1;
-PLOT = 1;
-
-filt = 0.3;
-modLen = 200;
-predLen = 50;
-day = 1600;
-
-if FAKER == 1
-    A = [0.5, 1, 1.5, 2, 4, 7]/4;
-    P = [24, 31, 52, 84, 122, 543];
-elseif REALER == 1
-    A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67]
-    P = [18 25 34 43 62 99 142 178]
-end
-ph = [1.5, 2.4, 0.4, 1.2 , .9, 1.2, 1.3, 4.5];
+A = [1 2 3 2 1 5 2 10 3 5 4 5 3 2 2 6 7  2 2 1 4 5]
 
 
-signal = signalGenerator(stock, RANSTEP, FAKER, REALER, 0, A, P, ph);
+spacing = linspace(0,1,length(A));
+
+logGrowth = (-log(1-spacing.^4))
+
+logGrowth(end) = logGrowth(end-1)
 
 
+offset = 1;
+scale  = 0.1;
 
-deg_filt = 5;                   % Enter order of filter
-norm_freqz = 0.005;  % Enter strength of filter
+adjuster = offset + scale*(logGrowth-min(logGrowth))/(range(logGrowth))
 
-[b a] = butter(deg_filt,norm_freqz, 'high');
-signalHIGH = filtfilt(b,a,signal);
+plot(adjuster)
 
-plot(signalHIGH)
+B = A.*adjuster
 
+figure()
+plot(A,'r')
 hold on;
-
-plot(signal,'r')
+plot(B)
 
