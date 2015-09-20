@@ -36,95 +36,59 @@ ix = [];
 % ok @ 1050
 % bad @ 1100
 
+load('evalBFtest.mat')
 
-% daz = 475;
+evalBFgood.sigPred;
+
+goodStd = std(evalBFgood.sigPred)/mean(evalBFgood.sigPred)
+
+[modMME, predMME, modMMElist, predMMElist] = evalBFgood.MME()
+
+predGood = Turtle(1, evalBFgood.sigPred, evalBFgood.modLen, 1,1);
+
+predGood.plotPred(evalBFgood.model_predict)
+ 
+% for i = 1:3
+%     
+% if i == 1
+%     day = 230
+% elseif i == 2
+%     day = 1050
+% elseif i == 3
+%     day = 1100 
+% end
 % 
-% day = daz;
-
-signal = SigObj.getSignal();
-
-plot(signal)
-
-signalFilt = getFiltered(signal, filt, 'high');
-signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
-
-sigMod = signal(day : day  + modLen);
-% sigMod = getFiltered(sigMod, filt, 'high');
-% sigMod = getFiltered(sigModUf, 0.123, 'low')+15;
-
-% sigMod must be cut and then filtered or else using future knowledge
-
-sigPred = signalFilt(day : day  + modLen+predLen);
-
-pred1 = Turtle(sigMod, sigPred, modLen, A, P);
-pred1.type = 1;
-evalBF1 = pred1.predictTurtle('BF');
-evalBF1.Total
-evalBF1.DVE();
-std(evalBF1.sigPred)/mean(evalBF1.sigPred);
-
-% parfor day = daz : daz+10
-% 
+%     
 % signal = SigObj.getSignal();
+% 
+% plot(signal)
 % 
 % signalFilt = getFiltered(signal, filt, 'high');
 % signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
 % 
-% % plot(signalFilt)
-% % hold on;
-% % plot(signal)
+% sigMod = signal(day : day  + modLen);
 % 
-% sigMod  = signalFilt(day : day  + modLen);
 % sigPred = signalFilt(day : day  + modLen+predLen);
-% % sigUnFiltPred = signal(day : day  + modLen+predLen);
 % 
 % pred1 = Turtle(sigMod, sigPred, modLen, A, P);
-% pred1.type = 2;
-% evalBF1 = pred1.predictTurtle('BF');
-% evalBF1.Total;
-% evalBF1.DVE();
-% std(evalBF1.sigPred)/mean(evalBF1.sigPred);
-% % fft
+% pred1.type = 1;
+% evalBF = pred1.predictTurtle('BF');
+% evalBF.Total
+% evalBF.DVE()
+% std(evalBF.sigPred)/mean(evalBF.sigPred);
 % 
-% 
-% sigPred = evalBF1.sigPred;
-% model_predict = evalBF1.model_predict;
-% 
-% mp = model_predict(modLen:end);
-% sp = sigPred(modLen:end);
-% 
-% [Modindex,Modindexpeak,Modindextrough] = evalBF1.peakAndTrough(mp);
-% [Sigindex,Sigindexpeak,Sigindextrough] = evalBF1.peakAndTrough(sp);
-% 
-% Sigindex;
-% Modindex;
-% 
-% SMx = [Sigindex(2)-1, Modindex(2)-1, Modindex(2) - Sigindex(2), day];
-% 
-% ix = [ix; SMx];
-% 
-% 
+% if i == 1
+%     evalBFgood = evalBF;
+% elseif i == 2
+%     evalBFok = evalBF;
+% elseif i == 3
+%     evalBFbad = evalBF; 
+% end
 % 
 % end 
-
-ix
-
-% Recalculator
-
-% pred2 = Turtle(sigMod, sigPred, modLen, A, P);
-% pred2.type = 2;
-% evalBF2 = pred2.predictTurtle('BF');
-% evalBF2.Total
-% evalBF2.DVE()
+% 
 
 
-% hold on;
-% plot(sigUnFiltPred-8,'c')
-
-
-
-% HeatMapofTurtles(signalFilt);
-% [totalX] = twoDMapOfTurtles(signal);
 
 %% Thoughts
 
