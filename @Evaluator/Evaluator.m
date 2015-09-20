@@ -24,7 +24,7 @@ classdef Evaluator
            
        end
        
-       function [modDVE, predDVE] = DVE(obj)
+       function [modDVE, predDVE, modDVElist, predDVElist] = DVE(obj)
            
            mm = obj.model_predict(1:obj.modLen);
            mp = obj.model_predict(obj.modLen:end);
@@ -36,9 +36,13 @@ classdef Evaluator
            dsm = diff(sm);
            dsp = diff(sp);
            
-           modDVE = sum((dmm-dsm).^2);
+           modDVElist = (dmm-dsm).^2;
            
-           predDVE = sum((dmp-dsp).^2);
+           modDVE = sum(modDVElist);
+           
+           predDVElist = (dmp-dsp).^2;
+           
+           predDVE = sum(predDVElist);
 
        end 
        

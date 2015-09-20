@@ -14,6 +14,11 @@ for i = 1:2
         [Sigindex,Sigindexpeak,Sigindextrough] = obj.peakAndTrough(sigPred(modLen:end));
     end
     
+%     Modindexpeak'
+%     Sigindexpeak'
+%     Modindextrough'
+%     Sigindextrough'
+    
     MME = [];
     
     if Modindexpeak(1) > Modindextrough(1)
@@ -40,6 +45,10 @@ for i = 1:2
         Sigindexpeak(end) = [];
     end
     
+%     Modindexpeak'
+%     Sigindexpeak'
+%     Modindextrough'
+%     Sigindextrough'
     
     for m = Modindexpeak
         MME = [MME; (min(abs((m - Sigindexpeak)))).^2];
