@@ -21,8 +21,9 @@ if FAKER == 1
     P = [24, 31, 52, 84, 122, 543];
 elseif REALER == 1
     A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67];
+%     P = [18 25 31 43 62 99 142 178];
     P = [18 25 34 43 62 99 142 178];
-    P = [18 25 31 43 56 89 157 178];
+   
 end
 ph = [1.5, 2.4, 0.4, 1.2 , .9, 1.2, 1.3, 4.5];
 
@@ -53,7 +54,7 @@ end
     
 signal = SigObj.getSignal();
 
-plot(signal)
+% plot(signal)
 
 signalFilt = getFiltered(signal, filt, 'high');
 signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
@@ -80,8 +81,7 @@ end
 end 
 
 
-
-close all;
+figure()
 
 
 trackAll = [];
