@@ -115,8 +115,6 @@ track = [Total; Std; modDVE; predDVE; closeModDVE]
 trackAll = [trackAll, track];
 
 
-
-
 x1 = eval.sigPred(1:eval.modLen);
 ss = length(x1);
 x1 = x1.*hanning(length(x1))';
@@ -171,5 +169,4 @@ end
 % BF finder parfor and w = 1:3 or 1:2
 
 % test against a control
-
 

@@ -6,140 +6,97 @@
 clear all; close all; clc;
 
 
+%% Declare
+
+stock = 'ABT';
+
+RANSTEP = 0;
+FAKER   = 0;
+REALER  = 1;
+
+filt = 0.005;
+present = 2400;
+signal_length = 2300;
+modLen = 1000;
+predLen = 1;
+day = 500;
+
+if FAKER == 1
+    A = [0.5, 1, 1.5, 2, 4, 7]/4;
+    P = [24, 31, 52, 84, 122, 543];
+elseif REALER == 1
+    A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67];
+%     P = [18 25 31 43 62 99 142 178];
+    P = [18 25 34 43 62 99 142 178];
+   
+end
+ph = [1.5, 2.4, 0.4, 1.2 , .9, 1.2, 1.3, 4.5];
+
+%% Initialize
+SigObj = SignalGenerator(stock, present, signal_length, RANSTEP, FAKER, REALER, ph, A, P);
+
+%% Run
+ix = [];
 
 
-t = 1:100;
 
-y = cos(2*pi/20*t);
-
-
-mLen = 20;
-
-x = cos(2*pi/24*t + 0.2);
+%% Testing recalculator
 
 
+ix = [];
 
-testEval = Evaluator(y, mLen, x)
+totals = [];
+daz = 500;
 
-[tag1, max1, min1] = testEval.peakAndTrough(y);
-[tag2, max2, min2] = testEval.peakAndTrough(x);
+day = daz;
+
+signal = SigObj.getSignal();
+
+signalFilt = getFiltered(signal, filt, 'high');
+signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
+
+sigMod = signal(day : day  + modLen);
+sigPred = signalFilt(day : day  + modLen+predLen);
+
+pred1 = Turtle(sigMod, sigPred, modLen, A, P);
+pred1.type = 2;
+evalBF1 = pred1.predictTurtle('BF');
+evalBF1.Total
+evalBF1.DVE();
+std(evalBF1.sigPred)/mean(evalBF1.sigPred);
+
+parfor day = daz : daz+100
+
+signal = SigObj.getSignal();
+
+signalFilt = getFiltered(signal, filt, 'high');
+signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
+
+sigMod  = signalFilt(day : day  + modLen);
+sigPred = signalFilt(day : day  + modLen+predLen);
+
+pred1 = Turtle(sigMod, sigPred, modLen, A, P);
+pred1.type = 2;
+evalBF1 = pred1.predictTurtle('BF');
+evalBF1.Total;
+evalBF1.DVE();
+std(evalBF1.sigPred)/mean(evalBF1.sigPred);
+
+slope = diff(evalBF1.model_predict);
+day
+slope = abs(slope(end))
+
+if slope > 0.0500
+    totals = [totals; evalBF1.Total];
+end
+
+end 
+
+
+totals
+
+sum(totals)
 
 
 
 
-
-% 
-% stock = 'ABT';
-% 
-% RANSTEP = 0;
-% FAKER = 0;
-% REALER = 1;
-% PLOT = 1;
-% 
-% 
-% filt = 0.3;
-% modLen = 178;
-% predLen = 1;
-% 
-% surfer = [];
-% 
-% 
-% present = 2100;
-% signal_length = 2000;
-% if FAKER == 1
-%     A = [0.5, 1, 1.5, 2, 4, 7]/4;
-%     P = [24, 31, 52, 84, 122, 543];
-% elseif REALER == 1
-%     A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67]
-%     P = [18 25 34 43 62 99 142 178]
-% end
-% ph = [1.5, 2.4, 0.4, 1.2 , .9, 1.2, 1.3, 4.5];
-% 
-% % How do we get percent return on this heat map?
-% 
-% SigObj = SignalGenerator(stock, present, signal_length, RANSTEP, FAKER, REALER, ph, A, P);
-% signal = SigObj.getSignal();
-% 
-% signalFilt = getFiltered(signal, filt, 'low');
-% 
-% 
-% figure()
-% plot(signal)
-% 
-% figure()
-% 
-% col = hsv(100);
-% icl = 1;
-% 
-% perRet = [];
-% 
-% 
-% parfor day = 601:1:700
-% 
-% 
-% sigMod  = signalFilt(day : day  + modLen);
-% sigPred = signalFilt(day : day  + modLen+predLen);
-% 
-% 
-% % HeatMapofTurtles(signalFilt);
-% 
-% % figure()
-% % [theta] = GDtideFinder(sigMod, A, P);
-% % [model_predict] = modelConstruction(sigPred, modLen, theta, A, P);
-% % plotPred(sigPred, modLen, model_predict);
-% % title('GD')
-% % 
-% % 
-% [theta] = BFtideFinder(sigMod, A, P);
-% [model_predict] = modelConstruction(sigPred, modLen, theta, A, P);
-% % plotPred(sigPred, modLen, model_predict);
-% 
-% % t = 1:length(model_predict);
-% % 
-% % plot(day+t, sigPred, 'k')
-% % hold on;
-% % plot(day+t(1:modLen),model_predict(1:modLen), 'color',col(icl,:))
-% % hold on;
-% % plot(day+t(modLen:end),model_predict(modLen:end), 'color',col(icl,:))
-% % hold on;
-% % icl = icl + 1;
-% 
-% 
-% title('BF')
-% hold on;
-% 
-% surfer = [surfer; model_predict];
-% 
-% Total = percentReturn(sigPred, modLen, model_predict, 1, 0)
-% 
-% perRet = [perRet; Total];
-% 
-% 
-%     
-% 
-% end 
-
-% 
-% [m,n] = size(surfer)
-% x = 1:n;
-% y = 1:m;
-% 
-% ax0 = figure()%subplot(3,1,1);
-% surf( x , y , surfer )
-% shading interp;
-% colorbar;
-% az = 0;
-% el = 90;
-% view(az, el);
-% 
-% figure()
-% plot(perRet)
-% 
-% 
-% % [totalX] = twoDMapOfTurtles(signal);
-% % [theta] = BFtideFinder(signal, modLen, PLOT,  A, P);
-% 
-% 
-% 
-% 
-% 
