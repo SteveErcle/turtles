@@ -56,7 +56,7 @@ logGrowth(end) = logGrowth(end-1)
 
 
 offset = 1;
-scale  = 0.1;
+scale  = 1;
 
 adjuster = offset + scale*(logGrowth-min(logGrowth))/(range(logGrowth))
 

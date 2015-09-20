@@ -14,7 +14,7 @@ present = 2400;
 signal_length = 2300;
 modLen = 1000;
 predLen = 100;
-day = 500;
+day = 1050;
 
 if FAKER == 1
     A = [0.5, 1, 1.5, 2, 4, 7]/4
@@ -32,71 +32,80 @@ SigObj = SignalGenerator(stock, present, signal_length, RANSTEP, FAKER, REALER, 
 ix = [];
 
 
-daz = 623;
+% good @ 230
+% ok @ 950
+% bad @ 1100
 
-day = daz;
+
+% daz = 475;
+% 
+% day = daz;
 
 signal = SigObj.getSignal();
+
+plot(signal)
 
 signalFilt = getFiltered(signal, filt, 'high');
 signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
 
-sigModUf = signal(day : day  + modLen);
-sigMod = getFiltered(sigModUf, filt, 'high');
-sigMod = getFiltered(sigModUf, 0.123, 'low')+15;
+sigMod = signal(day : day  + modLen);
+% sigMod = getFiltered(sigMod, filt, 'high');
+% sigMod = getFiltered(sigModUf, 0.123, 'low')+15;
+
+% sigMod must be cut and then filtered or else using future knowledge
 
 sigPred = signalFilt(day : day  + modLen+predLen);
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
-pred1.type = 2;
+pred1.type = 1;
 evalBF1 = pred1.predictTurtle('BF');
-evalBF1.Total;
+evalBF1.Total
 evalBF1.DVE();
 std(evalBF1.sigPred)/mean(evalBF1.sigPred);
 
-parfor day = daz : daz+10
-
-signal = SigObj.getSignal();
-
-signalFilt = getFiltered(signal, filt, 'high');
-signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
-
-% plot(signalFilt)
-% hold on;
-% plot(signal)
-
-sigMod  = signalFilt(day : day  + modLen);
-sigPred = signalFilt(day : day  + modLen+predLen);
-% sigUnFiltPred = signal(day : day  + modLen+predLen);
-
-pred1 = Turtle(sigMod, sigPred, modLen, A, P);
-pred1.type = 2;
-evalBF1 = pred1.predictTurtle('BF');
-evalBF1.Total;
-evalBF1.DVE();
-std(evalBF1.sigPred)/mean(evalBF1.sigPred);
-% fft
-
-
-sigPred = evalBF1.sigPred;
-model_predict = evalBF1.model_predict;
-
-mp = model_predict(modLen:end);
-sp = sigPred(modLen:end);
-
-[Modindex,Modindexpeak,Modindextrough] = evalBF1.peakAndTrough(mp);
-[Sigindex,Sigindexpeak,Sigindextrough] = evalBF1.peakAndTrough(sp);
-
-Sigindex;
-Modindex;
-
-SMx = [Sigindex(2)-1, Modindex(2)-1, Modindex(2) - Sigindex(2), day];
-
-ix = [ix; SMx];
-
-
-
-end 
+% parfor day = daz : daz+10
+% 
+% signal = SigObj.getSignal();
+% 
+% signalFilt = getFiltered(signal, filt, 'high');
+% signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
+% 
+% % plot(signalFilt)
+% % hold on;
+% % plot(signal)
+% 
+% sigMod  = signalFilt(day : day  + modLen);
+% sigPred = signalFilt(day : day  + modLen+predLen);
+% % sigUnFiltPred = signal(day : day  + modLen+predLen);
+% 
+% pred1 = Turtle(sigMod, sigPred, modLen, A, P);
+% pred1.type = 2;
+% evalBF1 = pred1.predictTurtle('BF');
+% evalBF1.Total;
+% evalBF1.DVE();
+% std(evalBF1.sigPred)/mean(evalBF1.sigPred);
+% % fft
+% 
+% 
+% sigPred = evalBF1.sigPred;
+% model_predict = evalBF1.model_predict;
+% 
+% mp = model_predict(modLen:end);
+% sp = sigPred(modLen:end);
+% 
+% [Modindex,Modindexpeak,Modindextrough] = evalBF1.peakAndTrough(mp);
+% [Sigindex,Sigindexpeak,Sigindextrough] = evalBF1.peakAndTrough(sp);
+% 
+% Sigindex;
+% Modindex;
+% 
+% SMx = [Sigindex(2)-1, Modindex(2)-1, Modindex(2) - Sigindex(2), day];
+% 
+% ix = [ix; SMx];
+% 
+% 
+% 
+% end 
 
 ix
 

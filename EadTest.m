@@ -14,7 +14,7 @@ present = 2100;
 signal_length = 2000;
 modLen = 1000;
 predLen = 100;
-day = 250;
+day = 350;
 
 if FAKER == 1
     A = [0.5, 1, 1.5, 2, 4, 7]/4
@@ -120,60 +120,60 @@ sigPred = evalBF.sigPred;
 model_predict = evalBF.model_predict;
 
 
- for i = 1:2
-               
-               if i == 1
-                   [Modindex,Modindexpeak,Modindextrough] = evalBF.peakAndTrough(model_predict(1:modLen));
-                   [Sigindex,Sigindexpeak,Sigindextrough] = evalBF.peakAndTrough(sigPred(1:modLen));
-               else
-                   [Modindex,Modindexpeak,Modindextrough] = evalBF.peakAndTrough(model_predict(modLen:end));
-                   [Sigindex,Sigindexpeak,Sigindextrough] = evalBF.peakAndTrough(sigPred(modLen:end));
-               end
-               
-               MME1 = [];
-               MME2 = [];
-               
-               if Modindexpeak(1) > Modindextrough(1)
-                   Modindextrough(1) = [];
-               else
-                   Modindexpeak(1) = [];
-               end
-               
-               if Modindexpeak(end) < Modindextrough(end)
-                   Modindextrough(end) = [];
-               else
-                   Modindexpeak(end) = [];
-               end
-               
-               if Sigindexpeak(1) > Sigindextrough(1)
-                   Sigindextrough(1) = [];
-               else
-                   Sigindexpeak(1) = [];
-               end
-               
-               if Sigindexpeak(end) < Sigindextrough(end)
-                   Sigindextrough(end) = [];
-               else
-                   Sigindexpeak(end) = [];
-               end
-               
-     
-               for m = Modindexpeak
-                   MME1 = [MME1; (min(abs((m - Sigindexpeak))))];
-               end
-               
-               for m = Modindextrough
-                   MME2 = [MME2; (min(abs((m - Sigindextrough))))];
-               end
-               
-               if i == 1
-                   modMME1 = MME1;
-                   modMME2 = MME2;
-               else
-                   predMME1 = MME1;
-                   predMME2 = MME2;
-               end
- end 
+%  for i = 1:2
+%                
+%                if i == 1
+%                    [Modindex,Modindexpeak,Modindextrough] = evalBF.peakAndTrough(model_predict(1:modLen));
+%                    [Sigindex,Sigindexpeak,Sigindextrough] = evalBF.peakAndTrough(sigPred(1:modLen));
+%                else
+%                    [Modindex,Modindexpeak,Modindextrough] = evalBF.peakAndTrough(model_predict(modLen:end));
+%                    [Sigindex,Sigindexpeak,Sigindextrough] = evalBF.peakAndTrough(sigPred(modLen:end));
+%                end
+%                
+%                MME1 = [];
+%                MME2 = [];
+%                
+%                if Modindexpeak(1) > Modindextrough(1)
+%                    Modindextrough(1) = [];
+%                else
+%                    Modindexpeak(1) = [];
+%                end
+%                
+%                if Modindexpeak(end) < Modindextrough(end)
+%                    Modindextrough(end) = [];
+%                else
+%                    Modindexpeak(end) = [];
+%                end
+%                
+%                if Sigindexpeak(1) > Sigindextrough(1)
+%                    Sigindextrough(1) = [];
+%                else
+%                    Sigindexpeak(1) = [];
+%                end
+%                
+%                if Sigindexpeak(end) < Sigindextrough(end)
+%                    Sigindextrough(end) = [];
+%                else
+%                    Sigindexpeak(end) = [];
+%                end
+%                
+%      
+%                for m = Modindexpeak
+%                    MME1 = [MME1; (min(abs((m - Sigindexpeak))))];
+%                end
+%                
+%                for m = Modindextrough
+%                    MME2 = [MME2; (min(abs((m - Sigindextrough))))];
+%                end
+%                
+%                if i == 1
+%                    modMME1 = MME1;
+%                    modMME2 = MME2;
+%                else
+%                    predMME1 = MME1;
+%                    predMME2 = MME2;
+%                end
+%  end 
  
  % Wrapped version below. evalBF.MME() returns the model MME and the
  % predMME (squared error).
