@@ -132,7 +132,9 @@ model_predict = evalBF.model_predict;
                
                MME1 = [];
                MME2 = [];
-               
+               %If this is a problem caused by the peakAndTrough code then
+               %I think the following pre-processing section should be added to to that
+               %function
                if Modindexpeak(1) > Modindextrough(1)
                    Modindextrough(1) = [];
                else
@@ -157,7 +159,8 @@ model_predict = evalBF.model_predict;
                    Sigindexpeak(end) = [];
                end
                
-     
+     %Doing it this way (i.e. without using the indices) does not take note of the signs of the difference,
+     %is this an issue?
                for m = Modindexpeak
                    MME1 = [MME1; (min(abs((m - Sigindexpeak))))];
                end
@@ -184,6 +187,9 @@ model_predict = evalBF.model_predict;
  % Answer not correlating to good answer because sometimes the
  % signal has more or less peaks. Maybe we have to filter the answer one
  % more time to get equal number of peaks and troughs
+ 
+ %Is discrepency in number of peaks really an issue? Can we not just base
+ %it on how close our peak is its closest peak?
 
 
 
@@ -197,4 +203,4 @@ model_predict = evalBF.model_predict;
 
 % Find best method for determining phases
 % test against a control
-% creat evaluator
+% create evaluator
