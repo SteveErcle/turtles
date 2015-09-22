@@ -22,18 +22,19 @@ function [Total] = percentReturn(obj)
 % yhl(:,3) = yLOW; %dataL_fut;
 
 
-sigPred = obj.sigPred;
+% sigPred = obj.sigPred;
+sigPredUnfilt = obj.sigPredUnfilt;
 modLen = obj.modLen;
 model_predict = obj.model_predict;
 stop_loss = obj.stop_loss;
 one_trade = obj.one_trade;
 
-sigPred = sigPred(modLen:end);
+sigPredUnfilt = sigPredUnfilt(modLen:end);
 
-y = sigPred;
-yhl(:,1) = sigPred;
-yhl(:,2) = sigPred;
-yhl(:,3) = sigPred;
+y = sigPredUnfilt;
+yhl(:,1) = sigPredUnfilt;
+yhl(:,2) = sigPredUnfilt;
+yhl(:,3) = sigPredUnfilt;
 
 
 eq_test = model_predict(modLen:end);

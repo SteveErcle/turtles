@@ -60,8 +60,8 @@ signalFilt = getFiltered(signal, filt, 'high');
 signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
 
 sigMod = signal(day : day  + modLen);
-
 sigPred = signalFilt(day : day  + modLen+predLen);
+sigPredUnfilt = signal(day : day  + modLen+predLen);
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
 pred1.type = 1;
@@ -81,10 +81,12 @@ end
 end 
 
 
-figure()
-
+close all
 
 trackAll = [];
+trackmodDVElist = [];
+trackpredDVElist = [];
+trackPnatlist = [];
 
 LowX1 = 100;
 HighX1 = 1850;
@@ -107,12 +109,15 @@ for i = 1:3
 Total = eval.Total
 Std = std(eval.sigPred)/mean(eval.sigPred);
 [modDVE, predDVE, modDVElist, predDVElist] = eval.DVE;
-closeModDVE = sum(modDVElist(end-20:end))
 
 
-track = [Total; Std; modDVE; predDVE; closeModDVE]
+
+track = [Total; Std; modDVE; predDVE]
 
 trackAll = [trackAll, track];
+
+trackmodDVElist = [trackmodDVElist; modDVElist];
+trackpredDVElist = [trackpredDVElist; predDVElist];
 
 
 x1 = eval.sigPred(1:eval.modLen);
@@ -122,9 +127,19 @@ x1 = [x1 zeros(1, 20000)];
 X1 = abs(fft(x1));
 X1 = X1(1:ceil(length(X1)/2));
 
+X1 = X1/(ss/4);
 Xt = 0:length(X1)-1;
 P = fs./ (Xt*(fs/length(x1)));
- [pkt It] = findpeaks(X1);
+[pkt It] = findpeaks(X1);
+It = It-1;
+
+pktItsort = [pkt', It'];
+pktItsort = sortrows(pktItsort,-1);
+
+Itk = pktItsort(:,2).';
+
+Pnatlist = fs./ (Itk*(fs/length(x1)));
+trackPnatlist = [trackPnatlist; Pnatlist(1:25)];
 
 
 
@@ -140,13 +155,57 @@ hold on;
 
 icl = icl + 1;
 
-axis([8 150 0 200])
+axis([8 150 0 0.75])
 
 
 
 
 end 
 
+P = [18 25 34 43 62 99 142 178];
+
+
+plot(P, ones(length(P),1)*0.5, '*');
+
+trackErrorPnatlist = [];
+errorPnat = [];
+
+for k = 1:3
+    for i = P
+        pm = abs(trackPnatlist(k,:)-i);
+        [mn ix] = min(pm);
+        errorPnat = [errorPnat; abs(i - trackPnatlist(k,ix))];
+    end
+    
+    trackErrorPnatlist = [trackErrorPnatlist; errorPnat'];
+    errorPnat = [];
+end
+
+
+
+t = trackmodDVElist';
+figure();
+plot(t);
+title('modDVE');
+legend('good','ok','bad');
+
+t = trackpredDVElist';
+figure();
+plot(t);
+title('predDVE');
+legend('good','ok','bad');
+
+% t = trackPnatlist';
+% figure();
+% plot(t);
+% title('Pnat');
+% legend('good','ok','bad');
+
+t = trackErrorPnatlist';
+figure();
+plot(P,t);
+title('ErrorPnat');
+legend('good','ok','bad');
 
 
 % [modMME, predMME, modMMElist, predMMElist] = evalBFgood.MME();

@@ -36,9 +36,8 @@ ph = [1.5, 2.4, 0.4, 1.2 , .9, 1.2, 1.3, 4.5];
 SigObj = SignalGenerator(stock, present, signal_length, RANSTEP, FAKER, REALER, ph, A, P);
 
 %% Run
+
 ix = [];
-
-
 
 %% Testing recalculator
 
@@ -46,37 +45,33 @@ ix = [];
 ix = [];
 
 totals = [];
-daz = 500;
+
+
+daz = 1100;
 
 day = daz;
 
 signal = SigObj.getSignal();
 
-signalFilt = getFiltered(signal, filt, 'high');
-signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
+parfor day = daz : daz+25
 
+sigPredUnfilt = signal(day : day  + modLen+predLen);
 sigMod = signal(day : day  + modLen);
-sigPred = signalFilt(day : day  + modLen+predLen);
+sigPred = signal(day : day  + modLen+predLen);
+
+sigMod = getFiltered(sigMod, filt, 'high');
+% sigMod = getFiltered(sigMod, 0.123, 'low');
+sigPred = getFiltered(sigPred, filt, 'high');
+% sigPred = getFiltered(sigPred, 0.123, 'low');
+
+sigPredUnfilt = sigPredUnfilt;
+sigMod = sigMod + 15;
+sigPred = sigPred + 15;
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
 pred1.type = 2;
-evalBF1 = pred1.predictTurtle('BF');
-evalBF1.Total
-evalBF1.DVE();
-std(evalBF1.sigPred)/mean(evalBF1.sigPred);
+pred1.sigPredUnfilt = sigPredUnfilt;
 
-parfor day = daz : daz+100
-
-signal = SigObj.getSignal();
-
-signalFilt = getFiltered(signal, filt, 'high');
-signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
-
-sigMod  = signalFilt(day : day  + modLen);
-sigPred = signalFilt(day : day  + modLen+predLen);
-
-pred1 = Turtle(sigMod, sigPred, modLen, A, P);
-pred1.type = 2;
 evalBF1 = pred1.predictTurtle('BF');
 evalBF1.Total;
 evalBF1.DVE();
@@ -84,9 +79,9 @@ std(evalBF1.sigPred)/mean(evalBF1.sigPred);
 
 slope = diff(evalBF1.model_predict);
 day
-slope = abs(slope(end))
+slope = abs(slope(end))/mean(evalBF1.model_predict)
 
-if slope > 0.0500
+if slope > 0.0033
     totals = [totals; evalBF1.Total];
 end
 

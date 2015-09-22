@@ -9,6 +9,7 @@ classdef Turtle
         A;
         P;
         type;
+        sigPredUnfilt;
     end
     
     methods
@@ -33,7 +34,8 @@ classdef Turtle
             plotPred(obj, model_predict);
           
             title(eval_Type_String);
-            eval = Evaluator(obj.sigPred, obj.modLen, model_predict);
+            
+            eval = Evaluator(obj.sigPred, obj.sigPredUnfilt, obj.modLen, model_predict);
             eval.Total = eval.percentReturn();
             eval.Type = eval_Type_String;
     

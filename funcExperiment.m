@@ -45,7 +45,8 @@ clear all
 close all
 clc
 
-A = [1 2 3 2 1 5 2 10 3 5 4 5 3 2 2 6 7  2 2 1 4 5]
+t = 1:1000;
+A = cos(2*pi/100*t);
 
 
 spacing = linspace(0,1,length(A));
@@ -56,7 +57,7 @@ logGrowth(end) = logGrowth(end-1)
 
 
 offset = 1;
-scale  = 1;
+scale  = 100;
 
 adjuster = offset + scale*(logGrowth-min(logGrowth))/(range(logGrowth))
 

@@ -11,17 +11,19 @@ classdef Evaluator
        Type;
        modMME;
        predMME;
+       sigPredUnfilt;
        
    end
    
    methods
        
-       function obj = Evaluator(sigPred, modLen, model_predict)
+       function obj = Evaluator(sigPred, sigPredUnfilt, modLen, model_predict)
            
            obj.sigPred = sigPred;
+           obj.sigPredUnfilt = sigPredUnfilt;
            obj.modLen = modLen;
            obj.model_predict = model_predict;
-           
+                
        end
        
        function [modDVE, predDVE, modDVElist, predDVElist] = DVE(obj)
