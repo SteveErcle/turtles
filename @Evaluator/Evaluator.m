@@ -17,12 +17,9 @@ classdef Evaluator
    
    methods
        
-       function obj = Evaluator(sig)
+       function obj = Evaluator(sigMod, sigFut, model, prediction)
            
-           obj.sigPred = sigPred;
-           obj.sigPredUnfilt = sigPredUnfilt;
-           obj.modLen = modLen;
-           obj.model_predict = model_predict;
+           
                 
        end
        
@@ -49,7 +46,7 @@ classdef Evaluator
        end 
        
        
-      [Total] = percentReturn(obj);
+      [Total] = percentReturn(obj, prediction, sigCmp);
       
       [modMME, predMME, modMMElist, predMMElist] = MME(obj);
       

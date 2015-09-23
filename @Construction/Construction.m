@@ -23,7 +23,7 @@ classdef Construction
        
         [model, prediction, projection] = constructPro(obj);
         
-        plotPro(obj, projection, sig);
+        plotPro(obj, projection, sigPlt);
         
     end
     

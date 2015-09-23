@@ -19,7 +19,7 @@ sqreTot = [];
 % cr = 0:res:2*pi;
 % cr = length(cr)-1
 % parfor jj = 0:cr;
-%     
+%
 %     j = jj*res;
 
 
@@ -33,14 +33,14 @@ for w = 1:2
             for k = 1:length(theta)
                 model = model + A(k)*cos(2*pi*1/P(k)*t + theta(k));
             end
-     
+            
             modeldf = diff(model)';
             
             spacing = linspace(0,1,length(modeldf));
             
             logGrowth = (-log(1-spacing.^4));
             logGrowth(end) = logGrowth(end-1);
-
+            
             offset = 1;
             scale  = 100;
             
@@ -49,7 +49,7 @@ for w = 1:2
             if type == 1
                 cost = sum((sigModdf - modeldf).^2);
             else
-                cost = sum(((sigModdf - modeldf).^2).* adjuster);
+                cost = sum(((sigModdf - modeldf).^2).* adjuster');
             end
             
             errorTerm = [cost, theta];
@@ -67,4 +67,4 @@ for w = 1:2
 end
 
 
-end 
+end

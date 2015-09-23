@@ -43,7 +43,7 @@ classdef SignalGenerator
     
           signal = getStock(obj.stock, obj.present, obj.signalLen, ohlc);
          
-          sig = signal(end-obj.sigLen+1:end);
+          sig = signal(end-obj.sigLen:end);
           
           filtH = 0.005;
           filtL = 0.123;
@@ -53,6 +53,26 @@ classdef SignalGenerator
           sigHL = getFiltered(sigH, filtL, 'low');
 
         end 
+        
+        function [signal, sig, sigHL, sigH, sigL] = getFutureSignal(obj, predLen, ohlc)
+            %% Enter ohlc. Ex: 'h' for high, 'ac' for adjusted close.
+            
+            signal = getStock(obj.stock, obj.present + predLen, obj.signalLen, ohlc);
+            
+            size(signal)
+            
+            
+            sig = signal(end-(obj.sigLen+predLen):end);
+            
+            filtH = 0.005;
+            filtL = 0.123;
+            
+            sigH = getFiltered(sig, filtH, 'high');
+            sigL = getFiltered(sig, filtL, 'low');
+            sigHL = getFiltered(sigH, filtL, 'low');
+            
+        end
+        
             
         function [signal] = getFakeSignal(obj)
             

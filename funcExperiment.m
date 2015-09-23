@@ -44,31 +44,49 @@ clc
 close all
 
 stock = 'ABT';
-present = 2000;
-signalLen = 1800;
+present = 2200;
+signalLen = 2000;
 sigLen = 1000;
 predLen = 100;
 
 A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67];
 P = [18 25 34 43 62 99 142 178];
 
-
 s = SignalGenerator(stock, present, signalLen, sigLen);
 [signal_pure, sig_pure, sigHL, sigH, sigL] = s.getSignal('ac');
+
+
+%% Sig to model against
 sigMod = sigHL;
 
+sigMod = sigMod + 15;
+
 t = TideFinder(sigMod, A, P)
+t.type = 1;
 [theta] = t.getTheta('BF');
+
+%% Sig to plot against
+sigPlt = sig_pure;
 
 c = Construction(A, P, theta, predLen, sigMod);
 [model, prediction, projection] = c.constructPro();
-c.plotPro(projection, sigHL);
+c.plotPro(projection, sigPlt);
 
-s.present = s.present + predLen;
-s.sigLen = s.sigLen + predLen;
-[signal_pure, sig_pure, sigHL, sigH, sigL] = s.getSignal('ac');
-sigPro = sigHL;
-c.plotPro(projection, sigHL);
+
+%% Sig to plot against
+[signalFut, sigFut, sigHLFut, sigH, sigL] = s.getFutureSignal(predLen, 'ac');
+sigPlt = sigFut;
+c.plotPro(projection, sigHLFut+15);
+
+sigCmp = sigHLFut + 15;
+
+e = Evaluator(sigMod, sigFut, model, prediction);
+
+e.percentReturn(prediction, sigHLFut);
+
+figure()
+plot(signal_pure)
+
 
 % plot(sig_pure)
 % hold on;
@@ -77,8 +95,6 @@ c.plotPro(projection, sigHL);
 % plot(sigH,'g')
 % hold on;
 % plot(sigL,'c')
-
-
 
 
 
