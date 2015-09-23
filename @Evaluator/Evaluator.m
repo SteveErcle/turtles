@@ -2,22 +2,22 @@ classdef Evaluator
     
    properties
        
-       sigPred;
-       modLen;
-       model_predict;
+       sig;
+       model;
+       prediction;
        stop_loss = 1;
        one_trade = 0;
        Total;
        Type;
        modMME;
        predMME;
-       sigPredUnfilt;
+       
        
    end
    
    methods
        
-       function obj = Evaluator(sigPred, sigPredUnfilt, modLen, model_predict)
+       function obj = Evaluator(sig)
            
            obj.sigPred = sigPred;
            obj.sigPredUnfilt = sigPredUnfilt;

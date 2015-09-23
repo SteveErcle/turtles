@@ -22,7 +22,7 @@ function [Total] = percentReturn(obj)
 % yhl(:,3) = yLOW; %dataL_fut;
 
 
-% sigPred = obj.sigPred;
+
 sigPredUnfilt = obj.sigPredUnfilt;
 modLen = obj.modLen;
 model_predict = obj.model_predict;

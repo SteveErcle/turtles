@@ -1,17 +1,15 @@
 function [theta] = BFtideFinder(obj)
 
 
-filt_signal_mod_against = obj.sigMod;
+sigMod = obj.sigMod;
 A = obj.A;
 P = obj.P;
 type = obj.type;
 
-tideFiltered = filt_signal_mod_against;
-tideFiltd = diff(tideFiltered);
-
+sigModdf = diff(sigMod);
 
 theta = zeros(1,length(P));
-t = 1:length(tideFiltered);
+t = 1:length(sigMod);
 
 res = .01;
 
@@ -31,14 +29,14 @@ for w = 1:2
             
             theta(i) = j;
             
-            model = mean(tideFiltered);
+            model = mean(sigMod);
             for k = 1:length(theta)
                 model = model + A(k)*cos(2*pi*1/P(k)*t + theta(k));
             end
      
-            modeld = diff(model);
+            modeldf = diff(model)';
             
-            spacing = linspace(0,1,length(modeld));
+            spacing = linspace(0,1,length(modeldf));
             
             logGrowth = (-log(1-spacing.^4));
             logGrowth(end) = logGrowth(end-1);
@@ -49,9 +47,9 @@ for w = 1:2
             adjuster = offset + scale*(logGrowth-min(logGrowth))/(range(logGrowth));
             
             if type == 1
-                cost = sum((tideFiltd - modeld).^2);
+                cost = sum((sigModdf - modeldf).^2);
             else
-                cost = sum(((tideFiltd - modeld).^2).* adjuster);
+                cost = sum(((sigModdf - modeldf).^2).* adjuster);
             end
             
             errorTerm = [cost, theta];
