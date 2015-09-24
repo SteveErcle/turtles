@@ -12,6 +12,9 @@ REALER  = 1;
 filt = 0.005;
 present = 2400;
 signal_length = 2300;
+
+
+
 modLen = 1000;
 predLen = 100;
 day = 1050;
@@ -41,7 +44,7 @@ ix = [];
 % load('evalBFtest.mat')
 
 
-for i = 1:3
+for i = 1:1
     
 if i == 1
     day = 230
@@ -51,17 +54,59 @@ elseif i == 3
     day = 1100 
 end
 
-    
-signal = SigObj.getSignal();
+
+SigObj.presentp = 1330;
+SigObj.sigLenp = 1001;
+sigMod = SigObj.getSignal();
+
+
+SigObj.presentp = 1430;
+SigObj.sigLenp = 1101;
+sigPred = SigObj.getSignal();
+
+tm = 1330-1000:1330;
+tp = 1430-1100:1430;
+
+plot(tm,sigMod,'r')
+hold on;
+plot(tp, sigPred+1,'b');
+
+
+% sigMod(1)
+% sigMod(end)
+% sigPred(1)
+% sigPred(end)
+
+% signal = SigObj.getSignal();
 
 % plot(signal)
 
-signalFilt = getFiltered(signal, filt, 'high');
-signalFilt = getFiltered(signalFilt, 0.123, 'low')+15;
 
-sigMod = signal(day : day  + modLen);
-sigPred = signalFilt(day : day  + modLen+predLen);
-sigPredUnfilt = signal(day : day  + modLen+predLen);
+% sigMod = signal(day : day  + modLen);
+sigMod = getFiltered(sigMod, filt, 'high');
+sigMod = getFiltered(sigMod, 0.123, 'low')+15;
+
+
+
+% sigPred = signal(day : day  + modLen+predLen);
+sigPred = getFiltered(sigPred, filt, 'high');
+sigPred = getFiltered(sigPred, 0.123, 'low')+15;
+
+
+
+
+
+
+
+% sigPredUnfilt = signal(day : day  + modLen+predLen);
+
+
+% sigMod = SigObj.getSignal()
+% 
+% SigFutObj = SignalGenerator(stock, present+predLen, 100, RANSTEP, FAKER, REALER, ph, A, P);
+% 
+% sigPred = SigFutObj.getSignal();
+
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
 pred1.type = 1;
@@ -79,6 +124,10 @@ elseif i == 3
 end
 
 end 
+
+
+
+pause
 
 
 close all
