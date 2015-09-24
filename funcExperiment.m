@@ -1,43 +1,5 @@
-% Percent Return
-
-% Cost using LSE -- standardize signals before LSE
-
-% Percent Differnce of deriative
-
-% amplitude thats wrong but period is right --> error 
-% in deriv compared to signal
-
-
-% 6 dof system = model
-% x dof system = signal x--> filter intensity
-
-
-% LSE on position
-% LSE on derivative
-% Scale amplitude
-
-% MME
-
-% standarize signal about 0; standarize model to signal about 0;
-
-
-
-% 1 --> 20
-
-% 1.1 --> mean at 0
-
-% 21 --> mean at 0
-
-
-% Filtering --> Standard Deviation --> HIGH PASS
-% Filtering bad model and passing on prediction
-% Probability of prediction being accurate
-%     Backing testing
-%     FFT of back test and finding cycles
-%         of positive result
-% Using multiple sets of periods, period refinment
-% Optimizing model length
-% Optimizing filter params
+% Stop loss, stop limit & open to close
+% "" "" optimization
 
 clear all
 clc
@@ -45,33 +7,61 @@ close all
 
 stock = 'ABT';
 present = 1330;
-sigLen = 1001;
-predLen = 100;
+sigLen = 1000;
+predLen = 1;
 
 A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67];
 P = [18 25 34 43 62 99 142 178];
 
-sMod = SignalGenerator(stock, 1330, 1001);
-[sig, sigHL] = sMod.getSignal('ac');
-sigMod = sigHL;
+totals = [];
+show = [];
 
-t = TideFinder(sigMod, A, P)
-t.type = 1;
-[theta] = t.getTheta('BF');
+parfor present = 2350:2375
+    
+    
+    sMod = SignalGenerator(stock, present, sigLen);
+    [sig, sigHL] = sMod.getSignal('ac');
+    sigMod = sigHL;
+    
+    t = TideFinder(sigMod, A, P)
+    t.type = 2;
+    [theta] = t.getTheta('BF');
+    
+    c = Construction(A, P, theta, predLen, sigMod);
+    [model, prediction, projection] = c.constructPro();
+    
+    % c.plotPro(projection, sig);
+    
+    sPro = SignalGenerator(stock, present+predLen, sigLen+predLen);
+    [sig, sigHL] = sPro.getSignal('ac');
+    sigPro = sigHL;
+    
+    c.plotPro(projection, sigPro);
+    
+    e = Evaluator(sigMod, model, prediction);
+    total1 = e.percentReturn(sig);
+    total2 = e.percentReturn(sigHL);
+    tt = [total1, total2];
+    
+    slope = diff(prediction);
+    slope = abs(slope(end))/mean(prediction);
+    
+   sloper =  [slope, total1, total2];
+   
+   show = [show; sloper];
+   
+    
+    if slope > 0.0033
+%         show = [present,slope,tt]
+        totals = [totals; tt];
+    end
+    
+  
+  
+end
 
-c = Construction(A, P, theta, predLen, sigMod);
-[model, prediction, projection] = c.constructPro();
-
-c.plotPro(projection, sigMod);
-
-sPro = SignalGenerator(stock, 1430, 1101);
-[sig, sigHL] = sPro.getSignal('ac');
-sigPro = sig;
-
-c.plotPro(projection, sigHL);
-
-e = Evaluator(sigMod, model, prediction);
-total = e.percentReturn(sigPro)
+sum(totals(:,1))
+sum(totals(:,2))
 
 % open to close;
 % stop loss
@@ -79,7 +69,7 @@ total = e.percentReturn(sigPro)
 
 
 % close all
-% 
+%
 % plot(sigPro,'r')
 % hold on;
 % plot(projection)
