@@ -1,4 +1,4 @@
-function [Total] = percentReturn(obj, prediction, sigCmp)
+function [Total] = percentReturn(obj, sigCmp)
 
 % , sigPred, modLen, model_predict, stop_loss, one_trade)
 
@@ -23,20 +23,23 @@ function [Total] = percentReturn(obj, prediction, sigCmp)
 
 
 
-
-
+prediction = obj.prediction;
 stop_loss = obj.stop_loss;
 one_trade = obj.one_trade;
 
+pd = length(prediction);
+
+y = sigCmp(end-pd+1:end);
 
 
-y = sigCmp(end-length(prediction):end);
 yhl(:,1) = sigCmp;
 yhl(:,2) = sigCmp;
 yhl(:,3) = sigCmp;
 
 
 eq_test = prediction;
+
+
 
 
 [tagged,imax,imin] = obj.peakAndTrough(eq_test);

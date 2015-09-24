@@ -2,7 +2,7 @@ classdef Evaluator
     
    properties
        
-       sig;
+       sigMod;
        model;
        prediction;
        stop_loss = 1;
@@ -17,10 +17,13 @@ classdef Evaluator
    
    methods
        
-       function obj = Evaluator(sigMod, sigFut, model, prediction)
+       function obj = Evaluator(sigMod, model, prediction)
            
+           obj.sigMod       = sigMod;
+           obj.model        = model;
+           obj.prediction   = prediction;
            
-                
+          
        end
        
        function [modDVE, predDVE, modDVElist, predDVElist] = DVE(obj)
@@ -46,7 +49,7 @@ classdef Evaluator
        end 
        
        
-      [Total] = percentReturn(obj, prediction, sigCmp);
+      [Total] = percentReturn(obj, sigCmp);
       
       [modMME, predMME, modMMElist, predMMElist] = MME(obj);
       

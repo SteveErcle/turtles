@@ -5,7 +5,6 @@ classdef SignalGenerator
         
         stock;
         present;
-        signalLen;
         sigLen;
         RANSTEP;
         FAKER;
@@ -22,61 +21,38 @@ classdef SignalGenerator
             
             obj.stock     = varargin{1};
             obj.present   = varargin{2};
-            obj.signalLen = varargin{3};
-            obj.sigLen    = varargin{4};
-            
+            obj.sigLen    = varargin{3};
+
             if nargin > 4
                 
-                obj.RANSTEP   = varargin{5};
-                obj.FAKER     = varargin{6};
-                obj.REALER    = varargin{7};
-                obj.ph        = varargin{8};
-                obj.A         = varargin{9};
-                obj.P         = varargin{10};
+                obj.RANSTEP   = varargin{4};
+                obj.FAKER     = varargin{5};
+                obj.REALER    = varargin{6};
+                obj.ph        = varargin{7};
+                obj.A         = varargin{8};
+                obj.P         = varargin{9};
                 
             end
 
         end
        
-        function [signal, sig, sigHL, sigH, sigL] = getSignal(obj, ohlc)
+        function [sig, sigHL, sigH, sigL] = getSignal(obj, ohlc)
            %% Enter ohlc. Ex: 'h' for high, 'ac' for adjusted close.
     
-          signal = getStock(obj.stock, obj.present, obj.signalLen, ohlc);
-         
-          sig = signal(end-obj.sigLen:end);
-          
+          sig = getStock(obj.stock, obj.present, obj.sigLen, ohlc);
+  
           filtH = 0.005;
           filtL = 0.123;
 
           sigH = getFiltered(sig, filtH, 'high');
           sigL = getFiltered(sig, filtL, 'low');
-          sigHL = getFiltered(sigH, filtL, 'low');
+          sigHL = getFiltered(sigH, filtL, 'low')+15;
 
         end 
-        
-        function [signal, sig, sigHL, sigH, sigL] = getFutureSignal(obj, predLen, ohlc)
-            %% Enter ohlc. Ex: 'h' for high, 'ac' for adjusted close.
-            
-            signal = getStock(obj.stock, obj.present + predLen, obj.signalLen, ohlc);
-            
-            size(signal)
-            
-            
-            sig = signal(end-(obj.sigLen+predLen):end);
-            
-            filtH = 0.005;
-            filtL = 0.123;
-            
-            sigH = getFiltered(sig, filtH, 'high');
-            sigL = getFiltered(sig, filtL, 'low');
-            sigHL = getFiltered(sigH, filtL, 'low');
-            
-        end
-        
-            
+                  
         function [signal] = getFakeSignal(obj)
             
-            signalLen   = obj.signalLen;
+            sigLen      = obj.sigLen;
             RANSTEP     = obj.RANSTEP;
             FAKER       = obj.FAKER;
             REALER      = obj.REALER;
@@ -124,6 +100,13 @@ classdef SignalGenerator
   
     end
     
+
+    
+end
+
+
+
+
     
 % function FindFiltIntensity = Evaluator(1,1,evalBF.model_predict);
 % 
@@ -148,8 +131,8 @@ classdef SignalGenerator
 
     
     
-    
-end
+
+
 
 
 
