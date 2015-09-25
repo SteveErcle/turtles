@@ -13,7 +13,7 @@ P = obj.P;
  
 tideFiltered = filt_signal_mod_and_pred_against;
 
-avg = mean(tideFiltered(1:modLen));
+avg = mean(tideFiltered(1:modLen+1));
 
 t = 1:length(tideFiltered);
 

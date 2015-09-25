@@ -25,12 +25,18 @@ function [Total] = percentReturn(obj)
 % sigPred = obj.sigPred;
 % sigPredUnfilt = obj.sigPredUnfilt;
 sigPred = obj.sigPredUnfilt;
+
+
+
 modLen = obj.modLen;
 model_predict = obj.model_predict;
 stop_loss = obj.stop_loss;
 one_trade = obj.one_trade;
 
-sigPred = sigPred(modLen:end);
+mean(sigPred)
+mean(model_predict)
+
+sigPred = sigPred(modLen+1:end);
 
 y = sigPred;
 yhl(:,1) = sigPred;
@@ -38,7 +44,14 @@ yhl(:,2) = sigPred;
 yhl(:,3) = sigPred;
 
 
-eq_test = model_predict(modLen:end);
+eq_test = model_predict(modLen+1:end);
+
+size(y)
+size(eq_test)
+
+y
+
+eq_test
 
 
 [tagged,imax,imin] = obj.peakAndTrough(eq_test);
