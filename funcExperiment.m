@@ -16,7 +16,7 @@ P = [18 25 34 43 62 99 142 178];
 totals = [];
 show = [];
 
-parfor present = 1330:1330+25
+for present = 1330:1330+0
     
     
     sMod = SignalGenerator(stock, present, sigLen);
