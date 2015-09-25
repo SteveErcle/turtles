@@ -47,7 +47,7 @@ ix = [];
 totals = [];
 
 
-daz = 230;
+daz = 1175;
 
 day = daz;
 
