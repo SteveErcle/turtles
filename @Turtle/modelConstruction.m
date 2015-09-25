@@ -6,16 +6,20 @@ function [model_predict] = modelConstruction(obj,theta)
 % prediction for 10 days
 
 
-filt_signal_mod_and_pred_against = obj.sigPred;
-modLen = obj.modLen;
+sigPred = obj.sigPred;
+
+sigMod = obj.sigMod;
+
 A = obj.A;
 P = obj.P;
  
-tideFiltered = filt_signal_mod_and_pred_against;
 
-avg = mean(tideFiltered(1:modLen+1));
 
-t = 1:length(tideFiltered);
+avg = mean(sigMod);
+
+
+
+t = 1:length(sigPred);
 
 model_predict = avg;
 for k = 1:length(theta)

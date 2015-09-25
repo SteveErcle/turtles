@@ -47,7 +47,7 @@ ix = [];
 totals = [];
 
 
-daz = 1175;
+daz = 230;
 
 day = daz;
 
@@ -55,7 +55,7 @@ show = [];
 
 signal = SigObj.getSignal();
 
-parfor day = daz : daz+25
+for day = daz : daz+0
 
 sigPredUnfilt = signal(day : day  + modLen+predLen);
 sigMod = signal(day : day  + modLen);
@@ -67,8 +67,8 @@ sigPred = signal(day : day  + modLen+predLen);
 % sigPred = getFiltered(sigPred, 0.123, 'low');
 
 sigPredUnfilt = sigPredUnfilt;
-sigMod = sigMod + 15;
-sigPred = sigPred + 15;
+sigMod = sigMod;
+sigPred = sigPred;
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
 pred1.type = 2;
