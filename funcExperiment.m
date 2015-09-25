@@ -7,7 +7,7 @@ close all
 
 stock = 'ABT';
 present = 1330;
-sigLen = 1000;
+sigLen = 1001;
 predLen = 1;
 
 A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67];
@@ -16,12 +16,12 @@ P = [18 25 34 43 62 99 142 178];
 totals = [];
 show = [];
 
-parfor present = 2350:2375
+parfor present = 1330:1330+25
     
     
     sMod = SignalGenerator(stock, present, sigLen);
     [sig, sigHL] = sMod.getSignal('ac');
-    sigMod = sigHL;
+    sigMod = sig;
     
     t = TideFinder(sigMod, A, P)
     t.type = 2;
@@ -43,21 +43,21 @@ parfor present = 2350:2375
     total2 = e.percentReturn(sigHL);
     tt = [total1, total2];
     
-    slope = diff(prediction);
-    slope = abs(slope(end))/mean(prediction);
+    slope = diff(projection);
+    slope = abs(slope(end))/mean(projection);
     
-   sloper =  [slope, total1, total2];
-   
-   show = [show; sloper];
-   
+    sloper =  [slope, total1, total2];
+    
+    show = [show; sloper];
+    
     
     if slope > 0.0033
-%         show = [present,slope,tt]
+        %         show = [present,slope,tt]
         totals = [totals; tt];
     end
     
-  
-  
+    
+    
 end
 
 sum(totals(:,1))
