@@ -55,7 +55,7 @@ show = [];
 
 signal = SigObj.getSignal();
 
-for day = daz : daz+0
+parfor day = daz : daz+25
 
 sigPredUnfilt = signal(day : day  + modLen+predLen);
 sigMod = signal(day : day  + modLen);
