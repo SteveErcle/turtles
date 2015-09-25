@@ -47,7 +47,7 @@ ix = [];
 totals = [];
 
 
-daz = 1175;
+daz = 230;
 
 day = daz;
 
@@ -55,26 +55,20 @@ show = [];
 
 signal = SigObj.getSignal();
 
-parfor day = daz : daz+25
+for day = daz : daz+10
 
 sigPredUnfilt = signal(day : day  + modLen+predLen);
 sigMod = signal(day : day  + modLen);
 sigPred = signal(day : day  + modLen+predLen);
 
-
-
-% sigMod = getFiltered(sigMod, filt, 'high');
-% sigMod = getFiltered(sigMod, 0.123, 'low');
-% sigPred = getFiltered(sigPred, filt, 'high');
-% sigPred = getFiltered(sigPred, 0.123, 'low');
+sigMod = getFiltered(sigMod, filt, 'high');
+sigMod = getFiltered(sigMod, 0.123, 'low');
+sigPred = getFiltered(sigPred, filt, 'high');
+sigPred = getFiltered(sigPred, 0.123, 'low');
 
 sigPredUnfilt = sigPredUnfilt;
-sigMod = sigMod;
-sigPred = sigPred;
-
-mean(sigPred)
-mean(sigMod)
-
+sigMod = sigMod+15;
+sigPred = sigPred+15;
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
 pred1.type = 2;
@@ -88,7 +82,6 @@ std(evalBF1.sigPred)/mean(evalBF1.sigPred);
 slope = diff(evalBF1.model_predict);
 day
 slope = abs(slope(end))%%/mean(evalBF1.model_predict)
-
 
 sloper = [slope, evalBF1.Total];
 show  = [show; sloper];
