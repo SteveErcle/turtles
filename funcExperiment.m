@@ -16,7 +16,7 @@ P = [18 25 34 43 62 99 142 178];
 totals = [];
 show = [];
 
-for present = 1925:1925+0
+parfor present = 1330:1330+25
     
     present
     
@@ -37,7 +37,6 @@ for present = 1925:1925+0
     [sig, sigHL] = sPro.getSignal('ac');
     sigPro = sigHL + mean(sig);
 
-    
     %c.plotPro(projection, sigPro);
     
     e = Evaluator(sigMod, model, prediction);
