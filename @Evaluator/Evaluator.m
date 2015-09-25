@@ -28,13 +28,12 @@ classdef Evaluator
        
        function [modDVE, modDVElist] = DVE(obj)
            
-           mm = obj.model;
-           sm = obj.sigMod;
+           dmm = diff(obj.model');
+           dsm = diff(obj.sigMod);
            
-           dmm = diff(mm);
-           dmp = diff(mp);
-           dsm = diff(sm);
-           dsp = diff(sp);
+           size(dmm)
+           size(dsm)
+           
            
            modDVElist = (dmm-dsm).^2;
            

@@ -8,7 +8,7 @@ close all
 stock = 'ABT';
 present = 1330;
 sigLen = 1001;
-predLen = 1;
+predLen = 25;
 
 A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67];
 P = [18 25 34 43 62 99 142 178];
@@ -16,7 +16,7 @@ P = [18 25 34 43 62 99 142 178];
 totals = [];
 show = [];
 
-parfor present = 1330:1330+25
+for present = 1925:1925+0
     
     present
     
@@ -25,7 +25,7 @@ parfor present = 1330:1330+25
     sigMod = sigHL + mean(sig);
     
     t = TideFinder(sigMod, A, P)
-    t.type = 2;
+    t.type = 1;
     [theta] = t.getTheta('BF');
     
     c = Construction(A, P, theta, predLen, sigMod);
@@ -36,12 +36,15 @@ parfor present = 1330:1330+25
     sPro = SignalGenerator(stock, present+predLen, sigLen+predLen);
     [sig, sigHL] = sPro.getSignal('ac');
     sigPro = sigHL + mean(sig);
+
     
     %c.plotPro(projection, sigPro);
     
     e = Evaluator(sigMod, model, prediction);
     total1 = e.percentReturn(sigPro);
     tt = [total1]
+    
+    [mod modl] = e.DVE();
     
     slope = diff(projection);
     slope = abs(slope(end))/mean(projection);
