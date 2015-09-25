@@ -46,7 +46,7 @@ classdef SignalGenerator
 
           sigH = getFiltered(sig, filtH, 'high');
           sigL = getFiltered(sig, filtL, 'low');
-          sigHL = getFiltered(sigH, filtL, 'low')+15;
+          sigHL = getFiltered(sigH, filtL, 'low');
 
         end 
                   
