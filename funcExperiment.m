@@ -34,7 +34,7 @@ parfor present = 1330:1330+25
     
     sPro = SignalGenerator(stock, present+predLen, sigLen+predLen);
     [sig, sigHL] = sPro.getSignal('ac');
-    sigPro = sigHL;
+    sigPro = sig;
     
     c.plotPro(projection, sigPro);
     
