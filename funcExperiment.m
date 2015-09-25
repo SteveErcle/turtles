@@ -16,7 +16,7 @@ P = [18 25 34 43 62 99 142 178];
 totals = [];
 show = [];
 
-parfor present = 2275:2275+25
+parfor present = 1330:1330+25
     
     
     sMod = SignalGenerator(stock, present, sigLen);
@@ -50,7 +50,6 @@ parfor present = 2275:2275+25
     
     show = [show; sloper];
     
-    
     if slope > 0.0033
         %         show = [present,slope,tt]
         totals = [totals; tt];
@@ -60,8 +59,8 @@ parfor present = 2275:2275+25
     
 end
 
-sum(totals(:,1))
-sum(totals(:,2))
+% sum(totals(:,1))
+% sum(totals(:,2))
 
 sum(show(:,2))
 
