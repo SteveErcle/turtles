@@ -18,10 +18,11 @@ show = [];
 
 parfor present = 1330:1330+25
     
+    present
     
     sMod = SignalGenerator(stock, present, sigLen);
     [sig, sigHL] = sMod.getSignal('ac');
-    sigMod = sigHL;
+    sigMod = sigHL + mean(sig);
     
     t = TideFinder(sigMod, A, P)
     t.type = 2;
@@ -34,35 +35,26 @@ parfor present = 1330:1330+25
     
     sPro = SignalGenerator(stock, present+predLen, sigLen+predLen);
     [sig, sigHL] = sPro.getSignal('ac');
-    sigPro = sig;
+    sigPro = sigHL + mean(sig);
     
-    c.plotPro(projection, sigPro);
+    %c.plotPro(projection, sigPro);
     
     e = Evaluator(sigMod, model, prediction);
-    total1 = e.percentReturn(sig);
-    total2 = e.percentReturn(sigHL);
-    tt = [total1, total2];
+    total1 = e.percentReturn(sigPro);
+    tt = [total1]
     
     slope = diff(projection);
     slope = abs(slope(end))/mean(projection);
-    
-    sloper =  [slope, total1, total2];
-    
-    show = [show; sloper];
-    
-    if slope > 0.0033
-        %         show = [present,slope,tt]
-        totals = [totals; tt];
-    end
-    
-    
+  
+   
+    totals = [totals; tt];
     
 end
 
 % sum(totals(:,1))
 % sum(totals(:,2))
 
-sum(show(:,2))
+%sum(show(:,2))
 
 % open to close;
 % stop loss
