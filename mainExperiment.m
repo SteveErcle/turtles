@@ -61,6 +61,8 @@ sigPredUnfilt = signal(day : day  + modLen+predLen);
 sigMod = signal(day : day  + modLen);
 sigPred = signal(day : day  + modLen+predLen);
 
+
+
 % sigMod = getFiltered(sigMod, filt, 'high');
 % sigMod = getFiltered(sigMod, 0.123, 'low');
 % sigPred = getFiltered(sigPred, filt, 'high');
@@ -69,6 +71,10 @@ sigPred = signal(day : day  + modLen+predLen);
 sigPredUnfilt = sigPredUnfilt;
 sigMod = sigMod;
 sigPred = sigPred;
+
+mean(sigPred)
+mean(sigMod)
+
 
 pred1 = Turtle(sigMod, sigPred, modLen, A, P);
 pred1.type = 2;

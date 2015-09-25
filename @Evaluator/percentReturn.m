@@ -33,8 +33,6 @@ model_predict = obj.model_predict;
 stop_loss = obj.stop_loss;
 one_trade = obj.one_trade;
 
-mean(sigPred)
-mean(model_predict)
 
 sigPred = sigPred(modLen+1:end);
 
@@ -45,13 +43,6 @@ yhl(:,3) = sigPred;
 
 
 eq_test = model_predict(modLen+1:end);
-
-size(y)
-size(eq_test)
-
-y
-
-eq_test
 
 
 [tagged,imax,imin] = obj.peakAndTrough(eq_test);
