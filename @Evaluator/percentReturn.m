@@ -24,7 +24,7 @@ function [Total] = percentReturn(obj)
 
 % sigPred = obj.sigPred;
 % sigPredUnfilt = obj.sigPredUnfilt;
-sigPred = obj.sigPredUnfilt;
+sigPred = obj.sigPred;
 
 
 
