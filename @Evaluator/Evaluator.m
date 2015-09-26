@@ -30,11 +30,7 @@ classdef Evaluator
            
            dmm = diff(obj.model');
            dsm = diff(obj.sigMod);
-           
-           size(dmm)
-           size(dsm)
-           
-           
+          
            modDVElist = (dmm-dsm).^2;
            
            modDVE = sum(modDVElist);
