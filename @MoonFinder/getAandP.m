@@ -1,13 +1,15 @@
 
-function [] = HeatMapofTurtles(signal)
+function [] = getAandP(obj)
 
-x1ph = signal;
+signal = obj.signal_pure;
+
+x1ph = signal';
 sampleSize = 1500;
-leftOver = 2000-sampleSize;
+leftOver = length(signal)-sampleSize;
 fs = 1;
 surfer = [];
 
-LowX1 = 100;
+LowX1 = 50;
 HighX1 = 1650;
 
 shifterSize = 1;

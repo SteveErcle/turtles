@@ -13,7 +13,7 @@ classdef MoonFinder
             obj.signal_pure = signal_pure;
         end
         
-        % Heat Map of Turtles
+        [] = getAandP(obj)
         
     end
     

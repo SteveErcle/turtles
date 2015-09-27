@@ -39,7 +39,7 @@ for i = 1:2
         hold on;
         plot(t(end-predLen:end), prediction, 'b')
         
-        axis([ 500 length(sigPlt) min(sigPlay(end-300:end)) max(sigPlay(end-300:end)) ]);
+%         axis([ 500 length(sigPlt) min(sigPlay(end-300:end)) max(sigPlay(end-300:end)) ]);
         
         pause;
         
