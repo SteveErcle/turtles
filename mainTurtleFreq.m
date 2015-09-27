@@ -1,12 +1,12 @@
-clear all
-clc
-close all
+% clear all
+% clc
+% close all
 
-stock = 'JPM';
+stock = 'CAH';
 
 
 
-present = 2000;
+present = 2005;
 sigLen = 1000;
 predLen = 100;
 ticker = 10;
@@ -16,17 +16,13 @@ totals = [];
 sosals = [];
 founder = [];
 
-% sFFT = SignalGenerator(stock, 2400, 2398);
-% [signal_pure] = sFFT.getSignal('ac');
-% 
-% m = MoonFinder(signal_pure);
-% m.getAandP();
+sFFT = SignalGenerator(stock, 2002, 2000);
+[signal_pure] = sFFT.getSignal('ac');
 
+m = MoonFinder(signal_pure);
+m.getAandP();
 
-P = [  19,  24,   35,   40,  48,  63,   81,   103, 123,   221];
-
-A = [0.23, 0.3, 0.53, 0.35, 0.3, 0.8, 0.56,  1.07, 1.16, 2.43];
-
+pause;
 
 sMod = SignalGenerator(stock, present, sigLen);
 [sig, sigHL] = sMod.getSignal('ac');
@@ -70,3 +66,24 @@ total0 = e.percentReturn(prediction)
 total1 = e.percentReturn(sigPro)
 total2 = e.percentReturn(sig)
 [modDVE modDVEList] = e.DVE();
+
+
+
+
+
+
+% saValues = [];
+
+% values = [];
+% 
+% for i = 1:length(cursor_info4)
+% 
+% value = getfield(cursor_info4, {i},'Position')
+% values = [values;value];
+% 
+% end 
+% 
+% saValues = [saValues;values];
+% 
+% P = saValues(:,1);
+% A = saValues(:,3);

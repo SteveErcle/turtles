@@ -42,7 +42,7 @@ classdef SignalGenerator
           sig = getStock(obj.stock, obj.present, obj.sigLen, ohlc);
   
           filtH = 0.005;
-          filtL = 0.123;
+          filtL = 0.23;
 
           sigH = getFiltered(sig, filtH, 'high');
           sigL = getFiltered(sig, filtL, 'low');

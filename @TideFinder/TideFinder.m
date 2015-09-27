@@ -21,6 +21,7 @@ classdef TideFinder
         
         [theta] = GDtideFinder(obj);
         
+%         FFTtideFinder()
         
         
         function theta = getTheta(obj, eval_Type_String)
