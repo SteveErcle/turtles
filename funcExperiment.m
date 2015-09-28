@@ -8,9 +8,9 @@ clc
 close all
 
 
-presentH = 2005;
+presentH = 2005;  
 sigLen = 1000;
-predLen = 1;
+predLen = 5;
 
 stock = 'CAH'
 % P = [13.9345430978613;12.1956891661940;10.1900473933649;8.54231227651967;41.4277456647399;44.7006237006237;35.8350000000000;30.5411931818182;26.2207317073171;87.4024390243903;100.943661971831;75.9752650176679;151.415492957747];
@@ -39,7 +39,7 @@ lps = [2140;2145;2135;2150;2155];
 
 hps = [2100;2055;2030;2040;2035];
 
-parfor i = 0:1:50
+parfor i = 0:1:20
 
 present = presentH+i*predLen;
 
@@ -47,17 +47,17 @@ present = presentH+i*predLen;
 % 
 %     present = lps(i)
 
-% 
+
 % ticker = 5;
 % 
 % for present = presentH:ticker:presentH+100;
-    
+   
     sMod = SignalGenerator(stock, present, sigLen);
     [sig, sigHL] = sMod.getSignal('ac');
     sigMod = sigHL + mean(sig(end-100:end));
     
     t = TideFinder(sigMod, A, P);
-    t.type = 2;
+    t.type = 1;
     [theta] = t.getTheta('BF');
     
     c = Construction(A, P, theta, predLen, sigMod);
@@ -86,6 +86,8 @@ present = presentH+i*predLen;
 %     totalPlay = ePlay.percentReturn(sig(1:length(sigMod)+ticker))
 
     c.plotPro(projection, sigPro);
+    c.plotPro(projection, sig);
+%     c.plotPro(sigPro, sig);
     
     e = Evaluator(sigMod, model, prediction);
     
@@ -94,12 +96,12 @@ present = presentH+i*predLen;
     total2 = e.percentReturn(sig)
     [modDVE modDVEList] = e.DVE();
     
-    loadErUp = [present, CItotal, total0, total1, total2];
+    loadErUp = [theta, present, CItotal, total0, total1, total2];
     founder = [founder; loadErUp];
     
     present
     
-%     pause
+    pause
     
     close all
     
@@ -107,3 +109,6 @@ end
 
 
 sfd = sortrows(founder,2)
+
+figure()
+plot(founder(:,1))

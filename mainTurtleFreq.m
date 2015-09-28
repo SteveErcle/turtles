@@ -1,10 +1,13 @@
-% clear all
-% clc
-% close all
+clear all
+clc
+close all
 
-stock = 'CAH';
-
-
+stock = 'PG';
+% AEE
+% AEP
+% AES
+% AA
+% ABX
 
 present = 2005;
 sigLen = 1000;
@@ -17,9 +20,9 @@ sosals = [];
 founder = [];
 
 sFFT = SignalGenerator(stock, 2002, 2000);
-[signal_pure] = sFFT.getSignal('ac');
+[signal_pure, sigHL] = sFFT.getSignal('ac');
 
-m = MoonFinder(signal_pure);
+m = MoonFinder(sigHL);
 m.getAandP();
 
 pause;
