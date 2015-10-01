@@ -2,14 +2,14 @@ clear all
 clc
 close all
 
-stock = 'PG';
+
 % AEE
 % AEP
 % AES
 % AA
 % ABX
 
-present = 2005;
+present = 1700;
 sigLen = 1000;
 predLen = 100;
 ticker = 10;
@@ -22,8 +22,14 @@ founder = [];
 sFFT = SignalGenerator(stock, 2002, 2000);
 [signal_pure, sigHL] = sFFT.getSignal('ac');
 
-m = MoonFinder(sigHL);
+
+
+m = MoonFinder(signal_pure);
 m.getAandP();
+
+plot(signal_pure)
+figure()
+plot(sigHL)
 
 pause;
 
@@ -75,18 +81,18 @@ total2 = e.percentReturn(sig)
 
 
 
-% saValues = [];
+saValues = [];
 
-% values = [];
-% 
-% for i = 1:length(cursor_info4)
-% 
-% value = getfield(cursor_info4, {i},'Position')
-% values = [values;value];
-% 
-% end 
-% 
-% saValues = [saValues;values];
-% 
-% P = saValues(:,1);
-% A = saValues(:,3);
+values = [];
+
+for i = 1:length(cursor_info3)
+
+value = getfield(cursor_info3, {i},'Position')
+values = [values;value];
+
+end 
+
+saValues = [saValues;values];
+
+P = saValues(:,1);
+A = saValues(:,3);

@@ -38,7 +38,7 @@ for i = 0:1:5
     sigMod = sigHL + mean(sig(end-100:end));
     
     t = TideFinder(sigMod, A, P)
-    t.type = 2;
+    t.type = 1;
     [theta] = t.getTheta('BF');
     
     c = Construction(A, P, theta, predLen, sigMod);
