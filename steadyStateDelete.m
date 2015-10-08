@@ -3,8 +3,8 @@ clc
 close all
 
 presentH = 1000
-sigLen =   900;
-predLen = 100;
+sigLen =  900;
+predLen = 50;
 
 totals = [];
 sosals = [];
@@ -18,30 +18,22 @@ stock = 'ABT';
 % A = [0.09 0.15 0.35 0.43 0.67];
 % P = [18 43 99 142 178];
 
-
 sFFT = SignalGenerator(stock, 2002, 2000);
-[signal_pure, sigHL] = sFFT.getSignal('ac');
-% [b a] = butter(5,[0.01 0.04], 'bandpass');
-% signal_pure = filtfilt(b,a,signal_pure);
+[signal_pure, sig_pure_HL, sph, spl] = sFFT.getSignal('ac');
+ 
 
+P = [178]; 
+A = [0.67];
 
-P = [178, 43];
-A = [0.67, 0.15];
+plot(spl, 'r')
 
-plot(signal_pure)
+keeper = [];
 
-
-totalDVE = [];
 parfor i = 0:1:100
     present = presentH+i*10;
-
-
-% for present = 200 : 10 : 2000
     
     sMod = SignalGenerator(stock, present, sigLen);
     [sig, sigHL, sigH, sigL] = sMod.getSignal('ac');
-%     [b a] = butter(5,[0.001 0.04], 'bandpass');
-%     sigMod = filtfilt(b,a,sig) + mean(sig)
     sigMod = sigL;
     
     t = TideFinder(sigMod, A, P);
@@ -63,47 +55,47 @@ parfor i = 0:1:100
     
     sPro = SignalGenerator(stock, present+predLen, sigLen+predLen);
     [sig, sigHL, sigH, sigL] = sPro.getSignal('ac');
-%     [b a] = butter(5,[0.001 0.04], 'bandpass');
-%     sigPro = filtfilt(b,a,sig) + mean(sig)
+    
     sigPro = sigL;
-    
-    
-    fs = 1;
-    x1 = sigMod';
-    ss = length(x1);
-    % x1 = x1.*hanning(length(x1))';
-    % x1 = [x1 zeros(1, 20000)];
-    X1 = abs(fft(x1));
-    X1 = X1(1:ceil(length(X1)/2));
-%     
-%     Xt = 0:length(X1)-1;
-%     P = fs./ (Xt*(fs/length(x1)));
-    [pkt It] = findpeaks(X1);
     
     c.plotPro(projection, sigPro);
     
     e = Evaluator(sigMod, model, prediction);
     
-    capture = [e.DVE(), e.percentReturn(sigPro), sum(pkt), present];
+%     capture = [e.DVE(), e.percentReturn(sigPro), sum(pkt), present];
     
-    totalDVE = [totalDVE; capture];
+%     totalDVE = [totalDVE; capture];
     
+    keeper = [keeper; theta];
 end
 
-dve = totalDVE(:,1);
-pr =  totalDVE(:,2);
-pks = totalDVE(:,3);
-i = totalDVE(:,4);
+
+
+
+t = 1:10;
+y = [];
+
+sFFT = SignalGenerator(stock, 2010, 1010);
+[signal_pure, sig_pure_HL, sph, spl] = sFFT.getSignal('ac');
+
+[m,n] = size(keeper)
 
 figure()
-plot(i,dve*50, 'k');
+for i = 1:m
+    
+    model = 0;
+    for k = 1:n
+        model = model + A(k)*cos(2*pi*1/P(k)*t + keeper(i,k));
+    end
+    
+    y = [y,model];
+    
+end 
+
+y = y+mean(spl);
+plot(y)
 hold on;
-plot(i, pr, 'b');
-plot(i,pks/20, 'm')
 
 
-
-% sFFTtest = SignalGenerator(stock, 200, 100);
-% [sig, sigHL, sigH, sigL] = sFFTtest.getSignal('ac');
-
+plot(spl,'r')
 
