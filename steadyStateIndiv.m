@@ -3,7 +3,7 @@ clc
 close all
 
 presentH = 1000
-sigLen =   900;
+sigLen  =  1900
 predLen = 100;
 
 totals = [];
@@ -12,8 +12,8 @@ founder = [];
 
 
 stock = 'ABT';
-% A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67];
-% P = [18 25 34 43 62 99 142 178];
+A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67];
+P = [18 25 34 43 62 99 142 178];
 
 % A = [0.09 0.15 0.35 0.43 0.67];
 % P = [18 43 99 142 178];
@@ -25,24 +25,25 @@ sFFT = SignalGenerator(stock, 2002, 2000);
 % signal_pure = filtfilt(b,a,signal_pure);
 
 
-P = [178, 43];
-A = [0.67, 0.15];
+% P = [178, 43];
+% A = [0.67, 0.15];
 
 plot(signal_pure)
 
 
 totalDVE = [];
-parfor i = 0:1:100
-    present = presentH+i*10;
+% parfor i = 0:1:100
+%     present = presentH+i*10;
 
 
 % for present = 200 : 10 : 2000
     
+present = 2000
     sMod = SignalGenerator(stock, present, sigLen);
     [sig, sigHL, sigH, sigL] = sMod.getSignal('ac');
 %     [b a] = butter(5,[0.001 0.04], 'bandpass');
 %     sigMod = filtfilt(b,a,sig) + mean(sig)
-    sigMod = sigL;
+    sigMod = sigHL;
     
     t = TideFinder(sigMod, A, P);
     t.type = 1;
@@ -65,7 +66,7 @@ parfor i = 0:1:100
     [sig, sigHL, sigH, sigL] = sPro.getSignal('ac');
 %     [b a] = butter(5,[0.001 0.04], 'bandpass');
 %     sigPro = filtfilt(b,a,sig) + mean(sig)
-    sigPro = sigL;
+    sigPro = sigHL;
     
     
     fs = 1;
@@ -88,7 +89,7 @@ parfor i = 0:1:100
     
     totalDVE = [totalDVE; capture];
     
-end
+% end
 
 dve = totalDVE(:,1);
 pr =  totalDVE(:,2);

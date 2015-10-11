@@ -4,12 +4,12 @@ function [] = getAandP(obj)
 signal = obj.signal_pure;
 
 x1ph = signal';
-sampleSize = 1500;
+sampleSize = 600;
 leftOver = length(signal)-sampleSize;
 fs = 1;
 surfer = [];
 
-LowX1 = 100;
+LowX1 = 50;
 HighX1 = 4000;
 
 shifterSize = 1;
@@ -35,7 +35,7 @@ for k = 1:shifterSize:leftOver
 end
 
 
-axisP = [15, 50, 125, 200];
+axisP = [15, 50, 125, 400];
 I = [0,0,0,0];
 maxerP = [0, 0, 0 ,0];
  

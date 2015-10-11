@@ -17,17 +17,17 @@ sigL = getFiltered(sig, filtL, 'low');
 sigHL = getFiltered(sigH, filtL, 'low');
 
 
-% plot(sigHL)
+
 
 hsvNum = 21;
 col = hsv(hsvNum);
 icl = 1;
 
-for filtL = 0.0020:0.0010:0.0250
+for filtL = 0.0010:0.0005:0.0110
     figure()
     icl = 1;
     
-    for filtH = 0.0100:0.0001:0.0120
+    for filtH = 0.0010:0.0005:0.0110
         
         sigH = getFiltered(sig, filtH, 'high');
         sigL = getFiltered(sig, filtL, 'low');
@@ -36,20 +36,23 @@ for filtL = 0.0020:0.0010:0.0250
         
         plot(sigHL+mean(sig), 'color',col(icl,:));
         hold on;
-        plot(sig);
-        hold on;
+%         plot(sig);
+%         hold on;  
         
-        %         axis([0 2000 15 30]);
+      % axis([0 2000 20 25]);
         
         icl = icl + 1;
-        
+      
     end
     
 end
 
+
+pause;
+
 figure()
-filtL = 0.0250;
-filtH = 0.0120;
+filtL = 0.0110;
+filtH = 0.0065;
 sigH = getFiltered(sig, filtH, 'high');
 sigL = getFiltered(sig, filtL, 'low');
 sigHL = getFiltered(sigH, filtL, 'low');
@@ -64,23 +67,29 @@ hold on;
 
 predLen = 0;
 
-% fs = 1;
-% x1 = sigHL';
-% ss = length(x1);
+fs = 1;
+x1 = sigHL';
+ss = length(x1);
 % x1 = x1.*hanning(length(x1))';
 % x1 = [x1 zeros(1, 20000)];
-% X1 = abs(fft(x1));
-% X1 = X1(1:ceil(length(X1)/2));
-% X1 = X1/(ss/4);
-% Xt = 0:length(X1)-1;
-% P = fs./ (Xt*(fs/length(x1)));
-% [pkt It] = findpeaks(X1);
-% 
-% figure()
-% plot(P,X1)
+X1 = abs(fft(x1));
+X1 = X1(1:ceil(length(X1)/2));
+X1 = X1/(ss/4);
+Xt = 0:length(X1)-1;
+P = fs./ (Xt*(fs/length(x1)));
+[pkt It] = findpeaks(X1);
 
-P = [143.790849673203;173.228346456693;222.222222222222;101.382488479263];
-A = [0.339427104715820;0.263888332732101;0.0314977986819783;0.248803629417075];
+figure()
+plot(P,X1)
+
+
+
+% P = [176.000000000000;132.530120481928;100];
+% A = [0.254756663686452;0.597430320133110;0.912870423280075];
+ 
+
+% P = [143.790849673203;173.228346456693;222.222222222222;101.382488479263];
+% A = [0.339427104715820;0.263888332732101;0.0314977986819783;0.248803629417075];
 
 sigMod = sigHL;
 t = TideFinder(sigMod, A, P);
@@ -92,10 +101,7 @@ c.plotPro(projection, sigHL);
 
 
 
-% PG
-% P = [176.000000000000;132.530120481928;100];
-% A = [0.254756663686452;0.597430320133110;0.912870423280075];
- 
+
 % saValues = [];
 % values = [];
 % for i = 1:length(cursor_info)

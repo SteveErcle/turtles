@@ -29,16 +29,13 @@ classdef Evaluator
        function [modDVE, modDVElist] = DVE(obj)
            
            dmm = diff(obj.model');
+           
            dsm = diff(obj.sigMod);
           
            modDVElist = (dmm-dsm).^2;
            
            modDVE = sum(modDVElist);
            
-%            predDVElist = (dmp-dsp).^2;
-%            
-%            predDVE = sum(predDVElist);
-
        end 
        
        
