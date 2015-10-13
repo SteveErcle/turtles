@@ -11,7 +11,7 @@ PR = [];
 % A = [0.48, 0.38, 0.36];
 % P = [222 171, 286];
 % B = [102 132 76];
-% 
+%
 % A = [0.13, 0.06, 0.04];
 % P = [169 221 147]
 % B = [134 103 154];
@@ -27,12 +27,17 @@ P = [221, 309];
 B = [73 103];
 
 
+
 day = 1000
-futer = 1000
+
+% 2250 2300
+futer = 1300
 
 dc_offset = 10;
 
-for present = day : 10 : day + futer
+sumoCumo = 150;
+
+for present = day : 25 : day + futer
     
     predLen = 25;
     
@@ -84,7 +89,7 @@ for present = day : 10 : day + futer
     
     model = A(1)*cos(2*pi*1/P(1)+angaliousMajor(1,:)) +...
         A(2)*cos(2*pi*1/P(2)+angaliousMajor(2,:));
-%         A(3)*cos(2*pi*1/P(3)+angaliousMajor(3,:));
+    %         A(3)*cos(2*pi*1/P(3)+angaliousMajor(3,:));
     
     ac = 0;
     
@@ -93,7 +98,7 @@ for present = day : 10 : day + futer
     
     projection = [ model, (A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1,end)+ac) +...
         A(2)*cos(2*pi*1/P(2)*(0:sampLen-1+predLen)+angaliousMajor(2,end)+ac))];
-        %A(3)*cos(2*pi*1/P(3)*(0:sampLen-1+predLen)+angaliousMajor(3,end)+ac))];
+    %A(3)*cos(2*pi*1/P(3)*(0:sampLen-1+predLen)+angaliousMajor(3,end)+ac))];
     
     
     projection1 = projection1 + dc_offset;
@@ -129,21 +134,44 @@ for present = day : 10 : day + futer
     modelExtender;
     prediction;
     
+    %     c.plotPro(projection, cheaterSigMod);
+    %     title('preBand');
+    %     c.plotPro(15*(projection-dc_offset), sigH(1:length(cheaterSigMod)));
+    %     title('preBand');
+    %     hold on;
+    %     plot(sigL(1:length(cheaterSigMod)));
+    %
+    %
+    
+    
+    %     pause
+    
+    
+    
 %     c.plotPro(projection, sigPro);
 %     title('Band')
-%     c.plotPro(projection-dc_offset+mean(signalPro), signalPro);
+%     c.plotPro(15*(projection-dc_offset)+mean(signalPro), signalPro);
 %     title('Actual')
-%     c.plotPro(sigPro-dc_offset+mean(signalPro), signalPro);
-%     title('Filt vs Unfilt')
 %     hold on;
-%     plot(projection1, 'c');
+%     plot(sigL(1:length(cheaterSigMod)));
+    
+    
+    
+    %     pause
+    %     close all
+    %     c.plotPro(sigPro-dc_offset+mean(signalPro), signalPro);
+    %     title('Filt vs Unfilt')
+    %     hold on;
+    %     plot(projection1, 'c');
+    
+    
     
     
     filtEval = Evaluator(1, 1, sigPro(end-(predLen-1):end));
     
     bandEval = Evaluator(cheaterSigMod, modelExtender, prediction);
     [modDVE, modDVElist] = bandEval.DVE();
-    mSumo = sum(modDVElist(end-199:end));
+    mSumo = sum(modDVElist(end-(sumoCumo-1):end));
     
     dmp = diff(prediction');
     dsp = diff(sigPro(end-(predLen-1):end));
@@ -154,7 +182,12 @@ for present = day : 10 : day + futer
         bandEval.percentReturn(signalPro),...
         filtEval.percentReturn(signalPro)]
     
-    toter = [toter; present, mSumo, pSumo, PR];
+    
+    cheaterSigLShort = sigL(end-200-predLen:end-200);
+    dervTrend = sum(diff(cheaterSigLShort));
+    dervPred = sum(diff(prediction));
+    
+    toter = [toter; present, mSumo, pSumo, dervTrend, dervPred, PR];
     
     
     angaliousMajor = [];
@@ -162,25 +195,64 @@ for present = day : 10 : day + futer
     
 end
 
-close all
+
+PR = toter(:,end-1);
+pres = toter(:,1);
+dvp = toter(:,end-3);
+dvt = toter(:,end-4);
+posRet = 0;
+
+
+
+negPR = [pres(find( PR<0 )), PR( PR<0 )]
+
+neutPR = [pres(find( PR>=0 & PR<=posRet )), PR( PR>=0 & PR<=posRet )]
+
+posPR = [pres(find( PR>posRet )), PR( PR>posRet )]
+
+
+
+
+
+% close all
 pres = toter(:,1);
 mS = toter(:,2)*10000;
 pS = toter(:,3)*10000;
+
 band = toter(:,4);
 actual = toter(:,5);
 filtv = toter(:,6);
+
+
 figure()
+
 plot(pres,-1*mS,'k');
 hold on;
-plot(pres,-1*pS,'b');
+plot(negPR(:,1),negPR(:,2),'r*')
+plot(neutPR(:,1),neutPR(:,2),'b*')
+plot(posPR(:,1),posPR(:,2),'g*')
+plot(pres,dvp*500, 'c')
+plot(pres,dvt*20, 'm')
+hold off;
+
+% Kinectic energy of pred high
+% Pred in same direction as trend
+% Visually inspected DVE chooser (peak or something)
+
+
+% plot(pres,-1*pS,'b');
 % hold on;
 % plot(pres,band,'g');
-hold on;
-plot(pres,actual,'c');
+% hold on;
+% plot(pres,actual,'c');
 % hold on;
 % plot(pres,filtv,'m');
-legend('model','pred','band','actual','filtv')
+% legend('model','pred','band','actual','filtv')
 
+% toter = [];
+% negPR = [];
+% neutPR = [];
+% posPR = [];
 
 
 
