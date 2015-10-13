@@ -2,7 +2,7 @@
 
 clc; clear all; close all;
 
-stock = 'PG';
+stock = 'JPM';
 
 sFFT = SignalGenerator(stock, 2502, 2500);
 [sig, sigHL, sigH, sigL] = sFFT.getSignal('ac');
@@ -80,7 +80,7 @@ P = fs./ (Xt*(fs/length(x1)));
 [pkt It] = findpeaks(X1);
 
 figure()
-plot(P,X1)
+plot(X1)
 
 
 

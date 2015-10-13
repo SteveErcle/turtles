@@ -16,10 +16,15 @@ PR = [];
 % P = [169 221 147]
 % B = [134 103 154];
 
-stock = 'PG';
-A = [1.25, 0.80];
-P = [268 216]
-B = [85 105];
+% stock = 'PG';
+% A = [1.25, 0.80];
+% P = [268 216]
+% B = [85 105];
+
+stock = 'JPM';
+A = [1.48 1.2]/5
+P = [221, 309];
+B = [73 103];
 
 
 day = 1000
@@ -27,9 +32,9 @@ futer = 1000
 
 dc_offset = 10;
 
-for present = day : 25 : day + futer
+for present = day : 10 : day + futer
     
-    predLen = 100;
+    predLen = 25;
     
     sFFT = SignalGenerator(stock, present+2, present);
     [sig] = sFFT.getSignal('ac');
@@ -124,8 +129,8 @@ for present = day : 25 : day + futer
     modelExtender;
     prediction;
     
-    c.plotPro(projection, sigPro);
-    title('Band')
+%     c.plotPro(projection, sigPro);
+%     title('Band')
 %     c.plotPro(projection-dc_offset+mean(signalPro), signalPro);
 %     title('Actual')
 %     c.plotPro(sigPro-dc_offset+mean(signalPro), signalPro);
@@ -159,8 +164,8 @@ end
 
 close all
 pres = toter(:,1);
-mS = toter(:,2)*2000;
-pS = toter(:,3)*4000;
+mS = toter(:,2)*10000;
+pS = toter(:,3)*10000;
 band = toter(:,4);
 actual = toter(:,5);
 filtv = toter(:,6);
@@ -168,12 +173,12 @@ figure()
 plot(pres,-1*mS,'k');
 hold on;
 plot(pres,-1*pS,'b');
-hold on;
-plot(pres,band,'g');
+% hold on;
+% plot(pres,band,'g');
 hold on;
 plot(pres,actual,'c');
-hold on;
-plot(pres,filtv,'m');
+% hold on;
+% plot(pres,filtv,'m');
 legend('model','pred','band','actual','filtv')
 
 
