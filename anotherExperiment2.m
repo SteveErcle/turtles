@@ -61,7 +61,7 @@ for present = day : 25 : day + futer
     ps = present-sampLen;
     
     
-    parfor i = 1:ps
+    parfor i = 500:ps
         
         sample = sigMod(i:sampLen + i)';
         
@@ -82,7 +82,7 @@ for present = day : 25 : day + futer
         [pkt It] = findpeaks(X1);
         
         
-        angaliousMinor = [angles(B(1)), angles(B(2))]; %angles(B(3))];
+        angaliousMinor = [angles(B(1)), angles(B(2))]
         
         angaliousMajor = [angaliousMajor; angaliousMinor];
         
@@ -97,8 +97,7 @@ for present = day : 25 : day + futer
     
     model = A(1)*cos(2*pi*1/P(1)+angaliousMajor(1,:)) +...
         A(2)*cos(2*pi*1/P(2)+angaliousMajor(2,:));
-    %         A(3)*cos(2*pi*1/P(3)+angaliousMajor(3,:));
-    
+ 
     ac = 0;
     
     projection1 = [ model1, A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1,end)+ac) ];
@@ -106,9 +105,7 @@ for present = day : 25 : day + futer
     
     projection = [ model, (A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1,end)+ac) +...
         A(2)*cos(2*pi*1/P(2)*(0:sampLen-1+predLen)+angaliousMajor(2,end)+ac))];
-    %A(3)*cos(2*pi*1/P(3)*(0:sampLen-1+predLen)+angaliousMajor(3,end)+ac))];
-    
-    
+
     projection1 = projection1 + dc_offset;
     projection = projection + dc_offset;
     
@@ -126,13 +123,13 @@ for present = day : 25 : day + futer
     
     sigPro = sigPro + dc_offset;
     
-    sigPro = sigPro(1:length(projection));
+    sigPro = sigPro(1:length(sigMod)+predLen);
     
     cheaterSigMod = sigPro(1:length(sigMod));
     
     signalPro = sig(1:length(projection));
     
-    modelExtender = projection(1:length(sigMod));
+    modelExtender = projection(1:end-predLen-1);
     
     prediction = projection(end-(predLen-1):end);
     
@@ -145,18 +142,8 @@ for present = day : 25 : day + futer
     modelExtender;
     prediction;
     
-%     c.plotPro(projection, cheaterSigMod);
-%     title('preBand');
-%     c.plotPro((projection-dc_offset), sigH(1:length(cheaterSigMod)));
-%     title('preBand');
-%     hold on;
-%     plot(sigL(1:length(cheaterSigMod))-mean(sigL(1:length(cheaterSigMod))));
-%     
-%     pause
-    
     sigTrendNorm = (sigTrend-min(sigTrend))/ range(sigTrend)+dc_offset;
-    
-    
+
     c.plotPro(projection, sigPro);
     title(present)
     hold on;
@@ -166,18 +153,7 @@ for present = day : 25 : day + futer
     title(present)
     hold on;
     plot(sigTrend);
-    
-    
-    %     pause
-    %     close all
-    %     c.plotPro(sigPro-dc_offset+mean(signalPro), signalPro);
-    %     title('Filt vs Unfilt')
-    %     hold on;
-    %     plot(projection1, 'c');
-    
-    
-    
-    
+
     filtEval = Evaluator(1, 1, sigPro(end-(predLen-1):end));
     
     bandEval = Evaluator(cheaterSigMod, modelExtender, prediction);
@@ -200,9 +176,7 @@ for present = day : 25 : day + futer
     
     toter = [toter; present, mSumo, pSumo, dervTrend, dervPred, PR];
     
-    
     angaliousMajor = [];
-    
     
 end
 
