@@ -32,10 +32,10 @@ B = [85 105];
 
 
 
-day = 1600
+day = 1000
 
 
-futer = 0
+futer = 1000
 
 dc_offset = 10;
 
@@ -44,6 +44,7 @@ predLen = 25;
 
 for present = day : 25 : day + futer
     
+    present
     sampLen = 300;
     
     sFFT = SignalGenerator(stock, present+2, sampLen);
@@ -56,40 +57,25 @@ for present = day : 25 : day + futer
     sigHL = getFiltered(sigH, filtL, 'low');
     sigMod = sigHL;
     
-   
+    sample = sigMod';
+ 
+    fs = 1;
+    x1 = sample;
+    ss = length(x1);
+    x1 = x1.*hanning(length(x1))';
+    x1 = [x1 zeros(1, 20000)];
+    angles = angle(fft(x1));
+    X1 = abs(fft(x1));
+    X1 = X1(1:ceil(length(X1)/2));
+    X1 = X1/(ss/4);
+    Xt = 0:length(X1)-1;
+    [pkt It] = findpeaks(X1);
     
-    ps = present-sampLen;
     
+    angaliousMinor = [angles(B(1)), angles(B(2))];
     
-%     parfor i = 1:ps
-        
-        sample = sigMod';
-        
-        % sample = sigMod(present-sampLen+1:end)';
-        % sigMod = sigMod(present-sampLen+1:end)';
-        
-        fs = 1;
-        x1 = sample;
-        ss = length(x1);
-        x1 = x1.*hanning(length(x1))';
-        x1 = [x1 zeros(1, 20000)];
-        angles = angle(fft(x1));
-        X1 = abs(fft(x1));
-        X1 = X1(1:ceil(length(X1)/2));
-        X1 = X1/(ss/4);
-        Xt = 0:length(X1)-1;
-%         P = fs./ (Xt*(fs/length(x1)));
-        [pkt It] = findpeaks(X1);
-        
-        
-        angaliousMinor = [angles(B(1)), angles(B(2))];
-        
-        angaliousMajor = [angaliousMajor; angaliousMinor];
-        
-        
-%     end
+    angaliousMajor = [angaliousMajor; angaliousMinor];
     
-    angaliousMajor
     
     angaliousMajor = angaliousMajor';
     
@@ -99,28 +85,25 @@ for present = day : 25 : day + futer
     
     model = A(1)*cos(2*pi*1/P(1)+angaliousMajor(1)) +...
         A(2)*cos(2*pi*1/P(2)+angaliousMajor(2));
- 
+    
     ac = 0;
     
     projection1 = [ model1, A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1)+ac) ];
     
-    plot(projection1)
-    pause
     
     projection = [ model, (A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1)+ac) +...
         A(2)*cos(2*pi*1/P(2)*(0:sampLen-1+predLen)+angaliousMajor(2)+ac))];
 
     
-  
     projection1 = projection1 + dc_offset;
     projection = projection + dc_offset;
     
     c = Construction(1, 1, 1, predLen, sigMod);
     
-    
-    
-    sFFT = SignalGenerator(stock, present+2+predLen+200, present+predLen+200);
+    sFFT = SignalGenerator(stock, present+2+predLen+200, sampLen+predLen+200);
     [sig] = sFFT.getSignal('ac');
+    
+   
     
     sigH = getFiltered(sig, filtH, 'high');
     sigL = getFiltered(sig, filtL, 'low');
@@ -148,18 +131,22 @@ for present = day : 25 : day + futer
     modelExtender;
     prediction;
     
+ 
+    
     sigTrendNorm = (sigTrend-min(sigTrend))/ range(sigTrend)+dc_offset;
-
+    
     c.plotPro(projection, sigPro);
     title(present)
     hold on;
     plot(sigTrendNorm);
+     
+%     c.plotPro(15*(projection-dc_offset)+mean(signalPro), signalPro);
+%     title(present)
+%     hold on;
+%     plot(sigTrend);
     
-    c.plotPro(15*(projection-dc_offset)+mean(signalPro), signalPro);
-    title(present)
-    hold on;
-    plot(sigTrend);
-
+%     pause
+    
     filtEval = Evaluator(1, 1, sigPro(end-(predLen-1):end));
     
     bandEval = Evaluator(cheaterSigMod, modelExtender, prediction);
@@ -173,7 +160,7 @@ for present = day : 25 : day + futer
     
     PR = [bandEval.percentReturn(sigPro),...
         bandEval.percentReturn(signalPro),...
-        filtEval.percentReturn(signalPro)]
+        filtEval.percentReturn(signalPro)];
     
     
     cheaterSigLShort = sigL(end-200-(predLen*2):end-200-predLen);
@@ -211,11 +198,6 @@ dvV = [dvtNorm(dvI),dvpNorm(dvI)];
 
 dvSame = [pres(dvI), dvV];
 
-
-
-
-
-% close all
 pres = toter(:,1);
 mS = toter(:,2)*100;
 pS = toter(:,3)*100;
@@ -227,7 +209,7 @@ filtv = toter(:,6);
 
 figure()
 
-plot(pres,-1*mS,'k');
+plot(pres,-1*mS*10,'k');
 hold on;
 plot(negPR(:,1),negPR(:,2),'r*')
 plot(neutPR(:,1),neutPR(:,2),'b*')
@@ -235,28 +217,9 @@ plot(posPR(:,1),posPR(:,2),'g*')
 % plot(pres,dvp*500, 'c')
 % plot(pres,dvt*20, 'm')
 plot(pres,zeros(1,length(pres)));
-plot(dvSame(:,1), dvSame(:,2)*10, 'ms');
-plot(dvSame(:,1), dvSame(:,3)*10, 'cs');
+plot(dvSame(:,1), dvSame(:,2), 'ms');
+plot(dvSame(:,1), dvSame(:,3), 'cs');
 hold off;
-
-% Kinectic energy of pred high
-% Pred in same direction as trend
-% Visually inspected DVE chooser (peak or something)
-
-
-% plot(pres,-1*pS,'b');
-% hold on;
-% plot(pres,band,'g');
-% hold on;
-% plot(pres,actual,'c');
-% hold on;
-% plot(pres,filtv,'m');
-% legend('model','pred','band','actual','filtv')
-
-% toter = [];
-% negPR = [];
-% neutPR = [];
-% posPR = [];
 
 
 
