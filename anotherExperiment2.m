@@ -44,9 +44,9 @@ predLen = 25;
 
 for present = day : 25 : day + futer
     
+    sampLen = 300;
     
-    
-    sFFT = SignalGenerator(stock, present+2, present);
+    sFFT = SignalGenerator(stock, present+2, sampLen);
     [sig] = sFFT.getSignal('ac');
     
     filtL = 0.0110;
@@ -56,14 +56,14 @@ for present = day : 25 : day + futer
     sigHL = getFiltered(sigH, filtL, 'low');
     sigMod = sigHL;
     
-    sampLen = 300;
+   
     
     ps = present-sampLen;
     
     
-    parfor i = 500:ps
+%     parfor i = 1:ps
         
-        sample = sigMod(i:sampLen + i)';
+        sample = sigMod';
         
         % sample = sigMod(present-sampLen+1:end)';
         % sigMod = sigMod(present-sampLen+1:end)';
@@ -78,34 +78,40 @@ for present = day : 25 : day + futer
         X1 = X1(1:ceil(length(X1)/2));
         X1 = X1/(ss/4);
         Xt = 0:length(X1)-1;
-        P = fs./ (Xt*(fs/length(x1)));
+%         P = fs./ (Xt*(fs/length(x1)));
         [pkt It] = findpeaks(X1);
         
         
-        angaliousMinor = [angles(B(1)), angles(B(2))]
+        angaliousMinor = [angles(B(1)), angles(B(2))];
         
         angaliousMajor = [angaliousMajor; angaliousMinor];
         
         
-    end
+%     end
+    
+    angaliousMajor
     
     angaliousMajor = angaliousMajor';
     
     sigMod = sigMod + dc_offset;
     
-    model1 = A(1)*cos(2*pi*1/P(1)+angaliousMajor(1,:));
+    model1 = A(1)*cos(2*pi*1/P(1)+angaliousMajor(1));
     
-    model = A(1)*cos(2*pi*1/P(1)+angaliousMajor(1,:)) +...
-        A(2)*cos(2*pi*1/P(2)+angaliousMajor(2,:));
+    model = A(1)*cos(2*pi*1/P(1)+angaliousMajor(1)) +...
+        A(2)*cos(2*pi*1/P(2)+angaliousMajor(2));
  
     ac = 0;
     
-    projection1 = [ model1, A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1,end)+ac) ];
+    projection1 = [ model1, A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1)+ac) ];
     
+    plot(projection1)
+    pause
     
-    projection = [ model, (A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1,end)+ac) +...
-        A(2)*cos(2*pi*1/P(2)*(0:sampLen-1+predLen)+angaliousMajor(2,end)+ac))];
+    projection = [ model, (A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1)+ac) +...
+        A(2)*cos(2*pi*1/P(2)*(0:sampLen-1+predLen)+angaliousMajor(2)+ac))];
 
+    
+  
     projection1 = projection1 + dc_offset;
     projection = projection + dc_offset;
     
@@ -123,13 +129,13 @@ for present = day : 25 : day + futer
     
     sigPro = sigPro + dc_offset;
     
-    sigPro = sigPro(1:length(sigMod)+predLen);
+    sigPro = sigPro(1:length(projection));
     
     cheaterSigMod = sigPro(1:length(sigMod));
     
     signalPro = sig(1:length(projection));
     
-    modelExtender = projection(1:end-predLen-1);
+    modelExtender = projection(1:length(sigMod));
     
     prediction = projection(end-(predLen-1):end);
     
