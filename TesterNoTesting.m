@@ -16,42 +16,49 @@ sigH = getFiltered(sig, filtH, 'high');
 sigL = getFiltered(sig, filtL, 'low');
 sigHL = getFiltered(sigH, filtL, 'low');
 
-
+hsvNum = 21;
+col = hsv(hsvNum);
+icl = 1;
+plot(sigL+mean(sig), 'color',col(icl,:));
+hold on;
+plot(sig);
+plot(sigH+mean(sig), 'color',col(icl,:));
 
 
 hsvNum = 21;
 col = hsv(hsvNum);
 icl = 1;
 
-for filtL = 0.0010:0.0005:0.0110
-    figure()
-    icl = 1;
-    
-    for filtH = 0.0010:0.0005:0.0110
-        
-        sigH = getFiltered(sig, filtH, 'high');
-        sigL = getFiltered(sig, filtL, 'low');
-        sigHL = getFiltered(sigH, filtL, 'low');
-        
-        
-        plot(sigHL+mean(sig), 'color',col(icl,:));
-        hold on;
-%         plot(sig);
-%         hold on;  
-        
-      % axis([0 2000 20 25]);
-        
-        icl = icl + 1;
-      
-    end
-    
-end
+% for filtL = 0.0010:0.0005:0.0110
+%     figure()
+%     icl = 1;
+%     
+%     for filtH = 0.0010:0.0005:0.0110
+%         
+%         sigH = getFiltered(sig, filtH, 'high');
+%         sigL = getFiltered(sig, filtL, 'low');
+%         sigHL = getFiltered(sigH, filtL, 'low');
+%         
+%         
+%         plot(sigHL+mean(sig), 'color',col(icl,:));
+%         hold on;
+% %         plot(sig);
+% %         hold on;  
+%         
+%       % axis([0 2000 20 25]);
+%         
+%         icl = icl + 1;
+%       
+%     end
+%     
+% end
 
 
 pause;
 
 figure()
 filtL = 0.0110;
+filtH = 0.0065;
 sigH = getFiltered(sig, filtH, 'high');
 sigL = getFiltered(sig, filtL, 'low');
 sigHL = getFiltered(sigH, filtL, 'low');
@@ -90,13 +97,13 @@ plot(P,X1)
 % P = [143.790849673203;173.228346456693;222.222222222222;101.382488479263];
 % A = [0.339427104715820;0.263888332732101;0.0314977986819783;0.248803629417075];
 
-sigMod = sigHL;
-t = TideFinder(sigMod, A, P);
-t.type = 1;
-[theta] = t.getTheta('BF');
-c = Construction(A, P, theta, predLen, sigMod);
-[model, prediction, projection] = c.constructPro();
-c.plotPro(projection, sigHL);
+% sigMod = sigHL;
+% t = TideFinder(sigMod, A, P);
+% t.type = 1;
+% [theta] = t.getTheta('BF');
+% c = Construction(A, P, theta, predLen, sigMod);
+% [model, prediction, projection] = c.constructPro();
+% c.plotPro(projection, sigHL);
 
 
 
