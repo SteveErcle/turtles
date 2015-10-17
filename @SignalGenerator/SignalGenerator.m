@@ -36,13 +36,13 @@ classdef SignalGenerator
 
         end
        
-        function [sig, sigHL, sigH, sigL] = getSignal(obj, ohlc)
+        function [sig, sigHL, sigH, sigL] = getSignal(obj, ohlc, filtH, filtL)
            %% Enter ohlc. Ex: 'h' for high, 'ac' for adjusted close.
     
           sig = getStock(obj.stock, obj.present, obj.sigLen, ohlc);
   
-          filtH = 0.005;
-          filtL = 0.123;
+%           filtH = 0.005;
+%           filtL = 0.123;
 
           sigH = getFiltered(sig, filtH, 'high');
           sigL = getFiltered(sig, filtL, 'low');

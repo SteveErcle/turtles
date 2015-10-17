@@ -2,7 +2,7 @@
 
 clc; clear all; close all;
 
-stock = 'ABT';
+stock = 'JPM';
 
 sFFT = SignalGenerator(stock, 2502, 2500);
 [sig, sigHL, sigH, sigL] = sFFT.getSignal('ac');
@@ -19,7 +19,7 @@ sigHL = getFiltered(sigH, filtL, 'low');
 
 
 
-hsvNum = 21;
+hsvNum = 12;
 col = hsv(hsvNum);
 icl = 1;
 
@@ -27,7 +27,7 @@ for filtL = 0.0010:0.0005:0.0110
     figure()
     icl = 1;
     
-    for filtH = 0.0010:0.0005:0.0110
+    for filtH = 0.0010:0.0005:0.0065
         
         sigH = getFiltered(sig, filtH, 'high');
         sigL = getFiltered(sig, filtL, 'low');
@@ -69,8 +69,8 @@ predLen = 0;
 fs = 1;
 x1 = sigHL';
 ss = length(x1);
-% x1 = x1.*hanning(length(x1))';
-% x1 = [x1 zeros(1, 20000)];
+x1 = x1.*hanning(length(x1))';
+x1 = [x1 zeros(1, 20000)];
 X1 = abs(fft(x1));
 X1 = X1(1:ceil(length(X1)/2));
 X1 = X1/(ss/4);
@@ -79,7 +79,7 @@ P = fs./ (Xt*(fs/length(x1)));
 [pkt It] = findpeaks(X1);
 
 figure()
-plot(P,X1)
+plot(X1)
 
 
 
@@ -90,13 +90,13 @@ plot(P,X1)
 % P = [143.790849673203;173.228346456693;222.222222222222;101.382488479263];
 % A = [0.339427104715820;0.263888332732101;0.0314977986819783;0.248803629417075];
 
-sigMod = sigHL;
-t = TideFinder(sigMod, A, P);
-t.type = 1;
-[theta] = t.getTheta('BF');
-c = Construction(A, P, theta, predLen, sigMod);
-[model, prediction, projection] = c.constructPro();
-c.plotPro(projection, sigHL);
+% sigMod = sigHL;
+% t = TideFinder(sigMod, A, P);
+% t.type = 1;
+% [theta] = t.getTheta('BF');
+% c = Construction(A, P, theta, predLen, sigMod);
+% [model, prediction, projection] = c.constructPro();
+% c.plotPro(projection, sigHL);
 
 
 
