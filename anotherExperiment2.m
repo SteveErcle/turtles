@@ -3,51 +3,39 @@
 clear all; clc; close all;
 
 y = [];
-angaliousMajor = [];
+
 toter = [];
 PR = [];
-
-% stock = 'ABT';
-% A = [0.48, 0.38 0.36];
-% P = [222 171 286];
-% B = [102 132 76];
-
-% A = [0.48, 0.36];
-% P = [222 286];
-% B = [102 76];
-%
-% A = [0.13, 0.06, 0.04];
-% P = [169 221 147]
-% B = [134 103 154];
-
-stock = 'PG';
-A = [1.25, 0.80]/5;
-P = [268 216]
-B = [85 105];
-
-% stock = 'JPM';
-% A = [1.48 1.2]/5
-% P = [221, 309];
-% B = [73 103];
+angaliousSuperiomus = [];
 
 
 
-day = 1000
+stock = 'JPM';
+A = [1.48 1.2]/5;
+P = [221, 309];
+B = [73 103];
 
 
-futer = 1000
 
-dc_offset = 10;
+day = 1000;
+futer = 1000;
+interval = 25;
 
-sumoCumo = 150;
 predLen = 25;
+dc_offset = 10;
+sumoCumo = 50;
 
-for present = day : 25 : day + futer
-    
+
+% for present = day : interval : day + futer
+for i = 0:futer/interval
+    present = day + i*interval
+        
+  
+    angaliousMajor = [];
     present
     sampLen = 300;
     
-    sFFT = SignalGenerator(stock, present+2, sampLen);
+    sFFT = SignalGenerator(stock, present+2, present);
     [sig] = sFFT.getSignal('ac');
     
     filtL = 0.0110;
@@ -57,8 +45,11 @@ for present = day : 25 : day + futer
     sigHL = getFiltered(sigH, filtL, 'low');
     sigMod = sigHL;
     
-    sample = sigMod';
- 
+    ps = present-sampLen;
+
+    sample = sigMod(ps:sampLen + ps)';
+%     sigMod = sample;
+    
     fs = 1;
     x1 = sample;
     ss = length(x1);
@@ -75,8 +66,7 @@ for present = day : 25 : day + futer
     angaliousMinor = [angles(B(1)), angles(B(2))];
     
     angaliousMajor = [angaliousMajor; angaliousMinor];
-    
-    
+
     angaliousMajor = angaliousMajor';
     
     sigMod = sigMod + dc_offset;
@@ -93,17 +83,17 @@ for present = day : 25 : day + futer
     
     projection = [ model, (A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1)+ac) +...
         A(2)*cos(2*pi*1/P(2)*(0:sampLen-1+predLen)+angaliousMajor(2)+ac))];
-
+    
     
     projection1 = projection1 + dc_offset;
     projection = projection + dc_offset;
-    
+        
     c = Construction(1, 1, 1, predLen, sigMod);
     
-    sFFT = SignalGenerator(stock, present+2+predLen+200, sampLen+predLen+200);
+    sFFT = SignalGenerator(stock, present+2+predLen+200, present+predLen+200);
     [sig] = sFFT.getSignal('ac');
     
-   
+    
     
     sigH = getFiltered(sig, filtH, 'high');
     sigL = getFiltered(sig, filtL, 'low');
@@ -112,17 +102,23 @@ for present = day : 25 : day + futer
     
     sigPro = sigPro + dc_offset;
     
-    sigPro = sigPro(1:length(projection));
+    sigPro = sigPro(1:length(sigMod)+predLen);
+    
+    projection = [dc_offset*ones(1,(length(sigPro)-length(projection))),...
+        projection];
     
     cheaterSigMod = sigPro(1:length(sigMod));
     
-    signalPro = sig(1:length(projection));
+    signalPro = sig(1:length(sigMod)+predLen);
     
-    modelExtender = projection(1:length(sigMod));
+    modelExtender = projection(1:end-predLen);
     
     prediction = projection(end-(predLen-1):end);
     
     sigTrend = sigL(1:length(cheaterSigMod));
+    
+   
+ 
     
     sigPro;
     signalPro;
@@ -131,21 +127,21 @@ for present = day : 25 : day + futer
     modelExtender;
     prediction;
     
- 
+    
     
     sigTrendNorm = (sigTrend-min(sigTrend))/ range(sigTrend)+dc_offset;
     
-    c.plotPro(projection, sigPro);
-    title(present)
-    hold on;
-    plot(sigTrendNorm);
-     
-%     c.plotPro(15*(projection-dc_offset)+mean(signalPro), signalPro);
+%     c.plotPro(projection, sigPro);
 %     title(present)
 %     hold on;
-%     plot(sigTrend);
+%     plot(sigTrendNorm);
     
-%     pause
+        c.plotPro(15*(projection-dc_offset)+mean(signalPro), signalPro);
+        title(present)
+        hold on;
+        plot(sigTrend);
+    
+    %     pause
     
     filtEval = Evaluator(1, 1, sigPro(end-(predLen-1):end));
     
@@ -167,10 +163,16 @@ for present = day : 25 : day + futer
     dervTrend = sum(diff(cheaterSigLShort));
     dervPred = sum(diff(prediction));
     
-    toter = [toter; present, mSumo, pSumo, dervTrend, dervPred, PR];
+    tt = [present, mSumo, pSumo, dervTrend, dervPred, PR];
     
-    angaliousMajor = [];
+    toter = [toter; tt];
     
+    
+    aif = [angaliousMajor(1), angaliousMajor(2)];
+    angaliousSuperiomus = [angaliousSuperiomus; aif];
+    
+    
+
 end
 
 

@@ -51,7 +51,7 @@ for stcn = 45:45length(allNames)
     X1 = X1(1:ceil(length(X1)/2));
     X1 = X1/(ss/4);
     Xt = 0:length(X1)-1;
-    P = fs./ (Xt*(fs/length(x1)));
+    Pds = fs./ (Xt*(fs/length(x1)));
     [pkt It] = findpeaks(X1);
     
     pktNbins = [pkt', It'];
@@ -60,9 +60,11 @@ for stcn = 45:45length(allNames)
     
     if (pktNbins(1,1) - pktNbins(2,1))/ pktNbins(1,1) > 0.25
         B = pktNbins(1:2,2);
+        P = fs./ (B*(fs/length(x1)));
         A = pktNbins(1:2,1);
     else
         B = pktNbins(1,2);
+        P = fs./ (B*(fs/length(x1)));
         A = pktNbins(1:2,1);
     end
     
