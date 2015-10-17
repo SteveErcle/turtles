@@ -8,7 +8,7 @@ allNames = { allFiles.name };
 
 stotal = [];
 
-for stcn = 45:45length(allNames)
+for stcn = 10:10length(allNames)
     
     stcn
     
@@ -70,15 +70,13 @@ for stcn = 45:45length(allNames)
     
     
     
-    %     sigPro = getFiltered(sigPro, 0.1, 'low');
-    
+
     figure(stcn)
     plot(sigHL)
     hold on;
     plot(sigPro,'r')
     plot(ones(length(sigPro),1)*mean(sigPro));
-    %     plot(X1)
-    %     axis ([0 500, 0, 0.2])
+
     
     eMod = Evaluator(sigPro, sigHL', 1);
     

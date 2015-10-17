@@ -10,19 +10,28 @@ angaliousSuperiomus = [];
 
 
 
-stock = 'JPM';
-A = [1.48 1.2]/5;
-P = [221, 309];
-B = [73 103];
+% stock = 'JPM';
+% A = [1.48 1.2]/5;
+% P = [221, 309];
+% B = [73 103];
+
+% stock = 'MENT';
+% A = [1.37, 0.75];
+% P = [215.68, 305.55];
+% B = [102, 72];
+
+stock = 'ADBE';
+A = [1.33; 0.73];
+P = [215.69; 314.29];
+B = [102; 70];
 
 
-
-day = 1000;
+day = 1400;
 futer = 1000;
 interval = 25;
 
 predLen = 25;
-dc_offset = 10;
+dc_offset = 15;
 sumoCumo = 50;
 
 
@@ -39,7 +48,7 @@ for i = 0:futer/interval
     [sig] = sFFT.getSignal('ac');
     
     filtL = 0.0110;
-    filtH = 0.0110;
+    filtH = 0.0065;
     sigH = getFiltered(sig, filtH, 'high');
     sigL = getFiltered(sig, filtL, 'low');
     sigHL = getFiltered(sigH, filtL, 'low');
@@ -136,10 +145,10 @@ for i = 0:futer/interval
 %     hold on;
 %     plot(sigTrendNorm);
     
-        c.plotPro(15*(projection-dc_offset)+mean(signalPro), signalPro);
-        title(present)
-        hold on;
-        plot(sigTrend);
+%         c.plotPro((projection-dc_offset)+mean(signalPro), signalPro);
+%         title(present)
+%         hold on;
+%         plot(sigTrend);
     
     %     pause
     
@@ -156,8 +165,9 @@ for i = 0:futer/interval
     
     PR = [bandEval.percentReturn(sigPro),...
         bandEval.percentReturn(signalPro),...
-        filtEval.percentReturn(signalPro)];
-    
+        filtEval.percentReturn(signalPro)]
+
+     bandEval.percentReturn(signalPro);
     
     cheaterSigLShort = sigL(end-200-(predLen*2):end-200-predLen);
     dervTrend = sum(diff(cheaterSigLShort));
@@ -181,12 +191,26 @@ PR = toter(:,end-1); % actual return
 pres = toter(:,1);
 dvp = toter(:,end-3);
 dvt = toter(:,end-4);
-posRet = 5;
+posRet = 10;
 
+
+
+% dvpNorm2 = dvp-mean(dvp);
+% dvpNorm2 = dvpNorm2/std(dvpNorm2);
+% dvtNorm2 = dvt-mean(dvt);
+% dvtNorm2 = dvtNorm2/std(dvtNorm2);
+% dvpNorm2 = dvp/mean(dvp)
+dvpNorm2 = dvp;
+dvtNorm2 = dvt;
+dvI2 = [(find( dvtNorm2 > 0 & dvpNorm2 > 0)); (find( dvtNorm2 <= 0 & dvpNorm2 <= 0))];
+dvV2 = [dvtNorm2(dvI2),dvpNorm2(dvI2)];
+dvSame2 = [pres(dvI2), dvV2];
 
 dvpNorm = (dvp-min(dvp))/ range(dvp)-0.5;
 dvtNorm = (dvt-min(dvt))/ range(dvt)-0.5;
-
+dvI = [(find( dvtNorm > 0 & dvpNorm > 0)); (find( dvtNorm <= 0 & dvpNorm <= 0))];
+dvV = [dvtNorm(dvI),dvpNorm(dvI)];
+dvSame = [pres(dvI), dvV];
 
 negPR = [pres(find( PR<0 )), PR( PR<0 )];
 
@@ -194,33 +218,34 @@ neutPR = [pres(find( PR>=0 & PR<=posRet )), PR( PR>=0 & PR<=posRet )];
 
 posPR = [pres(find( PR>posRet )), PR( PR>posRet )];
 
-dvI = [(find( dvtNorm > 0 & dvpNorm > 0)); (find( dvtNorm <= 0 & dvpNorm <= 0))];
 
-dvV = [dvtNorm(dvI),dvpNorm(dvI)];
-
-dvSame = [pres(dvI), dvV];
 
 pres = toter(:,1);
 mS = toter(:,2)*100;
 pS = toter(:,3)*100;
 
-band = toter(:,4);
-actual = toter(:,5);
-filtv = toter(:,6);
+band = toter(:,end-2);
+actual = toter(:,end-1);
+filtv = toter(:,end);
 
 
 figure()
 
-plot(pres,-1*mS*10,'k');
+plot(pres,-1*mS,'k');
 hold on;
+% plot(pres,-1*pS,'b');
 plot(negPR(:,1),negPR(:,2),'r*')
 plot(neutPR(:,1),neutPR(:,2),'b*')
 plot(posPR(:,1),posPR(:,2),'g*')
-% plot(pres,dvp*500, 'c')
-% plot(pres,dvt*20, 'm')
 plot(pres,zeros(1,length(pres)));
-plot(dvSame(:,1), dvSame(:,2), 'ms');
-plot(dvSame(:,1), dvSame(:,3), 'cs');
+plot(dvSame(:,1), dvSame(:,3)*25, 'cs');
+plot(dvSame(:,1), dvSame(:,2)*25, 'ms');
+plot(dvSame2(:,1), dvSame2(:,3)*25, 'bs');
+plot(dvSame2(:,1), dvSame2(:,2)*15, 'rs');
+
+% plot(pres,band*5, 'k');
+% plot(pres,actual, 'c');
+% plot(pres,filtv, 'm')
 hold off;
 
 

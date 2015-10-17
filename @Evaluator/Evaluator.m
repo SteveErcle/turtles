@@ -5,7 +5,7 @@ classdef Evaluator
        sigMod;
        model;
        prediction;
-       stop_loss = 1;
+       stop_loss = 10;
        one_trade = 0;
        Total;
        Type;
