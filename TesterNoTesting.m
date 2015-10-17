@@ -2,7 +2,7 @@
 
 clc; clear all; close all;
 
-stock = 'JPM';
+stock = 'ABT';
 
 sFFT = SignalGenerator(stock, 2502, 2500);
 [sig, sigHL, sigH, sigL] = sFFT.getSignal('ac');
@@ -16,42 +16,49 @@ sigH = getFiltered(sig, filtH, 'high');
 sigL = getFiltered(sig, filtL, 'low');
 sigHL = getFiltered(sigH, filtL, 'low');
 
+hsvNum = 21;
+col = hsv(hsvNum);
+icl = 1;
+plot(sigL+mean(sig), 'color',col(icl,:));
+hold on;
+plot(sig);
+plot(sigH+mean(sig), 'color',col(icl,:));
 
 
-
-hsvNum = 12;
+hsvNum = 21;
 col = hsv(hsvNum);
 icl = 1;
 
-for filtL = 0.0010:0.0005:0.0110
-    figure()
-    icl = 1;
-    
-    for filtH = 0.0010:0.0005:0.0065
-        
-        sigH = getFiltered(sig, filtH, 'high');
-        sigL = getFiltered(sig, filtL, 'low');
-        sigHL = getFiltered(sigH, filtL, 'low');
-        
-        
-        plot(sigHL+mean(sig), 'color',col(icl,:));
-        hold on;
-%         plot(sig);
-%         hold on;  
-        
-      % axis([0 2000 20 25]);
-        
-        icl = icl + 1;
-      
-    end
-    
-end
+% for filtL = 0.0010:0.0005:0.0110
+%     figure()
+%     icl = 1;
+%     
+%     for filtH = 0.0010:0.0005:0.0110
+%         
+%         sigH = getFiltered(sig, filtH, 'high');
+%         sigL = getFiltered(sig, filtL, 'low');
+%         sigHL = getFiltered(sigH, filtL, 'low');
+%         
+%         
+%         plot(sigHL+mean(sig), 'color',col(icl,:));
+%         hold on;
+% %         plot(sig);
+% %         hold on;  
+%         
+%       % axis([0 2000 20 25]);
+%         
+%         icl = icl + 1;
+%       
+%     end
+%     
+% end
 
 
 pause;
 
 figure()
 filtL = 0.0110;
+filtH = 0.0065;
 sigH = getFiltered(sig, filtH, 'high');
 sigL = getFiltered(sig, filtL, 'low');
 sigHL = getFiltered(sigH, filtL, 'low');
@@ -69,8 +76,8 @@ predLen = 0;
 fs = 1;
 x1 = sigHL';
 ss = length(x1);
-x1 = x1.*hanning(length(x1))';
-x1 = [x1 zeros(1, 20000)];
+% x1 = x1.*hanning(length(x1))';
+% x1 = [x1 zeros(1, 20000)];
 X1 = abs(fft(x1));
 X1 = X1(1:ceil(length(X1)/2));
 X1 = X1/(ss/4);
@@ -79,7 +86,7 @@ P = fs./ (Xt*(fs/length(x1)));
 [pkt It] = findpeaks(X1);
 
 figure()
-plot(X1)
+plot(P,X1)
 
 
 
