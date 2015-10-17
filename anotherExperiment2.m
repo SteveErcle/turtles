@@ -18,16 +18,15 @@ angaliousSuperiomus = [];
 % stock = 'MENT';
 % A = [1.37, 0.75];
 % P = [215.68, 305.55];
-% B = [102, 72];
+% B  = [102, 72];
 
 stock = 'ADBE';
 A = [1.33; 0.73];
 P = [215.69; 314.29];
 B = [102; 70];
 
-
-day = 1400;
-futer = 0;
+day = 1000;
+futer = 1000;
 interval = 25;
 
 predLen = 25;
@@ -67,7 +66,7 @@ for i = 0:futer/interval
     [pkt It] = findpeaks(X1);
     
     
-    angaliousMinor = [angles(B(1)), angles(B(2))];
+    angaliousMinor = [angles(B(1)), angles(B(2))]
     
     angaliousMajor = [angaliousMajor; angaliousMinor];
     
@@ -75,22 +74,23 @@ for i = 0:futer/interval
     
     sigMod = sigMod + dc_offset;
     
-    model1 = A(1)*cos(2*pi*1/P(1)+angaliousMajor(1));
     
-    model = A(1)*cos(2*pi*1/P(1)+angaliousMajor(1)) +...
-        A(2)*cos(2*pi*1/P(2)+angaliousMajor(2));
+    model = A(1)*cos(2*pi*1/P(1)*(0)+angaliousMajor(1)) +...
+        A(2)*cos(2*pi*1/P(2)*(0)+angaliousMajor(2));
     
     ac = 0;
     
-    projection1 = [ model1, A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1)+ac) ];
+    
+   
+    
+ 
+    projection = [ model, (A(1)*cos(2*pi*1/P(1)*(1:sampLen+predLen)+angaliousMajor(1)+ac) +...
+        A(2)*cos(2*pi*1/P(2)*(1:sampLen+predLen)+angaliousMajor(2)+ac))];
     
     
-    projection = [ model, (A(1)*cos(2*pi*1/P(1)*(0:sampLen-1+predLen)+angaliousMajor(1)+ac) +...
-        A(2)*cos(2*pi*1/P(2)*(0:sampLen-1+predLen)+angaliousMajor(2)+ac))];
-    
-    
-    projection1 = projection1 + dc_offset;
     projection = projection + dc_offset;
+    
+    
     
     c = Construction(1, 1, 1, predLen, sigMod);
     
@@ -105,6 +105,11 @@ for i = 0:futer/interval
     
     projection = [dc_offset*ones(1,(length(sigPro)-length(projection))),...
         projection];
+    
+   mean(model)
+    mean(projection)
+    
+    length(projection)
     
     cheaterSigMod = sigPro(1:length(sigMod));
     
@@ -140,7 +145,8 @@ for i = 0:futer/interval
     hold on;
     plot(sigTrend);
     
-    %         pause
+    pause 
+    
     
     filtEval = Evaluator(1, 1, sigPro(end-(predLen-1):end));
     
@@ -227,8 +233,8 @@ plot(negPR(:,1),negPR(:,2),'r*')
 plot(neutPR(:,1),neutPR(:,2),'b*')
 plot(posPR(:,1),posPR(:,2),'g*')
 plot(pres,zeros(1,length(pres)));
-plot(dvSame(:,1), dvSame(:,3)*25, 'cs');
-plot(dvSame(:,1), dvSame(:,2)*25, 'ms');
+% plot(dvSame(:,1), dvSame(:,3)*25, 'cs');
+% plot(dvSame(:,1), dvSame(:,2)*25, 'ms');
 plot(dvSame2(:,1), dvSame2(:,3)*25, 'bs');
 plot(dvSame2(:,1), dvSame2(:,2)*15, 'rs');
 

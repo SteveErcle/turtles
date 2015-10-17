@@ -10,7 +10,7 @@ sigMod = obj.sigMod;
 
 sigModLen = length(sigMod);
 
-t = 1:sigModLen + predLen;
+t = 0:sigModLen + predLen-1;
 
 projection = mean(sigMod);
 for k = 1:length(theta)

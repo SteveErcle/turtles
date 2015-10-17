@@ -15,8 +15,8 @@ P = [215.69; 314.29];
 B = [102; 70];
 
 
-day = 1400;
-futer = 0;
+day = 1000;
+futer = 1000;
 interval = 25;
 
 predLen = 25;
@@ -42,16 +42,14 @@ for i = 0:futer/interval
     sample = sigMod;
     [X1 Pds angles] = getFFT(sample);
     theta = [angles(B)];
-    
+
     sigMod = sigMod + dc_offset;
     
     c = Construction(A, P, theta, predLen, sigMod);
     [model, prediction, projection] = c.constructPro();
     
-    %    ac = 0 //ERROR?
-    
     sPro = SignalGenerator(stock, present+2+predLen+200, present+predLen+200);
-    [sig, sigHL] = sPro.getSignal('ac', filtH, filtL);
+    [sig, sigHL, sigH, sigL] = sPro.getSignal('ac', filtH, filtL);
     
     lenSPleft = 199+predLen+length(sigMod);
     lenSPright = 200;
@@ -69,22 +67,21 @@ for i = 0:futer/interval
     dervPred = sum(diff(prediction));
 
     
-    sigTrendNorm = (sigTrendOP-min(sigTrendOP))/ range(sigTrendOP)+dc_offset;
+    sigTrendOPNorm = sigTrendOP/(range(sigTrendOP)/2) * (range(projection)/2)+dc_offset;
     
     c.plotPro(projection, sigPro);
     title(present)
     hold on;
-    plot(sigTrendOP);
+    plot(sigTrendOPNorm);
     
    
     c.plotPro((projection-dc_offset)+mean(signalPro), signalPro);
     title(present)
     hold on;
-    plot(sigTrendOP);
+    plot(sigTrendOPNorm);
     
-   
     pause
-    
+     
     filtEval = Evaluator(1, 1, sigPro(end-predLen:end));
     bandEval = Evaluator(sigModOP, model, prediction);
     [modDVE, modDVElist] = bandEval.DVE();
@@ -148,8 +145,6 @@ neutPR = [pres(find( PR>=0 & PR<=posRet )), PR( PR>=0 & PR<=posRet )];
 
 posPR = [pres(find( PR>posRet )), PR( PR>posRet )];
 
-
-
 pres = toter(:,1);
 mS = toter(:,2)*100;
 pS = toter(:,3)*100;
@@ -170,8 +165,7 @@ plot(posPR(:,1),posPR(:,2),'g*')
 plot(pres,zeros(1,length(pres)));
 plot(dvSame(:,1), dvSame(:,3)*25, 'cs');
 plot(dvSame(:,1), dvSame(:,2)*25, 'ms');
-plot(dvSame2(:,1), dvSame2(:,3)*25, 'bs');
-plot(dvSame2(:,1), dvSame2(:,2)*15, 'rs');
+% plot(dvSame2(:,1), dvSame2(:,3)*25, 'bs');
+% plot(dvSame2(:,1), dvSame2(:,2)*15, 'rs');
 hold off;
-
 

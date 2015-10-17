@@ -11,6 +11,8 @@ sigModdf = diff(sigMod);
 theta = zeros(1,length(P));
 t = 1:length(sigMod);
 
+sprintf('Dont forget to fix index in tideFinders')
+
 res = .01;
 
 sqre = [];

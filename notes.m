@@ -40,6 +40,10 @@
 %     - How much filtering? What band?
 
 
+% sinfapm
+
+% Correlator
+
 
 
 

@@ -21,6 +21,8 @@ classdef TideFinder
         
         [theta] = GDtideFinder(obj);
         
+        [theta] = FTtideFinder(obj);
+        
 %         FFTtideFinder()
         
         
