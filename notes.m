@@ -1,5 +1,6 @@
 % Notes
 
+% Backtesting, optimizing the past
 
 % Create pass & select params and compare to select all
 %     - Trend

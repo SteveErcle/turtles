@@ -9,12 +9,12 @@ allNames = { allFiles.name };
 stotal = [];
 
 
-for stcn = 4:length(allNames)
+for stcn = 35:35length(allNames)
     
     stock = allNames{stcn}(1:end-4);
     filtH = 0.0065;
     filtL = 0.0110;
-    sFFT = SignalGenerator(stock, 2002, 2000);
+    sFFT = SignalGenerator(stock, 2402, 2000);
     [sig, sigHL, sigH, sigL] = sFFT.getSignal('ac',filtH, filtL);
 
     %     sigHL = (sigHL-min(sigHL))/ range(sigHL);
@@ -61,17 +61,17 @@ for stcn = 4:length(allNames)
         A = pktNbins(1:2,1);
     end
 
-    figure(stcn)
-    plot(X1)
- 
-    axis([0 300 0 3])
-    
-    
 %     figure(stcn)
-%     plot(sigHL)
-%     hold on;
-%     plot(sigPro,'r')
-%     plot(ones(length(sigPro),1)*mean(sigPro));
+%     plot(X1)
+%  
+%     axis([0 300 0 3])
+%    
+    
+    figure(stcn)
+    plot(sigHL)
+    hold on;
+    plot(sigPro,'r')
+    plot(ones(length(sigPro),1)*mean(sigPro));
 
     
     eMod = Evaluator(sigPro, sigHL', 1);

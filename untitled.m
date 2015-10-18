@@ -2,26 +2,25 @@
 clear all; close all; clc;
 
 stock = 'MENT'
-present = 1500
+present = 1200
 
 filtH = 0.0065;
 filtL = 0.0110;
 
 
 
-% for filtL = 0.0005:0.0010:0.0500
 
 sMod = SignalGenerator(stock, present+2, 1000);
 [sig, sigHL, sigH, sigL] = sMod.getSignal('ac', filtH, filtL);
 
 sigMod = sigHL;
 
-sigModMA = tsmovavg(sig,'s',25,1);
+
 
 sPro = SignalGenerator(stock, present+2+200, 1000+200);
 [sig, sigHL, sigH, sigL] = sPro.getSignal('ac', filtH, filtL);
 
-% cheaterSigMod = sigH;
+cheaterSigTrend = sigL(1:end-200);
 cheaterSigMod = sigHL(1:end-200);
 
 filtL = 0.0500
@@ -29,18 +28,38 @@ sDerv = SignalGenerator(stock, present+2, 1000);
 [sig, sigHL, sigH, sigL] = sDerv.getSignal('ac', filtH, filtL);
 
 
+
+trendLen = 50; 
+sigTrend = sigL;
+sigTrend(end-49:end) = linspace(sig(end-49), sig(end), 50);
+derv = diff(sigTrend(end-49:end))
+
+
+sigGreen = sigHL;
+
+
+sDerv = SignalGenerator(stock, present+2+200, 1000+200);
+[sig, sigHL, sigH, sigL] = sDerv.getSignal('ac', filtH, filtL);
+
+sigMagent = sigHL;
+
 % cheaterSigMod = tsmovavg(cheaterSigMod,'s',25,1);
 
-sumoCumo = 25   
-sigMod(end-(sumoCumo-1):end) = linspace(sigHL(end-(sumoCumo-1)), sigHL(end), sumoCumo);
 
 figure()
-plot(sigMod)
 hold on
-plot(cheaterSigMod,'r')
-plot(sigHL,'g')
+% plot(sigMod)
+% hold on
+% plot(cheaterSigMod,'r')
+% plot(sigGreen,'g')
+% plot(sigMagent, 'm')
+plot(cheaterSigTrend,'c')
+plot(sigTrend,'k')
+plot(sig)
 
-% end
+% plot(sig-mean(sig),'k')
+
+
 
 % 
 % figure()
