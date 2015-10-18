@@ -21,7 +21,7 @@ interval = 25;
 
 predLen = 25;
 dc_offset = 15;
-sumoCumo = 50;
+sumoCumo = 200;
 
 
 
@@ -48,6 +48,8 @@ for i = 0:futer/interval
     c = Construction(A, P, theta, predLen, sigMod);
     [model, prediction, projection] = c.constructPro();
     
+    filtH = 0.0065;
+    filtL = 0.0110;    
     sPro = SignalGenerator(stock, present+2+predLen+200, present+predLen+200);
     [sig, sigHL, sigH, sigL] = sPro.getSignal('ac', filtH, filtL);
     
@@ -59,15 +61,16 @@ for i = 0:futer/interval
     sigPro = sigHL(end-lenSPleft:end-lenSPright)+dc_offset;
     signalPro = sig(end-lenSPleft:end-lenSPright);
     
-    sigModOP = sigHL(end-lenSMleft:end-lenSMright)+dc_offset;
+    sigModOP = sigH(end-lenSMleft:end-lenSMright)+dc_offset;
     sigTrendOP = sigL(end-lenSMleft:end-lenSMright);
     sigTrendOPshort = sigTrendOP(end-49:end);
+    
     
     dervTrend = sum(diff(sigTrendOPshort));
     dervPred = sum(diff(prediction));
 
     
-    sigTrendOPNorm = sigTrendOP/(range(sigTrendOP)/2) * (range(projection)/2)+dc_offset;
+    sigTrendOPNorm = sigTrendOP - mean(sigTrendOP) + dc_offset;
     
     c.plotPro(projection, sigPro);
     title(present)
@@ -78,9 +81,9 @@ for i = 0:futer/interval
     c.plotPro((projection-dc_offset)+mean(signalPro), signalPro);
     title(present)
     hold on;
-    plot(sigTrendOPNorm);
+    plot(sigTrendOP);
+%     pause
     
-    pause
      
     filtEval = Evaluator(1, 1, sigPro(end-predLen:end));
     bandEval = Evaluator(sigModOP, model, prediction);
@@ -156,7 +159,7 @@ filtv = toter(:,end);
 
 figure()
 
-plot(pres,-1*mS,'k');
+plot(pres,-1*mS/200,'k');
 hold on;
 % plot(pres,-1*pS,'b');
 plot(negPR(:,1),negPR(:,2),'r*')
