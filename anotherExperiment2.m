@@ -10,22 +10,22 @@ angaliousSuperiomus = [];
 
 
 
-% stock = 'JPM';
-% A = [1.48 1.2]/5;
-% P = [221, 309];
-% B = [73 103];
+stock = 'JPM';
+A = [1.48 1.2]/5;
+P = [221, 309];
+B = [73 103];
 
 % stock = 'MENT';
 % A = [1.37, 0.75];
 % P = [215.68, 305.55];
 % B  = [102, 72];
 
-stock = 'ADBE';
-A = [1.33; 0.73];
-P = [215.69; 314.29];
-B = [102; 70];
+% stock = 'ADBE';
+% A = [1.33; 0.73];
+% P = [215.69; 314.29];
+% B = [102; 70];
 
-day = 1000;
+day = 2000;
 futer = 1000;
 interval = 25;
 
@@ -43,7 +43,7 @@ for i = 0:futer/interval
     
     filtH = 0.0065;
     filtL = 0.0110;
-    sFFT = SignalGenerator(stock, present+2, present);
+    sFFT = SignalGenerator(stock, present+2, 1584);
     [sig, sigHL, sigH, sigL] = sFFT.getSignal('ac', filtH, filtL);
     
     sigMod = sigHL;

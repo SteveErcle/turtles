@@ -9,14 +9,18 @@ allNames = { allFiles.name };
 stotal = [];
 
 
-for stcn = 35:35length(allNames)
-    
+for stcn = 33:33length(allNames)
+   
     stock = allNames{stcn}(1:end-4);
     filtH = 0.0065;
     filtL = 0.0110;
-    sFFT = SignalGenerator(stock, 2402, 2000);
+    sFFT = SignalGenerator(stock, 2202, 2000);
     [sig, sigHL, sigH, sigL] = sFFT.getSignal('ac',filtH, filtL);
 
+    figure(stcn+100)
+     plot(sig,'r');
+     
+    
     %     sigHL = (sigHL-min(sigHL))/ range(sigHL);
     %     sigH = (sigH-min(sigH))/ range(sigH);
     %     sig = (sig-min(sig))/ range(sig);
@@ -51,27 +55,28 @@ for stcn = 35:35length(allNames)
     
     pktNbins = sortrows(pktNbins,-1);
     
-    if (pktNbins(1,1) - pktNbins(2,1))/ pktNbins(1,1) > 0.25
+    if (pktNbins(1,1) - pktNbins(2,1))/ pktNbins(1,1) < 0.75
         B = pktNbins(1:2,2);
         P = fs./ (B*(fs/length(x1)));
         A = pktNbins(1:2,1);
     else
         B = pktNbins(1,2);
         P = fs./ (B*(fs/length(x1)));
-        A = pktNbins(1:2,1);
+        A = pktNbins(1:1,1);
     end
 
-%     figure(stcn)
-%     plot(X1)
-%  
-%     axis([0 300 0 3])
-%    
+    figure(stcn+200)
+    plot(X1)
+ 
+    axis([0 300 0 3])
+   
     
     figure(stcn)
     plot(sigHL)
     hold on;
     plot(sigPro,'r')
     plot(ones(length(sigPro),1)*mean(sigPro));
+   
 
     
     eMod = Evaluator(sigPro, sigHL', 1);

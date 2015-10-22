@@ -1,5 +1,13 @@
 % Notes
 
+% Steady state finder
+
+% T_tide -  compare to BF and FT finder
+    %    - sinfapm
+
+% Win at the baby game, small periods
+%     - Filters
+
 % Backtesting, optimizing the past
 
 % Create pass & select params and compare to select all
@@ -15,10 +23,10 @@
 %     - Variance
 
 
-% Run process on other stocks to see if correlation continues
+% BFperiodFinder using FFT phases, one period at a time?
+%     - How much filtering? What band?
 
-
-% Remove omnipotence
+% Correlator
 
 
 % Optimize parameters 
@@ -35,15 +43,10 @@
 
 % Relative gap to period size
 
+% Remove omnipotence
 
 
-% BFperiodFinder using FFT phases, one period at a time?
-%     - How much filtering? What band?
 
-
-% sinfapm
-
-% Correlator
 
 
 

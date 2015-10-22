@@ -1,95 +1,65 @@
-
-clear all; close all; clc;
-
-stock = 'MENT'
-present = 1200
-
-filtH = 0.0065;
-filtL = 0.0110;
+clear all; clc; close all;
 
 
 
+toter = [];
+PR = [];
+angaliousSuperiomus = [];
 
-sMod = SignalGenerator(stock, present+2, 1000);
+stock = 'JPM';
+A = [.45 .45 .45 .78 .88];
+P = [32 41 52 62 82];
+B = [270 356 422 535 665];
+
+day = 400;
+futer = 2500-day;
+interval = 1;
+
+predLen = 100;
+dc_offset = 15;
+
+
+angaliousMajor = [];
+
+
+parfor i = 0:futer/interval
+    present = day + i*interval
+    
+    
+    present
+    sampLen = 100;
+    
+    filtL = 0.1100;
+    filtH = 0.0210;
+    sMod = SignalGenerator(stock, present+2, present);
+    [sig, sigHL, sigH, sigL] = sMod.getSignal('ac', filtH, filtL);
+    
+    
+    signalMod = sig(present-sampLen:present);
+    sigMod = sigHL(present-sampLen:present)';
+    
+    sample = sigMod;
+    [X1 Pds angles] = getFFT(sample);
+    theta = [angles(B)];
+    
+    sigMod = sigMod + dc_offset;
+    
+    c = Construction(A, P, theta, predLen, sigMod);
+    [model, prediction, projection] = c.constructPro();
+    
+    angaliousMajor = [angaliousMajor; theta];
+    
+end
+
+filtL = 0.1100;
+filtH = 0.0210;
+present = 1000;
+sMod = SignalGenerator(stock, day+futer+2, futer);
 [sig, sigHL, sigH, sigL] = sMod.getSignal('ac', filtH, filtL);
 
-sigMod = sigHL;
 
-
-
-sPro = SignalGenerator(stock, present+2+200, 1000+200);
-[sig, sigHL, sigH, sigL] = sPro.getSignal('ac', filtH, filtL);
-
-cheaterSigTrend = sigL(1:end-200);
-cheaterSigMod = sigHL(1:end-200);
-
-filtL = 0.0500
-sDerv = SignalGenerator(stock, present+2, 1000);
-[sig, sigHL, sigH, sigL] = sDerv.getSignal('ac', filtH, filtL);
-
-
-
-trendLen = 50; 
-sigTrend = sigL;
-sigTrend(end-49:end) = linspace(sig(end-49), sig(end), 50);
-derv = diff(sigTrend(end-49:end))
-
-
-sigGreen = sigHL;
-
-
-sDerv = SignalGenerator(stock, present+2+200, 1000+200);
-[sig, sigHL, sigH, sigL] = sDerv.getSignal('ac', filtH, filtL);
-
-sigMagent = sigHL;
-
-% cheaterSigMod = tsmovavg(cheaterSigMod,'s',25,1);
-
-
-figure()
-hold on
-% plot(sigMod)
-% hold on
-% plot(cheaterSigMod,'r')
-% plot(sigGreen,'g')
-% plot(sigMagent, 'm')
-plot(cheaterSigTrend,'c')
-plot(sigTrend,'k')
-plot(sig)
-
-% plot(sig-mean(sig),'k')
-
-
-
-% 
-% figure()
-% plot(sigMod,'k')
-% hold on;
-% plot(sig(1:end-200))
-% plot(sigL)
-% plot(cheaterSigMod,'r')
-
-% hold on
-% plot(cheaterSigMod,'r')
-% 
-
-
-
-
-
-% 
-% sigModMA = tsmovavg(sigMod,'s',12,1);
-% sigProMA = tsmovavg(sigPro,'s',12,1);
-
-% plot(simple)
-
-
-
-% end
-
-
-% y = cos(2*pi*1/100*([1:100])) + rand(1,100)*15;
-% 
-% window_size = 10
+plot(angaliousMajor)
+hold on;
+plot(sig-mean(sig),'k')
 
 
