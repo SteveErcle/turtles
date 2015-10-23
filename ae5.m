@@ -30,9 +30,12 @@ angaliousSuperiomus = [];
 % P = [314 218];
 
 stock = 'JPM';
-A = [.45 .45 .45 .78 .88];
-P = [32 41 52 62 82];
-B = [270 356 422 535 665];
+% A = [.45 .45 .45 .78 .88];
+% P = [32 41 52 62 82];
+% B = [270 356 422 535 665];
+A = [0.45]
+P = [52]
+B = [423]
 
 
 
@@ -42,7 +45,7 @@ interval = 25;
 
 predLen = 25;
 dc_offset = 15;
-sumoCumo = 75 ;
+sumoCumo = 25;
 
 
 
@@ -51,9 +54,9 @@ for i = 0:futer/interval
     
     angaliousMajor = [];
     present
-    sampLen = 300;
+    sampLen = 50;
     
-    filtL = 0.1100;
+    filtL = 0.0550;
     filtH = 0.0210;
     sMod = SignalGenerator(stock, present+2, present);
     [sig, sigHL, sigH, sigL] = sMod.getSignal('ac', filtH, filtL);
@@ -95,8 +98,8 @@ for i = 0:futer/interval
     
     
     
-    filtH = 0.0065;
-    filtL = 0.0500;
+    filtH = 0.0210;
+    filtL = 0.0550;
     sPro = SignalGenerator(stock, present+2+predLen+10, present+predLen+10);
     [sig, sigHL, sigH, sigL] = sPro.getSignal('ac', filtH, filtL);
     
