@@ -4,6 +4,8 @@ clear all
 close all
 clc
 
+addpath('/Users/Roccotepper/Documents/turtles/TurtleData');
+
 stock = 'JPM'
 
 A = 1;
@@ -60,25 +62,42 @@ end
 dve = (steadaliousMajoralis(:,3));
 pr = (steadaliousMajoralis(:,4));
 theta = (steadaliousMajoralis(:,5));
+% [theta] = getFiltered(theta, 0.1, 'low');
 
 % 
-% figure()
-% hold on
-% plot(dve,'r')
-% figure()
-% plot(pr,'k')
-% hold on
-% plot(zeros(length(pr),1),'r')
-% figure()
-% plot(theta,'b')
+figure()
+hold on
+plot(dve,'r')
+figure()
+plot(pr,'k')
+hold on
+plot(zeros(length(pr),1),'r')
+figure()
+plot(theta,'b')
 % legend('modDVE', 'PR', 'theta')
 
 
 [pkt it] = findpeaks(theta);
 diferThet = [];
 
+e = Evaluator(1,1,1);
+
+% tagged = e.peakAndTrough(theta);
+
 for i = 1:length(it)-1
    diferThet = [diferThet; it(i+1)-it(i)];
 end
 
-plot(diferThet)
+
+figure()
+plot((1:length(diferThet))*30,diferThet)
+hold on
+x = (1:length(diferThet))*30;
+y = ones(1,length(x))*P/(interval);
+plot(x, y, 'k')
+
+
+
+
+
+

@@ -22,31 +22,7 @@ dc_offset = 15;
 dataliousMajor = [];
 dataliousMinor = [];
 
-% for i = 0:futer/interval
-%     
-%     present = day + i*interval;
-%     
-%     filtL = 0.0550;
-%     filtH = 0.0065;
-%     sMod = SignalGenerator(stock, present+2, sampLen);
-%     [sig, sigHL, sigH, sigL] = sMod.getSignal('ac', filtH, filtL);
-%     sigMod = sig;
-%     
-%     [X1 Pds] = getFFT(sigMod');
-%     t = TideFinder(sigMod, A, P);
-%     theta = t.BFtideFinder();
-%     c = Construction(A, P, theta, predLen, sigMod);
-%     [model, prediction, projection] = c.constructPro();
-%     e = Evaluator(sigMod, model, prediction);
-%     pr = e.percentReturn(sigPro)
-%     [modDVE, modList] = e.DVE();
-%     
-%     
-%     data = [i, present, modDVE, pr];
-%     dataliousMinor = [dataliousMinor; data];
-%     
-% end 
-
+    
 for i = 0:futer/interval
     present = day + i*interval
     
