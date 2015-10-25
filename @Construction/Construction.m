@@ -25,6 +25,8 @@ classdef Construction
         
         plotPro(obj, projection, sigPlt);
         
+        plotPlay(obj, projection, sigPlt)
+        
     end
     
 end

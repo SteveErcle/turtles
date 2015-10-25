@@ -12,7 +12,7 @@ classdef SignalGenerator
         A;
         P;
         ph;
-
+        
     end
     
     methods
@@ -22,7 +22,7 @@ classdef SignalGenerator
             obj.stock     = varargin{1};
             obj.present   = varargin{2};
             obj.sigLen    = varargin{3};
-
+            
             if nargin > 4
                 
                 obj.RANSTEP   = varargin{4};
@@ -33,23 +33,30 @@ classdef SignalGenerator
                 obj.P         = varargin{9};
                 
             end
-
+            
         end
-       
+        
         function [sig, sigHL, sigH, sigL] = getSignal(obj, ohlc, filtH, filtL)
-           %% Enter ohlc. Ex: 'h' for high, 'ac' for adjusted close.
-    
-          sig = getStock(obj.stock, obj.present, obj.sigLen, ohlc);
-  
-%           filtH = 0.005;
-%           filtL = 0.123;
-
-          sigH = getFiltered(sig, filtH, 'high');
-          sigL = getFiltered(sig, filtL, 'low');
-          sigHL = getFiltered(sigH, filtL, 'low');
-
-        end 
-                  
+            %% Enter ohlc. Ex: 'h' for high, 'ac' for adjusted close.
+            
+            sig = getStock(obj.stock, obj.present, obj.sigLen, ohlc);
+            
+            %           filtH = 0.005;
+            %           filtL = 0.123;
+            
+            if size(sig,2) > 1
+                sigHL = 0;
+                sigH = 0;
+                sigL = 0;
+            else
+                
+                sigH = getFiltered(sig, filtH, 'high');
+                sigL = getFiltered(sig, filtL, 'low');
+                sigHL = getFiltered(sigH, filtL, 'low');
+                
+            end
+        end
+        
         function [signal] = getFakeSignal(obj)
             
             sigLen      = obj.sigLen;
@@ -59,7 +66,7 @@ classdef SignalGenerator
             ph          = obj.ph;
             A           = obj.A;
             P           = obj.P;
-
+            
             x1 = 12;
             
             t = 1 : signalLen;
@@ -97,27 +104,27 @@ classdef SignalGenerator
             end
             
         end
-  
+        
     end
     
-
+    
     
 end
 
 
 
 
-    
+
 % function FindFiltIntensity = Evaluator(1,1,evalBF.model_predict);
-% 
+%
 % [tag1] = FindFiltIntensity.peakAndTrough(FindFiltIntensity.model_predict);
 % target_num_of_extrema = length(tag1)
-% 
+%
 % signal = SigObj.getSignal();
 % signalHighPass = getFiltered(signal, filt, 'high');
 % sigHigh = signalHighPass(day : day  + sigLen+predLen)+15;
-% 
-% 
+%
+%
 % for filt_intensity = 0.075: 0.001:0.175
 %     sigHighLow = getFiltered(sigHigh, filt_intensity, 'low');
 %     [tag1, max1, min1] = FindFiltIntensity.peakAndTrough(sigHighLow);
@@ -126,11 +133,11 @@ end
 %         break
 %     end
 % end
-% 
+%
 % found_filt_intensity
 
-    
-    
+
+
 
 
 

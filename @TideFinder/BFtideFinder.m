@@ -9,7 +9,7 @@ type = obj.type;
 sigModdf = diff(sigMod);
 
 theta = zeros(1,length(P));
-t = 1:length(sigMod);
+t = 0:length(sigMod)-1;
 
 sprintf('Dont forget to fix index in tideFinders')
 

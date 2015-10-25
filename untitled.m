@@ -28,7 +28,7 @@ angaliousMajor = [];
 modeliousMajor = [];
 
 
-for i = 0:futer/interval
+parfor i = 0:futer/interval
     present = day + i*interval
     
     
