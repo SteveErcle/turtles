@@ -318,12 +318,23 @@ while 1 %                   ********************
     d = diag(A);
     s = zeros(n,1);
 %                           INTERNAL CYCLE
+cholCounter = 0;
     while 1 %               ~~~~~~~~~~~~~~
         while 1
             UA = triu(A,1);
             A = UA'+UA+diag(d+l*D);
             [U,p] = chol(A);%UA,A,U,p,D,d,l, pause   Choleski decomposition
             %~~~~~~~~~~~~~~~
+            cholCounter = cholCounter + 1;
+            if cholCounter == 100;
+                cholCounter
+                xf  = 1;
+                SS  = 1;
+                cnt = 1;
+                res = 1;
+                XY  = 1;
+                return;
+            end
             if p==0, break, end
             l = 2*l;
             if l==0, l=1; end

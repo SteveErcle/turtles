@@ -1,17 +1,9 @@
 function [thetaShift] = shiftTheta(P, sampLens, theta);
 
-% close all
-% clear all
-% clc
-% 
-% P = [ 77 50 125 ];
-% sampLen = [ 140 100 250  ];
-% theta = [1 2 3];
-% thetaShift = theta;
 
 xpelliarmus = [];
 
-for i = 1:3
+for i = 1:length(sampLens)
 
 past = 0;
 present = sampLens(i)-1;
@@ -29,7 +21,8 @@ x = cos(2*pi*1/P(i)*tn + thetaShift(i));
 % figure()
 % plot(t,y)
 % hold on
-% 
+
+% figure()
 % tnn = present - (min(sampLens)-1) : present;
 % plot(tnn, x,'k')
 

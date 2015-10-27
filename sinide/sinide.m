@@ -124,6 +124,13 @@ end
 res  = @(z) z(2)*sin(2*pi*z(1)*(arg-1)/fs + z(3)) + z(4) - y; 
 %       LMFnlsq:    www.mathworks.com/matlabcentral/fileexchange/17534
 [q,ssq,cnt] = LMFnlsq(res,p,'Display',ipr);
+if (q == 1 & ssq == 1 & cnt == 1)
+    frq = 1;
+    amp = 1;
+    phi = 1;
+    ave = 1;
+    return;
+end 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if q(2)<0
     q(2) = -q(2);

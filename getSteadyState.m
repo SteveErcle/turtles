@@ -9,21 +9,21 @@ addpath('/Users/Roccotepper/Documents/turtles/TurtleData');
 stock = 'JPM'
 
 A = 1;
-P = 30;
+P = 316;
 
-day = 1040;
-futer = 400;
+day = 1000;
+futer = 1000;
 interval = 10
 
 
-predLen = 10;
-sampLen = 50;
+predLen = P/4;
+sampLen = P*3;
 dc_offset = 15;
 
 steadaliousMajoralis= [];
 
 
-parfor i = 0:futer/interval
+for i = 0:futer/interval
     
     present = day + i*interval;
     
@@ -42,7 +42,7 @@ parfor i = 0:futer/interval
     theta = t.BFtideFinder();
     c = Construction(A, P, theta, predLen, sigMod);
     [model, prediction, projection] = c.constructPro();
-%     c.plotPro(projection, sigPro)
+    c.plotPro(projection, sigPro)
     e = Evaluator(sigMod, model, prediction);
     pr = e.percentReturn(sigPro)
     [modDVE, modList] = e.DVE();
@@ -66,14 +66,34 @@ theta = (steadaliousMajoralis(:,5));
 
 % 
 figure()
-hold on
-plot(dve,'r')
-figure()
 plot(pr,'k')
 hold on
 plot(zeros(length(pr),1),'r')
+
+zoneStart = input('Where does steady state zone start? ')
+zoneEnd = input('Where does steady state zone end? ')
+
+
+
+plot(pr,'k')
+hold on
+plot(zeros(length(pr),1),'r')
+hold on
+plot(zoneStart:zoneEnd, pr(zoneStart:zoneEnd), 'g');
+
 figure()
 plot(theta,'b')
+hold on
+plot(zoneStart:zoneEnd, theta(zoneStart:zoneEnd), 'g');
+
+figure()
+plot(dve,'r')
+hold on
+plot(zoneStart:zoneEnd, dve(zoneStart:zoneEnd), 'g');
+
+
+
+
 % legend('modDVE', 'PR', 'theta')
 
 
@@ -84,17 +104,19 @@ e = Evaluator(1,1,1);
 
 % tagged = e.peakAndTrough(theta);
 
-for i = 1:length(it)-1
-   diferThet = [diferThet; it(i+1)-it(i)];
-end
-
-
-figure()
-plot((1:length(diferThet))*30,diferThet)
-hold on
-x = (1:length(diferThet))*30;
-y = ones(1,length(x))*P/(interval);
-plot(x, y, 'k')
+% for i = 1:length(it)-1
+%    diferThet = [diferThet; it(i+1)-it(i)];
+% end
+% 
+% diferThet = [0; diferThet];
+% 
+% figure()
+% plot(diferThet)
+% % (1:length(diferThet))*P,
+% hold on
+% x = (1:length(diferThet))*P;
+% y = ones(1,length(x))*P/(interval);
+% plot(y, 'k')
 
 
 

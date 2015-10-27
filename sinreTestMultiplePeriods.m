@@ -14,10 +14,9 @@ stock = 'JPM'
 
 day = 1000;
 futer = 1000;
-interval = 50
+interval = 25
 
-
-predLen = 50;
+predLen = 25;
 sampLen = 50;
 dc_offset = 15;
 
@@ -26,11 +25,15 @@ dataliousMinor = [];
 
 expectoProptronum = [];
 
+% theSamples = [25, 120, 300]
 
-for i = 0:futer/interval
+
+parfor i = 0:futer/interval
     present = day + i*interval
     
-    for sampLen = 100:105:515
+    expectoProptronum = [];
+    
+    for sampLen = 500:100:500
         
         filtL = 0.0550;
         filtH = 0.0065;
@@ -52,47 +55,80 @@ for i = 0:futer/interval
         theta = phi - pi/2;
         ssq/1000;
         
-        expectoProptronum = [expectoProptronum; P, A, theta, sampLen];
+        props = [P, A, theta, sampLen];
+        
+        expectoProptronum = [expectoProptronum; props];
         
         c = Construction(A, P, theta, predLen, sigMod);
         [model, prediction, projection] = c.constructPro();
-        %     c.plotPlay(projection, sigPro);
-%         c.plotPro(projection, sigPro);
-%         hold on;
-%         plot(sigMod,'m')
+        %         c.plotPlay(projection, sigPro);
+        c.plotPro(projection, sigPro);
+        hold on;
+        plot(sigMod,'m')
         
         
         
     end
     
-    
-    P = expectoProptronum(:,1)
+    P = expectoProptronum(:,1);
     A = expectoProptronum(:,2);
-    theta = expectoProptronum(:,3)
+    theta = expectoProptronum(:,3);
     sampLens = expectoProptronum(:,4);
     
-    [thetaShift] = shiftTheta(P, sampLens, theta)
-    
-    sigMod = sigMod(end-(min(sampLens)-1):end);
-    sigPro = sigPro(end-(min(sampLens)-1)-predLen:end);
-    
-    c = Construction(A, P, thetaShift, predLen, sigMod);
-    [model, prediction, projection] = c.constructPro();
-    %     c.plotPlay(projection, sigPro);
-    c.plotPro(projection-mean(projection) + mean(sigPro), sigPro);
-    hold on;
-    plot(sigMod,'m')
-    
-    
-    expectoProptronum = [];
-    
-%     pause
-    
-%     close all
-    
+    if (sum(P == 1) < 1)
+        
+        [thetaShift] = shiftTheta(P, sampLens, theta);
+        
+        sMod = SignalGenerator(stock, present+2, min(sampLens));
+        [sigMod, sigHL, sigH, sigL] = sMod.getSignal('ac', filtH, filtL);
+        sPro = SignalGenerator(stock, present+2+predLen, min(sampLens)+predLen);
+        [sigPro, sigHL, sigH, sigL] = sPro.getSignal('ac', filtH, filtL);
+        
+        %         for i = 1:length(sampLens)
+        %             c = Construction(A(i), P(i), thetaShift(i), predLen, sigMod);
+        %             [model, prediction, projection] = c.constructPro();
+        %             %     c.plotPlay(projection, sigPro);
+        %             c.plotPro(projection-mean(projection) + mean(sigPro), sigPro);
+        %             hold on;
+        %             plot(sigMod,'m')
+        %         end
+        %
+        %         theta
+        %         thetaShift
+        
+        P
+        
+        c = Construction(A, P, thetaShift, predLen, sigMod);
+        [model, prediction, projection] = c.constructPro();
+        %     c.plotPlay(projection, sigPro);
+        
+        pause;
+        c.plotPro(projection-mean(projection) + mean(sigPro), sigPro);
+        hold on;
+        plot(sigMod,'m')
+        
+        
+        e = Evaluator(sigMod, model, prediction);
+        pr = e.percentReturn(sigPro)
+        [modDVE, modList] = e.DVE();
+        
+        posList = (model-sigMod').^2;
+        pSumo = sum(posList);
+        
+        
+        dataliousMinor = [i, present, pr, P];
+        
+        dataliousMajor = [dataliousMajor; dataliousMinor];
+        
+        pause
+        
+        close all
+        
+        
+    end
     
 end
 
-
+sprintf('Done')
 
 
