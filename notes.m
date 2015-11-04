@@ -45,6 +45,13 @@
 
 % Remove omnipotence
 
+%%
+
+% 1) Accuracy with fft methods
+% 2) filter results of totaliousMajor by observing best plots
+     % and numerically categorize them
+% 3) Test against totaliousMajor and choose best stoploss/stoplimit
+% 4) See if we can obtain results of 0.5% per day on average
 
 
 
