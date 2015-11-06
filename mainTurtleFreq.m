@@ -1,14 +1,18 @@
-clear all; close all; clc;
+clear all
+clc
+close all
 
 
-%% Declare
+% AEE
+% AEP
+% AES
+% AA
+% ABX
 
-stock = 'ABT';
-
-RANSTEP = 0;
-FAKER   = 0;
-REALER  = 1;
-
+<<<<<<< HEAD
+present = 1700;
+sigLen = 1000;
+=======
 filt = 0.005;
 present = 2400;
 signal_length = 2300;
@@ -16,34 +20,21 @@ signal_length = 2300;
 
 
 modLen = 1000;
+>>>>>>> master
 predLen = 100;
-day = 1050;
-
-if FAKER == 1
-    A = [0.5, 1, 1.5, 2, 4, 7]/4;
-    P = [24, 31, 52, 84, 122, 543];
-elseif REALER == 1
-    A = [0.09 0.09 0.2 0.15 0.20 0.35 0.43 0.67];
-%     P = [18 25 31 43 62 99 142 178];
-    P = [18 25 34 43 62 99 142 178];
-   
-end
-ph = [1.5, 2.4, 0.4, 1.2 , .9, 1.2, 1.3, 4.5];
-
-%% Initialize
-SigObj = SignalGenerator(stock, present, signal_length, RANSTEP, FAKER, REALER, ph, A, P);
-
-%% Run
-ix = [];
+ticker = 10;
 
 
-% good @ 230
-% ok @ 1050
-% bad @ 1100
+totals = [];
+sosals = [];
+founder = [];
 
-% load('evalBFtest.mat')
+sFFT = SignalGenerator(stock, 2002, 2000);
+[signal_pure, sigHL] = sFFT.getSignal('ac');
 
 
+<<<<<<< HEAD
+=======
 for i = 1:1
     
 if i == 1
@@ -124,157 +115,85 @@ elseif i == 3
 end
 
 end 
+>>>>>>> master
 
+m = MoonFinder(signal_pure);
+m.getAandP();
 
+<<<<<<< HEAD
+plot(signal_pure)
+figure()
+plot(sigHL)
+=======
 
 pause
 
 
 close all
+>>>>>>> master
 
-trackAll = [];
-trackmodDVElist = [];
-trackpredDVElist = [];
-trackPnatlist = [];
+pause;
 
-LowX1 = 100;
-HighX1 = 1850;
-fs = 1;
+sMod = SignalGenerator(stock, present, sigLen);
+[sig, sigHL] = sMod.getSignal('ac');
+sigMod = sigHL + mean(sig(end-100:end));
 
-col = hsv(3);
-icl = 1;
+t = TideFinder(sigMod, A, P);
+t.type = 2;
+[theta] = t.getTheta('BF');
 
-for i = 1:3
+c = Construction(A, P, theta, predLen, sigMod);
+[model, prediction, projection] = c.constructPro();
 
-    if i == 1
-        eval = evalBFgood;
-    elseif i == 2
-        eval = evalBFok;
-    elseif i == 3
-        eval = evalBFbad;
+conInt = [];
+for ci = 1:length(P)
+    
+    cDays = length(model) + theta(ci)/(2*pi)*P(ci);
+    cDays =  mod(cDays, P(ci));
+    if cDays > P(ci)/2
+        cDays = P(ci) - cDays;
     end
     
-    
-Total = eval.Total
-Std = std(eval.sigPred)/mean(eval.sigPred);
-[modDVE, predDVE, modDVElist, predDVElist] = eval.DVE;
+    %     cPer  = 2*abs( 0.5 - (cDays/ P(ci)) );
+    conInt = [conInt; cDays];
+end
+CItotal = sum(conInt(:,1)) / (sum(P)/2)
+
+sPro = SignalGenerator(stock, present+predLen, sigLen+predLen);
+[sig, sigHL] = sPro.getSignal('ac');
+sigPro = sigHL + mean(sig(end-100:end));
+
+
+% c.plotPlay(projection, sig, ticker);
+% ePlay = Evaluator(sigMod, model, prediction(1:ticker+1));
+% totalPlay = ePlay.percentReturn(sig(1:length(sigMod)+ticker))
+
+c.plotPro(projection, sig);
+
+e = Evaluator(sigMod, model, prediction);
+
+total0 = e.percentReturn(prediction)
+total1 = e.percentReturn(sigPro)
+total2 = e.percentReturn(sig)
+[modDVE modDVEList] = e.DVE();
 
 
 
-track = [Total; Std; modDVE; predDVE]
-
-trackAll = [trackAll, track];
-
-trackmodDVElist = [trackmodDVElist; modDVElist];
-trackpredDVElist = [trackpredDVElist; predDVElist];
-
-
-x1 = eval.sigPred(1:eval.modLen);
-ss = length(x1);
-x1 = x1.*hanning(length(x1))';
-x1 = [x1 zeros(1, 20000)];
-X1 = abs(fft(x1));
-X1 = X1(1:ceil(length(X1)/2));
-
-X1 = X1/(ss/4);
-Xt = 0:length(X1)-1;
-P = fs./ (Xt*(fs/length(x1)));
-[pkt It] = findpeaks(X1);
-It = It-1;
-
-pktItsort = [pkt', It'];
-pktItsort = sortrows(pktItsort,-1);
-
-Itk = pktItsort(:,2).';
-
-Pnatlist = fs./ (Itk*(fs/length(x1)));
-trackPnatlist = [trackPnatlist; Pnatlist(1:25)];
 
 
 
-plot(P(LowX1:HighX1), X1(LowX1:HighX1), 'color',col(icl,:))
-hold on;
+saValues = [];
 
+values = [];
 
-        for j = 1:length(It)
-            if It(j) < 1650
-                text( P(It(j)), X1(It(j)), [num2str(P(It(j)))] );
-            end
-        end
+for i = 1:length(cursor_info3)
 
-icl = icl + 1;
-
-axis([8 150 0 0.75])
-
-
-
+value = getfield(cursor_info3, {i},'Position')
+values = [values;value];
 
 end 
 
-P = [18 25 34 43 62 99 142 178];
+saValues = [saValues;values];
 
-
-plot(P, ones(length(P),1)*0.5, '*');
-
-trackErrorPnatlist = [];
-errorPnat = [];
-
-for k = 1:3
-    for i = P
-        pm = abs(trackPnatlist(k,:)-i);
-        [mn ix] = min(pm);
-        errorPnat = [errorPnat; abs(i - trackPnatlist(k,ix))];
-    end
-    
-    trackErrorPnatlist = [trackErrorPnatlist; errorPnat'];
-    errorPnat = [];
-end
-
-
-
-t = trackmodDVElist';
-figure();
-plot(t);
-title('modDVE');
-legend('good','ok','bad');
-
-t = trackpredDVElist';
-figure();
-plot(t);
-title('predDVE');
-legend('good','ok','bad');
-
-% t = trackPnatlist';
-% figure();
-% plot(t);
-% title('Pnat');
-% legend('good','ok','bad');
-
-t = trackErrorPnatlist';
-figure();
-plot(P,t);
-title('ErrorPnat');
-legend('good','ok','bad');
-
-
-% [modMME, predMME, modMMElist, predMMElist] = evalBFgood.MME();
-
-% predGood = Turtle(1, evalBFgood.sigPred, evalBFgood.modLen, 1,1);
-
-% predGood.plotPred(evalBFgood.model_predict)
-
-% evalBFgood.peakAndTrough(evalBFgood.sigPred(evalBFgood.modLen:end))
-
-
-% Bug with MME found, peak or trough before prediction 
-
-
-
-
-%% Thoughts
-
-% Find best method for determining phases
-% BF finder parfor and w = 1:3 or 1:2
-
-% test against a control
-
+P = saValues(:,1);
+A = saValues(:,3);
