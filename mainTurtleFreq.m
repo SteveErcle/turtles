@@ -9,8 +9,18 @@ close all
 % AA
 % ABX
 
+<<<<<<< HEAD
 present = 1700;
 sigLen = 1000;
+=======
+filt = 0.005;
+present = 2400;
+signal_length = 2300;
+
+
+
+modLen = 1000;
+>>>>>>> master
 predLen = 100;
 ticker = 10;
 
@@ -23,13 +33,104 @@ sFFT = SignalGenerator(stock, 2002, 2000);
 [signal_pure, sigHL] = sFFT.getSignal('ac');
 
 
+<<<<<<< HEAD
+=======
+for i = 1:1
+    
+if i == 1
+    day = 230
+elseif i == 2
+    day = 1050
+elseif i == 3
+    day = 1100 
+end
+
+
+SigObj.presentp = 1330;
+SigObj.sigLenp = 1001;
+sigMod = SigObj.getSignal();
+
+
+SigObj.presentp = 1430;
+SigObj.sigLenp = 1101;
+sigPred = SigObj.getSignal();
+
+tm = 1330-1000:1330;
+tp = 1430-1100:1430;
+
+plot(tm,sigMod,'r')
+hold on;
+plot(tp, sigPred+1,'b');
+
+
+% sigMod(1)
+% sigMod(end)
+% sigPred(1)
+% sigPred(end)
+
+% signal = SigObj.getSignal();
+
+% plot(signal)
+
+
+% sigMod = signal(day : day  + modLen);
+sigMod = getFiltered(sigMod, filt, 'high');
+sigMod = getFiltered(sigMod, 0.123, 'low')+15;
+
+
+
+% sigPred = signal(day : day  + modLen+predLen);
+sigPred = getFiltered(sigPred, filt, 'high');
+sigPred = getFiltered(sigPred, 0.123, 'low')+15;
+
+
+
+
+
+
+
+% sigPredUnfilt = signal(day : day  + modLen+predLen);
+
+
+% sigMod = SigObj.getSignal()
+% 
+% SigFutObj = SignalGenerator(stock, present+predLen, 100, RANSTEP, FAKER, REALER, ph, A, P);
+% 
+% sigPred = SigFutObj.getSignal();
+
+
+pred1 = Turtle(sigMod, sigPred, modLen, A, P);
+pred1.type = 1;
+evalBF = pred1.predictTurtle('BF');
+evalBF.Total
+evalBF.DVE()
+std(evalBF.sigPred)/mean(evalBF.sigPred);
+
+if i == 1
+    evalBFgood = evalBF;
+elseif i == 2
+    evalBFok = evalBF;
+elseif i == 3
+    evalBFbad = evalBF; 
+end
+
+end 
+>>>>>>> master
 
 m = MoonFinder(signal_pure);
 m.getAandP();
 
+<<<<<<< HEAD
 plot(signal_pure)
 figure()
 plot(sigHL)
+=======
+
+pause
+
+
+close all
+>>>>>>> master
 
 pause;
 
