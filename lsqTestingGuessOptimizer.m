@@ -41,35 +41,52 @@ y = y + rander + stepper';
 filtH = 0.0100;
 [y] = getFiltered(y, filtH, 'high');
 
-fun = @(x)loopClosure(theta, 1:300, y(1:300), x);
+
+
+
+g      = zeros(length(theta),3);
+g(:,1) = rand(length(theta),1)*5;
+g(:,2) = rand(length(theta),1)*150 ;
+g(:,3) = rand(length(theta),1)*2*pi;
+g = g';
+g = g(:);
+g(end+1) = mean(y);
+
+
+outterFun = @(guess)innerFun(guess,theta,t,y)
+
+g0 = g;
+
+[g, resnorm] = lsqnonlin(outterFun, g0);
+
+foundg1 = g;
+
+innerFun(g,theta,t,y)
 
 resMajor = [];
-
-parfor i = 1:100
+for i = 1:100;
+    g      = zeros(length(theta),3);
+    g(:,1) = rand(length(theta),1)*5;
+    g(:,2) = rand(length(theta),1)*150 ;
+    g(:,3) = rand(length(theta),1)*2*pi;
+    g = g';
+    g = g(:);
+    g(end+1) = mean(y);
     
-    i
-    
-    guess      = zeros(length(theta),3);
-    guess(:,1) = rand(length(theta),1)*5;
-    guess(:,2) = rand(length(theta),1)*150 %[150, 75, 50, 25]+rand(1,length(theta))*10;
-    guess(:,3) = rand(length(theta),1)*2*pi;
-    guess = guess';
-    guess = guess(:);
-    guess(end+1) = mean(y);
-    
-    x0 = [guess'];
-    
-    lb = [];
-    ub = [];
-    options = optimset('Display', 'off');
-    
-    [x, resnorm] = lsqnonlin(fun, x0, lb, ub, options);
-    
-    
-    resMinor = [resnorm , x];
-    resMajor = [resMajor; resMinor];
-    
+    resnorm = innerFun(g,theta,t,y);
+    resMajor = [resMajor;resnorm];
 end
+
+
+
+
+
+
+
+
+
+
+
 
 resMajor = sortrows(resMajor,1);
 x = resMajor(1,2:end);
@@ -95,24 +112,6 @@ plot(model(1:300), 'k')
 
 
 
-%
-% x0 = [guess(1), guess(2),0,0];
-%
-% % x0 = [70, 20, 0, 0];
-%
-% [x, resnorm] = lsqnonlin(fun, x0);
-%
-% resMajor = [resMajor; resnorm , x]
-%
-% end
-%
-
-%
-% z = cos(2*pi*1/x(1)*t + x(3)) + cos(2*pi*1/x(2)*t + x(4));
-%
-% plot(z)
-% hold on
-% plot(y, 'r')
 
 
 
