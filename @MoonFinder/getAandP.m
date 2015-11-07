@@ -4,7 +4,7 @@ function [] = getAandP(obj)
 signal = obj.signal_pure;
 
 x1ph = signal';
-sampleSize = 600;
+sampleSize = 1500;
 leftOver = length(signal)-sampleSize;
 fs = 1;
 surfer = [];
@@ -35,6 +35,12 @@ for k = 1:shifterSize:leftOver
 end
 
 
+surf1 = surfer';
+bias = logspace(0,1,size(surf1,2))';
+bias = (bias-min(bias))/range(bias);
+selector = surf1*bias;
+
+
 axisP = [15, 50, 125, 400];
 I = [0,0,0,0];
 maxerP = [0, 0, 0 ,0];
@@ -42,11 +48,11 @@ maxerP = [0, 0, 0 ,0];
 
 for ac = 1:4
     
-    min = 10;
+    minimum = 10;
     
     for i = 1:length(P)
-        if abs((P(i) - axisP(ac))) < min
-            min = P(i)-axisP(ac);
+        if abs((P(i) - axisP(ac))) < minimum
+            minimum = P(i)-axisP(ac);
             I(ac) = i;
         end
     end
