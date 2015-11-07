@@ -9,7 +9,9 @@ type = obj.type;
 sigModdf = diff(sigMod);
 
 theta = zeros(1,length(P));
-t = 1:length(sigMod);
+t = 0:length(sigMod)-1;
+
+% sprintf('Dont forget to fix index in tideFinders')
 
 res = .01;
 
@@ -42,7 +44,7 @@ for w = 1:2
             logGrowth(end) = logGrowth(end-1);
             
             offset = 1;
-            scale  = 100;
+            scale  = 50;
             
             adjuster = offset + scale*(logGrowth-min(logGrowth))/(range(logGrowth));
             
