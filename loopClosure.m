@@ -1,13 +1,13 @@
-function fun = loopClosure(A, t, y, x)
+function fun = loopClosure(theta, t, y, x)
 
 model = 0;
-for i = 1:2:length(A)*2
+for i = 1:3:length(theta)*3
     
-   model = model + A((i+1)/2)*cos(2*pi*1/x(i)*t + x(i+1));
+   model = model + x(i)*cos(2*pi*1/x(i+1)*t + x(i+2));
    
 end
 
-model = x(length(A)*2 + 1) + model;
+model = x(length(theta)*3 + 1) + model;
 
 fun = y-model;
          
