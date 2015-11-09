@@ -38,7 +38,7 @@ end
 surf1 = surfer';
 bias = logspace(0,1,size(surf1,2))';
 bias = (bias-min(bias))/range(bias);
-selector = surf1*bias;
+selector = (surf1*bias)./ size(surfer,1);
 
 
 axisP = [15, 50, 125, 400];

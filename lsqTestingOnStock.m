@@ -6,16 +6,36 @@ addpath('/Users/Roccotepper/Documents/turtles/TurtleData')
 addpath('/Users/Roccotepper/Documents/turtles/sinide')
 
 
-filtL = 0.1;
+filtL = 0.3;
 filtH = 0.0065;
 stock = 'JPM'
-present = 2400;
+
 sampLen = 500;
 predLen = 50;
-interval = 50;
+interval = 10;
 
-day = 2000;
+day = 1525;
 futer = 500;
+present = day;
+
+% sFFT = SignalGenerator(stock, present+2, 2000);
+% [sigFFT, sigHL, sigH, sigL] = sFFT.getSignal('c', filtH, filtL);
+%
+% m = MoonFinder(sigFFT);
+% m.getAandP();
+
+foundP = [209 121 81 62 41 33 22 8];
+foundA = [0.67 0.63 0.43 0.29 0.16 0.19 0.14 0.08]*4;
+% foundP = [209 121 81 62];
+% foundA = [0.67 0.63 0.43 0.29];
+theta = [1,2,3,4,5,6,7,8];
+
+
+icl = 1;
+hsvNum = futer/interval;
+col = hsv(hsvNum);
+figure()
+plot(sort(foundP'),'k')
 
 
 for i = 0:futer/interval
@@ -23,111 +43,130 @@ for i = 0:futer/interval
     
     sMod = SignalGenerator(stock, present+2, sampLen);
     [sig, sigHL, sigH, sigL] = sMod.getSignal('c', filtH, filtL);
-    
-    sigMod = sig;
-    %     plot(sigMod)
-    %     drawnow
-    
-    foundP = [209 121 81 62 41 33 22 8];
-    theta = [1,2,3,4,5,6,7,8];
+    sigMod = sigL;
+    plot(sigMod)
+    drawnow
     t = (0:length(sigMod)-1).';
-    
     
     fun = @(x)loopClosure(theta, t, sigMod, x);
     
     resMajor = [];
     
-    parfor i = 1:100
+    for ii = 1:1
         
-        i
+        ii
         
-        guess      = zeros(length(theta),3);
-        guess(:,1) = rand(length(theta),1)*5;
-        %     guess(:,2) = rand(length(theta),1)*150;
-        guess(:,2) = foundP % + ((-0.5+rand(1,length(foundP)))*2)*10
-        %     guess(end,2) = 5;
-        guess(:,3) = rand(length(theta),1)*2*pi;
-        guess = guess';
-        guess = guess(:);
-        guess(end+1) = mean(sigMod);
+        parfor i = 1:20
+            
+            guess      = zeros(length(theta),3);
+            guess(:,1) = rand(length(theta),1)*1;
+            guess(:,1) = foundA + ((-0.5+rand(1,length(foundP)))*2)*1
+            %         guess(:,2) = rand(length(theta),1)*210;
+            guess(:,2) = foundP + ((-0.5+rand(1,length(foundP)))*2)*5
+            %         guess(end,2 ) = 10;
+            guess(:,3) = rand(length(theta),1)*2*pi;
+            guess = guess';
+            guess = guess(:);
+            guess(end+1) = mean(sigMod);
+            
+            x0 = [guess'];
+            
+            lb = [];
+            ub = [];
+            options = optimset('Display', 'off');
+            
+            [x, resnorm] = lsqnonlin(fun, x0, lb, ub, options);
+            
+            
+            resMinor = [resnorm/sampLen , x];
+            resMajor = [resMajor; resMinor];
+            
+        end
         
-        x0 = [guess'];
+        resMajor = sortrows(resMajor,1);
         
-        lb = [];
-        ub = [];
-        options = optimset('Display', 'off');
-        
-        [x, resnorm] = lsqnonlin(fun, x0, lb, ub, options);
-        
-        
-        resMinor = [resnorm , x];
-        resMajor = [resMajor; resMinor];
+        %     if resMajor(1,1) < 1.5
+        %         break
+        %     end
         
     end
-    
     
     
     sPro = SignalGenerator(stock, present+2+predLen, sampLen+predLen);
     [sigPro, sigHL, sigH, sigL] = sPro.getSignal('c', filtH, filtL);
     
+    % resMajor = sortrows(resMajor,1);
+    % resMajor(:,1) = resMajor(:,1)/size(resMajor,1);
     
-    
-    resMajor = sortrows(resMajor,1);
- 
     x = resMajor(1,2:end);
     xReshaped = reshape(x(1:end-1),3,length(theta));
-    A = xReshaped(1,:);
-    P = xReshaped(2,:);
-    theta = xReshaped(3,:);
+    A = xReshaped(1,:)';
+    P = xReshaped(2,:)';
+    theta = xReshaped(3,:)';
+    storeProps = [P,A,theta];
+    storeProps = sortrows(storeProps,1);
+    P = storeProps(:,1);
+    A = storeProps(:,2);
+    %     if P(1) < 8
+    %         A(1) = A(1)*10;
+    %     end
+    theta = storeProps(:,3);
     
     c = Construction(A, P, theta, predLen, sigMod);
     [model, prediction, projection] = c.constructPro();
     c.plotPro(projection-mean(projection), sigPro-mean(sigPro));
     
-    %     sprintf('Properties found via sorting resnorm')
-    %     display([A',P',theta'])
-    
-    display([sort(foundP'), sort(P')]);
-    sum(abs(sort(foundP') - sort(P')))
+    display([sort(foundP'), sort(P)]);
+    sum(abs(sort(foundP') - sort(P)))
     resMajor(1:3,1)
     
+    % figure(1)
+    % hold on
+    % plot(P,'color', col(icl,:))
+    % icl = icl + 1;
     
+    pause
     
-    deltaSum = [];
-    for i = 1:size(resMajor,1)
-        resP = resMajor(i,3:3:size(resMajor,2));
-        selectedP = sortrows(abs(resP)',-1);
-        deltaP = abs(selectedP-foundP');
-        deltaSum = [deltaSum; sum(deltaP),resMajor(i,:)];
-    end
-    
-    
-    deltaSum = sortrows(deltaSum,1);
-    deltaSum = deltaSum(:,2:end);
-    
-    x = deltaSum(1,2:end);
-    xReshaped = reshape(x(1:end-1),3,length(theta));
-    A = xReshaped(1,:);
-    P = xReshaped(2,:);
-    theta = xReshaped(3,:);
-    
-     display([sort(foundP'), sort(P')]);
-     sum(abs(sort(foundP') - sort(P')))
-    
-    
-    
-    c = Construction(A, P, theta, predLen, sigMod);
-    [model, prediction, projection] = c.constructPro();
-    c.plotPro(projection-mean(projection), sigPro-mean(sigPro));
-    
-    %     sprintf('Properties found via sorting deltaSum')
-    %     display([A',P',theta'])
-    
-    
-    pause;
-    close all;
+    %     close 2
     
 end
+
+
+% deltaSum = [];
+% for i = 1:size(resMajor,1)
+%     resP = resMajor(i,3:3:size(resMajor,2));
+%     selectedP = sortrows(abs(resP)',-1);
+%     deltaP = abs(selectedP-foundP');
+%     deltaSum = [deltaSum; sum(deltaP),resMajor(i,:)];
+% end
+%
+%
+% deltaSum = sortrows(deltaSum,1);
+% deltaSum = deltaSum(:,2:end);
+%
+% x = deltaSum(1,2:end);
+% xReshaped = reshape(x(1:end-1),3,length(theta));
+% A = xReshaped(1,:);
+% P = xReshaped(2,:);
+% theta = xReshaped(3,:);
+%
+% display([sort(foundP'), sort(P')]);
+% sum(abs(sort(foundP') - sort(P')))
+%
+%
+%
+% c = Construction(A, P, theta, predLen, sigMod);
+% [model, prediction, projection] = c.constructPro();
+% c.plotPro(projection-mean(projection), sigPro-mean(sigPro));
+
+%     sprintf('Properties found via sorting deltaSum')
+%     display([A',P',theta'])
+
+
+% pause;
+% close all;
+
+% end
 
 % figure()
 % plot(resMajor(:,1))
@@ -153,9 +192,4 @@ end
 
 
 
-% sFFT = SignalGenerator(stock, present+2, 2000);
-% [sigFFT, sigHL, sigH, sigL] = sFFT.getSignal('c', filtH, filtL);
-%
-% m = MoonFinder(sigFFT);
-% m.getAandP();
 
