@@ -14,7 +14,7 @@ sampLen = 418;
 predLen = 10;
 interval = 10;
 
-day = 1850;
+day = 2000;
 futer = 0;
 present = day;
 
@@ -119,9 +119,9 @@ for i = 0:futer/interval
     storeProps = sortrows(storeProps,1);
     P = storeProps(:,1);
     A = storeProps(:,2);
-    %         if P(1) < 8
-    %             A(1) = A(1)*10;
-    %         end
+            if P(1) < 8
+                A(1) = A(1)*10;
+            end
     theta = storeProps(:,3);
     
     c = Construction(A, P, theta, predLen, sigMod);
