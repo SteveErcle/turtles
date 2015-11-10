@@ -10,4 +10,5 @@ end
 model = x(length(theta)*3 + 1) + model;
 
 fun = diff(y) - diff(model);
+% fun = (y) - (model);
           

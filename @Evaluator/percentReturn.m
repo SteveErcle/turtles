@@ -22,29 +22,7 @@ function [Total] = percentReturn(obj, sigCmp)
 % yhl(:,3) = yLOW; %dataL_fut;
 
 
-<<<<<<< HEAD
-% sigPred = obj.sigPred;
-% sigPredUnfilt = obj.sigPredUnfilt;
-sigPred = obj.sigPred;
 
-
-
-modLen = obj.modLen;
-model_predict = obj.model_predict;
-stop_loss = obj.stop_loss;
-one_trade = obj.one_trade;
-
-
-sigPred = sigPred(modLen+1:end);
-
-y = sigPred;
-yhl(:,1) = sigPred;
-yhl(:,2) = sigPred;
-yhl(:,3) = sigPred;
-
-
-eq_test = model_predict(modLen+1:end);
-=======
 
 prediction = obj.prediction;
 stop_loss = obj.stop_loss;
@@ -63,10 +41,8 @@ yhl(:,3) = sigCmp;
 eq_test = prediction;
 
 
->>>>>>> de984d8d5c0249a6a34548f9a547200075924dcb
-
-
 [tagged,imax,imin] = obj.peakAndTrough(eq_test);
+tagged
 
 actual = [];
 tagged;
