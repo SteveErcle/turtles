@@ -10,12 +10,12 @@ filtL = 0.4;
 filtH = 0.0005;
 stock = 'JPM'
 
-sampLen = 418;
-predLen = 10;
+sampLen = 67;
+predLen = 1;
 interval = 10;
 
-day = 2000;
-futer = 0;
+day = 2300;
+futer = 100;
 present = day;
 
 % sFFT = SignalGenerator(stock, present+2, 2000);
@@ -24,13 +24,15 @@ present = day;
 % m = MoonFinder(sigFFT);
 % m.getAandP();
 
-foundP = [209 121 81 62 41 33 22 8];
+% foundP = [209 121 81 62 41 33 22 13 10 8];
+foundP = [33 22 13 10 8];
 % foundP = [41 33 22 8];
-foundA = [0.67 0.63 0.43 0.29 0.16 0.19 0.14 0.08]*4;
+% foundA = [0.67 0.63 0.43 0.29 0.16 0.19 0.14 0.08]*4;
 % foundP = [209 121 81 62];
-% foundA = [0.67 0.63 0.43 0.29];
-theta = [1,2,3,4,5,6,7,8];
+foundA = [0.67 0.63 0.43 0.29 .19];
+theta = [1,2,3,4,5];
 
+prAll = [];
 
 icl = 1;
 hsvNum = futer/interval;
@@ -47,14 +49,15 @@ for i = 0:futer/interval
     [sig, sigHL, sigH, sigL] = sMod.getSignal ('c', filtH, filtL);
     sigMod = sig;
     
-%     figure(10)
-%     plot(sigMod)
-%     drawnow
+    %     figure(10)
+    %     plot(sigMod)
+    %     drawnow
     t = (0:length(sigMod)-1).';
     
     fun = @(x)loopClosure(theta, t, sigMod, x);
     
     resMajor = [];
+    
     
     for ii = 1:1
         
@@ -99,144 +102,99 @@ for i = 0:futer/interval
     sPro = SignalGenerator(stock, present+2+predLen, sampLen+predLen);
     [sigPro, sigHL, sigH, sigL] = sPro.getSignal('c', filtH, filtL);
     
+    sMtx = SignalGenerator(stock, present+2+predLen, sampLen+predLen);
+    [sigMtx, sigHL, sigH, sigL] = sMtx.getSignal('all', filtH, filtL);
     
-    t = TideFinder(sigMod, foundA, foundP);
-    t.getTheta('BF');
-    c = Construction(foundA, foundP, theta, predLen, sigMod);
-    [model, prediction, projection] = c.constructPro();
-    c.plotPro(projection-mean(projection), sigPro-mean(sigPro));
-    title('BF');
-    e = Evaluator(sigMod, model, prediction);
-    pr1 = e.percentReturn(sigPro);
+    for hide_BF = 1:1
+        t = TideFinder(sigMod, foundA, foundP);
+        t.getTheta('BF');
+        c = Construction(foundA, foundP, theta, predLen, sigMod);
+        [model, prediction, projection] = c.constructPro();
+        c.plotPro(projection, sigPro);
+        title('BF');
+        e = Evaluator(sigMod, model, prediction);
+        pr1 = e.percentReturn(sigPro);
+    end
     
+    for hide_lsq = 1:1
+        
+        x = resMajor(1,2:end);
+        resMajor(1,1)
+        xReshaped = reshape(x(1:end-1),3,length(theta));
+        A = xReshaped(1,:)';
+        P = xReshaped(2,:)';
+        theta = xReshaped(3,:)';
+        storeProps = [P,A,theta];
+        storeProps = sortrows(storeProps,1);
+        P = storeProps(:,1);
+        A = storeProps(:,2);
+        if P(1) < 8
+            A(1) = A(1)*3;
+        end
+        theta = storeProps(:,3);
+        
+        c = Construction(A, P, theta, predLen, sigMod);
+        [model, prediction, projection] = c.constructPro();
+        c.plotPro(projection, sigPro);
+        title('lsqBest');
+        e = Evaluator(sigMod, model, prediction);
+        pr2 = e.percentReturn(sigPro)
+        
+        display([sort(foundP'), sort(P)]);
+        
+    end
     
-    x = resMajor(1,2:end);
-    xReshaped = reshape(x(1:end-1),3,length(theta));
-    A = xReshaped(1,:)';
-    P = xReshaped(2,:)';
-    theta = xReshaped(3,:)';
-    storeProps = [P,A,theta];
-    storeProps = sortrows(storeProps,1);
-    P = storeProps(:,1);
-    A = storeProps(:,2);
-            if P(1) < 8
-                A(1) = A(1)*10;
-            end
-    theta = storeProps(:,3);
-    
-    c = Construction(A, P, theta, predLen, sigMod);
-    [model, prediction, projection] = c.constructPro();
-    c.plotPro(projection-mean(projection), sigPro-mean(sigPro));
-    title('lsqBest');
-    e = Evaluator(sigMod, model, prediction);
-    pr2 = e.percentReturn(sigPro)
-    
-    display([sort(foundP'), sort(P)]);
-    sum(abs(sort(foundP') - sort(P)));
-    resMajor(1:3,1);
-    
-%     figure(1)
-%     hold on
-%     plot(P,'color', col(icl,:))
-%     icl = icl + 1;
-    
-    x = resMajor(end,2:end);
-    xReshaped = reshape(x(1:end-1),3,length(theta));
-    A = xReshaped(1,:)';
-    P = xReshaped(2,:)';
-    theta = xReshaped(3,:)';
-    storeProps = [P,A,theta];
-    storeProps = sortrows(storeProps,1);
-    P = storeProps(:,1);
-    A = storeProps(:,2);
-    %     if P(1) < 8
-    %         A(1) = A(1)*10;
-    %     end
-    theta = storeProps(:,3);
-    
-    c = Construction(A, P, theta, predLen, sigMod);
-    [model, prediction, projection] = c.constructPro();
-    c.plotPro(projection-mean(projection), sigPro-mean(sigPro));
-    title('lsqWorst');
-    e = Evaluator(sigMod, model, prediction);
-    pr3 = e.percentReturn(sigPro);
-    
-    display([sort(foundP'), sort(P)]);
-    sum(abs(sort(foundP') - sort(P)));
-    resMajor(1:3,1);
-    
-%     figure(1)
-%     hold on
-%     plot(P,'color', col(icl,:))
-%     icl = icl + 1;
-    
-    pr_me = [pr1,pr2,pr3]
+    for hide_candles = 1:1
+        spPasto = sigMtx(end-predLen-10:end-predLen,1);
+        spPasth = sigMtx(end-predLen-10:end-predLen,2);
+        spPastl = sigMtx(end-predLen-10:end-predLen,3);
+        spPastc = sigMtx(end-predLen-10:end-predLen,4);
+        spPastt = length(sigPro)-(predLen)-10:length(sigPro)-predLen;
+        
+        spo = sigMtx(end-(predLen-1):end,1);
+        sph = sigMtx(end-(predLen-1):end,2);
+        spl = sigMtx(end-(predLen-1):end,3);
+        spc = sigMtx(end-(predLen-1):end,4);
+        spt = length(sigPro)-(predLen-1):length(sigPro);
+        
+        spmh = max(sigMtx(end-(predLen-1):end,2));
+        spml = min(sigMtx(end-(predLen-1):end,3));
+        
+        speo = sigMtx(end-(predLen-1),1);
+        spec = sigMtx(end,4);
+        
+        for cc = predLen:-1:0
+            
+            hold on;
+            plot(sigMod,'m')
+            plot(spt(1:end-cc),spo(1:end-cc),'ro')
+%             pause;
+            plot(sigPro(1:end-cc),'r')
+            plot(spt(1:end-cc),sph(1:end-cc),'k+')
+            plot(spt(1:end-cc),spl(1:end-cc),'ks')
+            
+            plot(spt(1:end-cc),spc(1:end-cc),'x', 'color', [0, 0.65, 0])
+            plot(spt(1),speo,'ro');
+            plot(spPastt,spPastc, 'x', 'color', [0, 0.65, 0], 'markers', 7)
+            plot(spPastt,spPasto,'ro', 'markers', 7)
+            plot(spPastt,spPasth,'k+', 'markers', 7)
+            plot(spPastt,spPastl,'ks', 'markers', 7)
+            
+            hold off
+            
+            drawnow
+            
+        end
+        
+    end
     
     pause
     
-    close 2
     
+    close all
+    
+    prAll = [prAll; pr2]
+    
+
+
 end
-
-
-% deltaSum = [];
-% for i = 1:size(resMajor,1)
-%     resP = resMajor(i,3:3:size(resMajor,2));
-%     selectedP = sortrows(abs(resP)',-1);
-%     deltaP = abs(selectedP-foundP');
-%     deltaSum = [deltaSum; sum(deltaP),resMajor(i,:)];
-% end
-%
-%
-% deltaSum = sortrows(deltaSum,1);
-% deltaSum = deltaSum(:,2:end);
-%
-% x = deltaSum(1,2:end);
-% xReshaped = reshape(x(1:end-1),3,length(theta));
-% A = xReshaped(1,:);
-% P = xReshaped(2,:);
-% theta = xReshaped(3,:);
-%
-% display([sort(foundP'), sort(P')]);
-% sum(abs(sort(foundP') - sort(P')))
-%
-%
-%
-% c = Construction(A, P, theta, predLen, sigMod);
-% [model, prediction, projection] = c.constructPro();
-% c.plotPro(projection-mean(projection), sigPro-mean(sigPro));
-
-%     sprintf('Properties found via sorting deltaSum')
-%     display([A',P',theta'])
-
-
-% pause;
-% close all;
-
-% end
-
-% figure()
-% plot(resMajor(:,1))
-
-
-
-
-% [frq,amp,phi,ave,ssq,cnt] = sinide(sigMod,1,0);
-%
-% P = 1/frq;
-% A = amp;
-% theta = phi - pi/2;
-% ssq/1000;
-%
-% props = [P, A, theta, sampLen];
-%
-% c = Construction(A, P, theta, predLen, sigMod);
-% [model, prediction, projection] = c.constructPro();
-% c.plotPro(projection, sigPro);
-%
-% sprintf('Properties found via sinide')
-% display([A;P;theta])
-
-
-
-
