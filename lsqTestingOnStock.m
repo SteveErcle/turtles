@@ -11,10 +11,10 @@ filtH = 0.0005;
 stock = 'JPM'
 
 sampLen = 67;
-predLen = 1;
-interval = 10;
+predLen = 10;
+interval = 3;
 
-day = 2300;
+day = 2005;
 futer = 100;
 present = day;
 
@@ -25,21 +25,22 @@ present = day;
 % m.getAandP();
 
 % foundP = [209 121 81 62 41 33 22 13 10 8];
+% foundP = [209 121 81 62 41 33 22 8];
 foundP = [33 22 13 10 8];
 % foundP = [41 33 22 8];
 % foundA = [0.67 0.63 0.43 0.29 0.16 0.19 0.14 0.08]*4;
 % foundP = [209 121 81 62];
-foundA = [0.67 0.63 0.43 0.29 .19];
+% foundA = [0.67 0.63 0.43 0.29 .19];
 theta = [1,2,3,4,5];
 
 prAll = [];
 
-icl = 1;
-hsvNum = futer/interval;
-hsvNum = 2;
-col = hsv(hsvNum);
-figure()
-plot(sort(foundP'),'k')
+% icl = 1;
+% hsvNum = futer/interval;
+% hsvNum = 2;
+% col = hsv(hsvNum);
+% figure()
+% plot(sort(foundP'),'k')
 
 
 for i = 0:futer/interval
@@ -105,16 +106,16 @@ for i = 0:futer/interval
     sMtx = SignalGenerator(stock, present+2+predLen, sampLen+predLen);
     [sigMtx, sigHL, sigH, sigL] = sMtx.getSignal('all', filtH, filtL);
     
-    for hide_BF = 1:1
-        t = TideFinder(sigMod, foundA, foundP);
-        t.getTheta('BF');
-        c = Construction(foundA, foundP, theta, predLen, sigMod);
-        [model, prediction, projection] = c.constructPro();
-        c.plotPro(projection, sigPro);
-        title('BF');
-        e = Evaluator(sigMod, model, prediction);
-        pr1 = e.percentReturn(sigPro);
-    end
+%     for hide_BF = 1:1
+%         t = TideFinder(sigMod, foundA, foundP);
+%         t.getTheta('BF');
+%         c = Construction(foundA, foundP, theta, predLen, sigMod);
+%         [model, prediction, projection] = c.constructPro();
+% %         c.plotPro(projection, sigPro);
+%         title('BF');
+%         e = Evaluator(sigMod, model, prediction);
+%         pr1 = e.percentReturn(sigPro)
+%     end
     
     for hide_lsq = 1:1
         
@@ -135,7 +136,7 @@ for i = 0:futer/interval
         
         c = Construction(A, P, theta, predLen, sigMod);
         [model, prediction, projection] = c.constructPro();
-        c.plotPro(projection, sigPro);
+        c.plotPro(projection, sigMod);
         title('lsqBest');
         e = Evaluator(sigMod, model, prediction);
         pr2 = e.percentReturn(sigPro)
@@ -168,7 +169,7 @@ for i = 0:futer/interval
             hold on;
             plot(sigMod,'m')
             plot(spt(1:end-cc),spo(1:end-cc),'ro')
-%             pause;
+            pause;
             plot(sigPro(1:end-cc),'r')
             plot(spt(1:end-cc),sph(1:end-cc),'k+')
             plot(spt(1:end-cc),spl(1:end-cc),'ks')
