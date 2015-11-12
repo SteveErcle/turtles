@@ -23,6 +23,8 @@ classdef TideFinder
         
         [theta] = FTtideFinder(obj);
         
+        [theta, dc_offset] = SQtideFinder(obj);
+        
 %         FFTtideFinder()
         
         
@@ -32,6 +34,8 @@ classdef TideFinder
                 theta = GDtideFinder(obj);
             elseif strcmp(eval_Type_String, 'BF')
                 theta = BFtideFinder(obj);
+            elseif strcmp(eval_Type_String, 'SQ')
+                theta = SQtideFinder(obj);
             end
             
         end

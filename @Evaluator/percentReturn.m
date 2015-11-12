@@ -42,7 +42,7 @@ eq_test = prediction;
 
 
 [tagged,imax,imin] = obj.peakAndTrough(eq_test);
-tagged
+tagged;
 
 actual = [];
 tagged;
