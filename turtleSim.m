@@ -1,133 +1,66 @@
-% turtleSim
-clear all
-close all
-clc
+clc; clear all; close all;
 
 
-gain = 4;
-price = 100;
-A = 1000;
-B = 1000;
-M = 0;
 
-figure()
-allPrice = [];
+A = 0;
+B = 0;
+
 capital = 0;
-s=0;
-b=0;
-for i = 1:100
-    
-    
-    i
-    
-    if s <= b
-        s = input('s: ');
-        A = A-s;
-    end
-    
-%     b = input('b: ')
-b = rand(1)*15
+price = 100;
+allPrice = [];
 
-    M = M + s-b
-    
-   
-    B = B+b;
-    
-    if s>=b
-        s = s-b;
-        capital = capital+price*b
-    else
-        capital = capital+price*s
-        s = 0;
-    end
-    
-%     display([s,b,M]);
-%     display([A,B]);
-    
-    equl = -M/(A+B+M);
-    
-    rateOfChange = equl;
-    price = price*(1+rateOfChange)
-    
-    
-    
-    vol = min(s,b);
-    
-    allPrice = [allPrice; price];
-    plot(allPrice);
-    %     hold on
-    %     plot(vol,'g')
-    
-    
-end
+supply = 0;
+demand = 0;
 
-
-
-
-% insiderNumShares = 1000;
-% publicNumShares = 1000;
-%
-% totalShares = insiderNumShares + publicNumShares;
-%
-%
-% insider = Shark(insiderNumShares);
-% public = Shark(publicNumShares);
-%
-%
-% seaTurtle = TurtleMarket(totalShares, 100);
-%
-%
-% price = 100;
-%
-%
-%     x = input('insider sell')
-%     y = input('public buy')
-%     insider = insider.sellOrder(x);
-%     public = public.buyOrder(y);
-%
-%     sellOrders = insider.sell;
-%     buyOrders = public.buy;
-%
-%
-%     equl = (insider.hold+public.hold)/2;
-%
-%     if sellOrders >= buyOrders
-%         rateOfChange = (sellOrders+equl)/(buyOrders+equl);
-%         price = price-rateOfChange;
-%
-%         returnOrderToSeller = sellOrders-buyOrders;
-%         insider.sell = returnOrderToSeller;
-%
+% for i = 1:50
+%     s = input('s: ')
+%     b = 10;
+%     
+%     supply = supply + s;
+%     demand = demand + b;
+%     
+%     equl = (demand-supply)/(20000);
+%     
+%     rateOfChange = equl;
+%     price = price*(1+rateOfChange);
+%     
+%     allPrice = [allPrice; price];
+%     plot(allPrice);
+%     
+%     if supply >= demand
+%         A = A + demand;
+%         capital = capital + demand*price;
+%         sprintf('Capital: %0.2f',capital)
+%         supply = supply - demand
+%         demand = demand - demand
+%     else
+%         A = A + supply;
+%         capital = capital + supply*price;
+%         sprintf('Capital: %0.2f',capital)
+%         demand = demand - supply
+%         supply = supply - supply
 %     end
-%
-%
-%
-%
-%
-%
-%
-% %     [seaTurtle, insider, public] = seaTurtle.equalizeMarket(insider, public)
-%
-%
-% % price = 100;
-% %
-% % sellOrders = 500;
-% %
-% % buyOrders = 100;
-% %
-% % equl = (insider+public)/2;
-% %
-% %
-% % if sellOrders >= buyOrders
-% %     rateOfChange = (sellOrders+equl)/(buyOrders+equl);
-% %     price = price-rateOfChange
-% %     sellOrders = sellOrders-buyOrders
-% %     buyOrders = buyOrders - buyOrders;
-% % else
-% %     rateOfChange = (buyOrders+equl)/(sellOrders+equl);
-% %     price = price+rateOfChange
-% %     buyOrders = buyOrders - sellOrders
-% %     sellOrders = sellOrders-sellOrders
-% % end
-%
-%
+%     
+%     
+%     
+% end
+
+
+fun = @(x)loopClosureTurtleSim(x);
+
+
+x0 = [ones(50,1)];
+
+lb = [];
+ub = [];
+options = optimset('Display', 'off');
+
+[x, resnorm] = lsqnonlin(fun, x0, lb, ub, options);
+
+fun = loopClosureTurtleSim(x);
+
+capital = 1/fun
+
+
+
+

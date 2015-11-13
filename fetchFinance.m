@@ -10,10 +10,19 @@ d = fetch(c,'IBM','11/12/2015', '11/12/2010');
 
 close(c)
 
-priceNorm = normalizer(d(:,7));
+% priceNorm = normalizer(d(:,7));
+% volNorm = normalizer(d(:,6));
+
+priceNormDiff = normalizer(diff(d(:,7)));
+priceNorm = normalizer((d(:,7)));
 volNorm = normalizer(d(:,6));
 
-plot(priceNorm,'r');
+[priceFilt] = getFiltered(priceNormDiff, 0.02, 'low');
+[volFilt] = getFiltered(volNorm, 0.02, 'low');
+
+
+plot(priceFilt,'r');
 hold on
-plot(volNorm)
-plot(1:length(volNorm),mean(volNorm),'k');
+plot(volFilt)
+plot(1:length(volFilt),mean(volFilt),'k');
+plot(priceNorm)
