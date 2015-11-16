@@ -12,6 +12,7 @@ allPrice = [];
 supply = 0;
 demand = 0;
 
+
 % for i = 1:50
 %     s = input('s: ')
 %     b = 10;
@@ -44,7 +45,7 @@ demand = 0;
 %     
 %     
 % end
-
+% 
 
 fun = @(x)loopClosureTurtleSim(x);
 

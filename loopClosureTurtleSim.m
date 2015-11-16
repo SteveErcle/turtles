@@ -23,7 +23,7 @@ for i = 1:50
     supply = supply + s;
     demand = demand + b;
     
-    equl = (demand-supply)/(16700);
+    equl = (demand-supply)/(10000);
     
     rateOfChange = equl;
     price = price*(1+rateOfChange);
