@@ -1,4 +1,4 @@
-% eggLayer
+% eggFinder
 
 clear all;
 close all;
