@@ -6,17 +6,34 @@ clc;
 
 
 c = yahoo;
-stock = 'MENT';
+stock = 'CMG';
 
 
 yearlyHL = [];
 
 
-year1 = 1995;
-year2 = year1+5;
+year1 = 2014;
+year2 = year1+1;
 month = 1;
 
+
+
+
 monthDay = strcat(num2str(month),'/33/');
+
+
+w = fetch(c,stock,now, now-300);
+
+
+ highlow(w(:,3), w(:,4),...
+        w(:,3), w(:,4),'blue',w(:,1));
+    
+    
+
+
+pause
+
+
 
 w = fetch(c,stock,strcat('1/1/', num2str(year1)),...
     strcat(monthDay, num2str(year2)), 'w');
