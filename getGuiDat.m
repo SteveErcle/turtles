@@ -43,25 +43,26 @@ stock = 'MENT';
 
 w = fetch(c,stock,now, now-2000, 'w');
 
-highlow(w(:,3), w(:,4),...
+highlowFlex(handles.axesG, w(:,3), w(:,4),...
     w(:,3), w(:,4),'blue',w(:,1));
-h = gca
+% h = gca
 
 startDate = w(end,1);
 endDate = w(1,1);
 
 levels = [0 12.5 25 33 37.5 50 62.5 67 75 87.5 100 150 250]';
-bottomLevs = 8.5*(1+levels/100);
+bottomLevs = 8.21*(1+levels/100);
 
 % set(h, 'XLim', [startDate+val-100, startDate+val]);
 %     set(h, 'YLim', [min(w(:,4))*0.9, max(w(:,3))*1.1]);
-datetick('x',12, 'keeplimits');
+% datetick('x',12, 'keeplimits');
 
-hold on
+
 for i = 1:length(bottomLevs)
-plot(startDate:endDate, ones(1,length(startDate:endDate))*bottomLevs(i), 'k')
+    set(handles.axesG, 'NextPlot', 'add');
+plot(handles.axesG, startDate:endDate, ones(1,length(startDate:endDate))*bottomLevs(i), 'k')
 end 
-hold off
+
 
 
 for i = 1:1000
@@ -69,9 +70,9 @@ for i = 1:1000
     
     
     val = get(handles.slider1,'Value');
-    set(h, 'XLim', [startDate+val-100, startDate+val]);
-    %     set(h, 'YLim', [min(w(:,4))*0.9, max(w(:,3))*1.1]);
-    datetick('x',12, 'keeplimits');
+    set(handles.axesG, 'XLim', [startDate+val-100, startDate+val]);
+        set(handles.axesG, 'YLim', [min(w(:,4))*0.9, max(w(:,3))*1.1]);
+    datetick(handles.axesG,'x',12, 'keeplimits');
     
     pause(0.025)
     
