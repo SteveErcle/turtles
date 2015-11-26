@@ -22,7 +22,7 @@ function varargout = giua(varargin)
 
 % Edit the above text to modify the response to help giua
 
-% Last Modified by GUIDE v2.5 24-Nov-2015 22:39:05
+% Last Modified by GUIDE v2.5 25-Nov-2015 14:03:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -105,8 +105,8 @@ function checkbox1_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on slider movement.
-function slider2_Callback(hObject, eventdata, handles)
-% hObject    handle to slider2 (see GCBO)
+function slider4_Callback(hObject, eventdata, handles)
+% hObject    handle to slider4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -115,8 +115,8 @@ function slider2_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function slider2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider2 (see GCBO)
+function slider4_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
