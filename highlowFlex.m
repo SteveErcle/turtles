@@ -79,7 +79,7 @@ opt = [ind(:) ind(:)-inc nanpad]';
 alldat = [hilo clo ope];
 allind = [indhilo clt opt];
 hdles = plot(guiHandle, allind(:),alldat(:),'color',color);
-setappdata(gca,'plottype','HighLow')  
+% setappdata(gca,'plottype','HighLow')  
 if nargout == 1  
   h = hdles;  
 end
@@ -109,11 +109,11 @@ if nargin == 6 | nargin == 7,
 	set(hhll, 'XData', newdtaxis);
 
 	% Change XTickLabel to date string format.
-	if ~exist('dateform', 'var') | isempty(dateform),
-	   datetick('x');
-    else
-	   datetick('x', dateform);
-	end
+% 	if ~exist('dateform', 'var') | isempty(dateform),
+% 	   datetick('x');
+%     else
+% 	   datetick('x', dateform);
+% 	end
 end
 
 return
