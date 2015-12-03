@@ -22,7 +22,7 @@ function varargout = giua(varargin)
 
 % Edit the above text to modify the response to help giua
 
-% Last Modified by GUIDE v2.5 29-Nov-2015 13:48:09
+% Last Modified by GUIDE v2.5 02-Dec-2015 19:14:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -146,3 +146,12 @@ function slider5_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
+
+
+% --- Executes on button press in radiobutton2.
+function radiobutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton2
