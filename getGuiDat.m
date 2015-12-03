@@ -25,10 +25,10 @@ h2 = highlow(w(:,3), w(:,4),...
 set(gcf, 'Position', [0, 0, 1460, 700]);
 set(giua, 'Position', [15, 210, 210, 5]);
 
-initView = 70
+initView = 300
 set(handles.slider1, 'Value', 0);
-set(handles.slider1, 'Max', size(m,1)-initView-1, 'Min', 0);
-set(handles.slider1, 'SliderStep', [1/(size(m,1)-initView), 10/(size(m,1)-initView)]);
+set(handles.slider1, 'Max', size(w,1)-initView-1, 'Min', 0);
+set(handles.slider1, 'SliderStep', [1/(size(w,1)-initView), 10/(size(w,1)-initView)]);
 set(handles.radiobutton2, 'Value', 0)
 
 highestR = 0%91.42;
@@ -92,10 +92,14 @@ while(true)
             values = [];
             for i = 1:length(cursor_info)
                 
-                value = getfield(cursor_info, {i},'Position')
+                value = getfield(cursor_info, {i},'Position');
                 datestr(value)
                 values = [values;value(2)];
                 subplot(2,1,1)
+                hold on
+                plot(tLevs , ones(1,length(tLevs))*value(2), 'k')
+                
+                subplot(2,1,2)
                 hold on
                 plot(tLevs , ones(1,length(tLevs))*value(2), 'k')
                 
@@ -106,13 +110,13 @@ while(true)
     end
     
     subplot(2,1,1)
-    axis([m(end - startIndx,1)+4, m(end - endIndx,1)+4,...
-        min(m(end-endIndx:end-startIndx,4))*0.99, max(m(end-endIndx:end-startIndx,3))*1.01]);
+    axis([w(end - startIndx,1)+1, w(end - endIndx,1)+1,...
+        min(w(end-endIndx:end-startIndx,4))*0.95, max(w(end-endIndx:end-startIndx,3))*1.05]);
     datetick('x',12, 'keeplimits');
     
     subplot(2,1,2)
-    axis([m(end - startIndx,1), m(end - endIndx,1),...
-        min(m(end-endIndx:end-startIndx,4))*0.99, max(m(end-endIndx:end-startIndx,3))*1.01]);
+    axis([w(end - startIndx-4,1)+1, w(end - endIndx-4,1)+1,...
+        min(w(end-endIndx:end-startIndx,4))*0.95, max(w(end-endIndx:end-startIndx,3))*1.05]);
     datetick('x',12, 'keeplimits');
     
     pause(0.025)
