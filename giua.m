@@ -22,7 +22,7 @@ function varargout = giua(varargin)
 
 % Edit the above text to modify the response to help giua
 
-% Last Modified by GUIDE v2.5 02-Dec-2015 19:14:15
+% Last Modified by GUIDE v2.5 03-Dec-2015 18:48:40
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -148,10 +148,19 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
-% --- Executes on button press in radiobutton2.
-function radiobutton2_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton2 (see GCBO)
+% --- Executes on button press in button.
+function button_Callback(hObject, eventdata, handles)
+% hObject    handle to button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of radiobutton2
+% Hint: get(hObject,'Value') returns toggle state of button
+
+
+% --- Executes on button press in view.
+function view_Callback(hObject, eventdata, handles)
+% hObject    handle to view (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of view

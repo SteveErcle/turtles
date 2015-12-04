@@ -17,19 +17,35 @@ subplot(2,1,1)
 h1 = highlow(m(:,3), m(:,4),...
     m(:,3), m(:,4),'blue',m(:,1));
 
+ax1 = gca;
+hold on
+
+ax2 = axes('Position',get(ax1,'Position'),...
+    'XAxisLocation','top',...
+    'YAxisLocation','right',...
+    'Color','none',...
+    'XColor','k','YColor','k');
+set(ax2, 'YLim', [0 80000000])
+linkaxes([ax1 ax2],'x');
+hold on
+bar(m(:,1),m(:,6),'Parent',ax2);
+hold off
+
 subplot(2,1,2)
 h2 = highlow(w(:,3), w(:,4),...
     w(:,3), w(:,4),'blue',w(:,1));
+hold on
 
 
 set(gcf, 'Position', [0, 0, 1460, 700]);
 set(giua, 'Position', [15, 210, 210, 5]);
 
-initView = 300
+initView = 100
 set(handles.slider1, 'Value', 0);
 set(handles.slider1, 'Max', size(w,1)-initView-1, 'Min', 0);
 set(handles.slider1, 'SliderStep', [1/(size(w,1)-initView), 10/(size(w,1)-initView)]);
-set(handles.radiobutton2, 'Value', 0)
+set(handles.button, 'Value', 0);
+set(handles.view, 'Value', 0);
 
 highestR = 0%91.42;
 lowestS  = 0%19.38;
@@ -78,7 +94,9 @@ for i = 1:length(highLevs)
     end
 end
 
-
+values = [];
+prevView = get(handles.view, 'Value');
+flagView = -1;
 while(true)
     
     val = get(handles.slider1,'Value');
@@ -86,10 +104,10 @@ while(true)
     startIndx = ceil(val);
     endIndx  = ceil(val)+initView;
     
-    if get(handles.radiobutton2, 'Value')
+    if get(handles.button, 'Value')
         
         if exist('cursor_info', 'var')
-            values = [];
+            
             for i = 1:length(cursor_info)
                 
                 value = getfield(cursor_info, {i},'Position');
@@ -106,7 +124,36 @@ while(true)
             end
             clear cursor_info
         end
-        set(handles.radiobutton2, 'Value', 0);
+        set(handles.button, 'Value', 0);
+    end
+    
+    
+    
+    if get(handles.view, 'Value') ~= prevView
+        
+        if flagView == -1
+            
+            
+            %             hi = m(:,3); lo = m(:,4); cl = m(:,5); op = m(:,2); da = m(:,1);
+            %             subplot(2,1,1)
+            %             h3 = highlow(hi, lo, cl, op, 'blue', da);
+            
+            hi = w(:,3); lo = w(:,4); cl = w(:,5); op = w(:,2); da = w(:,1);
+            subplot(2,1,2)
+            h4 = highlow(hi, lo, cl, op, 'blue', da);
+            
+            
+            flagView = flagView*-1;
+            
+        else
+            %             delete(h3)
+            delete(h4)
+            
+            flagView = flagView*-1;
+        end
+        
+        prevView = get(handles.view, 'Value');
+        
     end
     
     subplot(2,1,1)
@@ -121,3 +168,7 @@ while(true)
     
     pause(0.025)
 end
+
+% Add feature to delete previous level
+
+% storedValues = [25.6875000000000;29.1250000000000;30.1718810000000;24;32.3125000000000;27.6250000000000]
