@@ -60,7 +60,6 @@ fluctLevs(end+1) = (highestR-lowestS)*(2)+lowestS;
 fluctLevs(end+1) = (highestR-lowestS)*(2.5)+lowestS;
 fluctLevs(end+1) = (highestR-lowestS)*(1/3)+lowestS;
 fluctLevs(end+1) = (highestR-lowestS)*(2/3)+lowestS;
-
 for i = 1:length(fluctLevs)
     %     set(handles.axesG, 'NextPlot', 'add');
     tLevs = m(end,1):m(1,1);
@@ -81,8 +80,6 @@ highLevs(end+1) = highestR*2;
 highLevs(end+1) = highestR*2.5;
 highLevs(end+1) = highestR*1/3;
 highLevs(end+1) = highestR*2/3;
-
-
 for i = 1:length(highLevs)
     %     set(handles.axesG, 'NextPlot', 'add');
     tLevs = m(end,1):m(1,1);
@@ -93,6 +90,17 @@ for i = 1:length(highLevs)
         plot(tLevs , ones(1,length(tLevs))*highLevs(i), 'm')
     end
 end
+
+
+storedValues = [25.6875000000000;29.1250000000000;30.1718810000000;24;32.3125000000000;27.6250000000000]
+
+for i = 1:length(storedValues)
+    subplot(2,1,1)     
+    plot(tLevs , ones(1,length(tLevs))*storedValues(i), 'k')
+    subplot(2,1,2)     
+    plot(tLevs , ones(1,length(tLevs))*storedValues(i), 'k')
+end
+
 
 values = [];
 prevView = get(handles.view, 'Value');
@@ -162,13 +170,13 @@ while(true)
     datetick('x',12, 'keeplimits');
     
     subplot(2,1,2)
-    axis([w(end - startIndx-4,1)+1, w(end - endIndx-4,1)+1,...
+    axis([w(end - startIndx,1), w(end - endIndx,1)+2,...
         min(w(end-endIndx:end-startIndx,4))*0.95, max(w(end-endIndx:end-startIndx,3))*1.05]);
     datetick('x',12, 'keeplimits');
+    
+     (w(end-endIndx:end-endIndx+5,4))
     
     pause(0.025)
 end
 
 % Add feature to delete previous level
-
-% storedValues = [25.6875000000000;29.1250000000000;30.1718810000000;24;32.3125000000000;27.6250000000000]
