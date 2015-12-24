@@ -4,7 +4,6 @@ clear all
 close all
 delete(giua)
 
-
 stock = 'USO'; %XLE
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
@@ -17,25 +16,18 @@ subplot(2,1,1)
 h1 = highlow(m(:,3), m(:,4),...
     m(:,3), m(:,4),'blue',m(:,1));
 
-ax1 = gca;
-hold on
-
-ax2 = axes('Position',get(ax1,'Position'),...
-    'XAxisLocation','top',...
-    'YAxisLocation','right',...
-    'Color','none',...
-    'XColor','k','YColor','k');
-set(ax2, 'YLim', [0 80000000])
-linkaxes([ax1 ax2],'x');
-hold on
-bar(m(:,1),m(:,6),'Parent',ax2);
-hold off
-
 subplot(2,1,2)
 h2 = highlow(w(:,3), w(:,4),...
     w(:,3), w(:,4),'blue',w(:,1));
 hold on
 
+hi = w(:,3); lo = w(:,4); cl = w(:,5); op = w(:,2); da = w(:,1);
+subplot(2,1,2)
+highlow(hi, lo, cl, op, 'blue', da);
+hold on
+
+lineHiLo  = lineSetter(gcf, 1)
+set(lineHiLo,'Visible','off')
 
 set(gcf, 'Position', [0, 0, 1460, 700]);
 set(giua, 'Position', [15, 210, 210, 5]);
@@ -47,75 +39,32 @@ set(handles.slider1, 'SliderStep', [1/(size(w,1)-initView), 10/(size(w,1)-initVi
 set(handles.button, 'Value', 0);
 set(handles.view, 'Value', 0);
 
-highestR = 0;%91.42;
-lowestS  = 0;%19.38;
-subplot(2,1,1)
-hold on;
+tLevs = m(end,1):m(1,1);
 
-for i = 1:9
-    fluctLevs(i) = (highestR-lowestS)*((i-1)/8)+lowestS;
-end
-fluctLevs(end+1) = (highestR-lowestS)*(1.5)+lowestS;
-fluctLevs(end+1) = (highestR-lowestS)*(2)+lowestS;
-fluctLevs(end+1) = (highestR-lowestS)*(2.5)+lowestS;
-fluctLevs(end+1) = (highestR-lowestS)*(1/3)+lowestS;
-fluctLevs(end+1) = (highestR-lowestS)*(2/3)+lowestS;
-for i = 1:length(fluctLevs)
-    %     set(handles.axesG, 'NextPlot', 'add');
-    tLevs = m(end,1):m(1,1);
-    %     plot(handles.axesG, tLevs , ones(1,length(tLevs))*fluctLevs(i), 'k')
-    if i <= length(fluctLevs) - 2
-        plot(tLevs , ones(1,length(tLevs))*fluctLevs(i), 'k')
-    else
-        plot(tLevs , ones(1,length(tLevs))*fluctLevs(i), 'c')
-    end
-    
-end
+subplot(2,1,2)
+highest = 0;
+lowest  = 0;
+showFluctLevs(highest, lowest, tLevs)
+linFluct = lineSetter(gcf, 14)
+set(linFluct,'Visible','off')
 
-for i = 1:9
-    highLevs(i) = highestR*((i-1)/8);
-end
-highLevs(end+1) = highestR*1.5;
-highLevs(end+1) = highestR*2;
-highLevs(end+1) = highestR*2.5;
-highLevs(end+1) = highestR*1/3;
-highLevs(end+1) = highestR*2/3;
-for i = 1:length(highLevs)
-    %     set(handles.axesG, 'NextPlot', 'add');
-    tLevs = m(end,1):m(1,1);
-    %     plot(handles.axesG, tLevs , ones(1,length(tLevs))*highLevs(i), 'g')
-    if i <= length(highLevs) - 2
-        plot(tLevs , ones(1,length(tLevs))*highLevs(i), 'r')
-    else
-        plot(tLevs , ones(1,length(tLevs))*highLevs(i), 'm')
-    end
-end
+subplot(2,1,2)
+showHighLevs(highest, tLevs)
+linHi = lineSetter(gcf, 14)
+set(linHi,'Visible','off')
 
-
-% storedValues = [25.6875000000000;29.1250000000000;30.1718810000000;24;32.3125000000000;27.6250000000000]
-% % [34.9000020000000;19.3799990000000;21.0937500000000;37.9000020000000;44.9199980000000;54.6500020000000;58.2799990000000;62.1300010000000;50.0099980000000;74;80.7500000000000]
-% for i = 1:length(storedValues)
-%     subplot(2,1,1)     
-%     plot(tLevs , ones(1,length(tLevs))*storedValues(i), 'k')
-%     subplot(2,1,2)     
-%     plot(tLevs , ones(1,length(tLevs))*storedValues(i), 'k')
-% end
 
 
 values = [];
-prevView = get(handles.view, 'Value');
 flagView = -1;
 while(true)
     
     val = get(handles.slider1,'Value');
-    
     startIndx = ceil(val);
     endIndx  = ceil(val)+initView;
     
     if get(handles.button, 'Value')
-        
         if exist('cursor_info', 'var')
-            
             for i = 1:length(cursor_info)
                 
                 value = getfield(cursor_info, {i},'Position');
@@ -135,34 +84,70 @@ while(true)
         set(handles.button, 'Value', 0);
     end
     
-    
-    
-    if get(handles.view, 'Value') ~= prevView
-        
-        if flagView == -1
-            
-            
-            %             hi = m(:,3); lo = m(:,4); cl = m(:,5); op = m(:,2); da = m(:,1);
-            %             subplot(2,1,1)
-            %             h3 = highlow(hi, lo, cl, op, 'blue', da);
-            
-            hi = w(:,3); lo = w(:,4); cl = w(:,5); op = w(:,2); da = w(:,1);
-            subplot(2,1,2)
-            h4 = highlow(hi, lo, cl, op, 'blue', da);
-            
-            
-            flagView = flagView*-1;
-            
-        else
-            %             delete(h3)
-            delete(h4)
-            
-            flagView = flagView*-1;
+    for ihide = 1:1
+        if get(handles.view, 'Value')
+            if flagView == -1
+                set(lineHiLo,'Visible','on')
+                flagView = flagView*-1;
+            else
+                set(lineHiLo,'Visible','off')
+                flagView = flagView*-1;
+            end
+            set(handles.view, 'Value', 0);
         end
         
-        prevView = get(handles.view, 'Value');
+        if get(handles.viewHiLevs, 'Value')
+            if flagView == -1
+                set(linHi,'Visible','on')
+                flagView = flagView*-1;
+            else
+                set(linHi,'Visible','off')
+                flagView = flagView*-1;
+            end
+            set(handles.viewHiLevs, 'Value', 0);
+        end
         
+        if get(handles.viewFluctLevs, 'Value')
+            if flagView == -1
+                set(linFluct,'Visible','on')
+                flagView = flagView*-1;
+            else
+                set(linFluct,'Visible','off')
+                flagView = flagView*-1;
+            end
+            set(handles.viewFluctLevs, 'Value', 0);
+        end
     end
+    
+    
+    
+    if get(handles.setHiLo, 'Value')
+        
+%         dataTips = findall(gca, 'Type', 'hggroup', 'HandleVisibility', 'off');
+%         if length(dataTips) > 0
+%             delete(dataTips);
+%         end
+        
+        set(linFluct,'Visible','off')
+        set(linHi,'Visible','off')
+        
+        highest = str2double(get(handles.HiLevView,'String'));
+        lowest = str2double(get(handles.LoLevView,'String'));
+        
+        subplot(2,1,2)
+        showFluctLevs(highest, lowest, tLevs);
+        linFluct = lineSetter(gcf, 14);
+        set(linFluct,'Visible','off')
+        
+        subplot(2,1,2)
+        showHighLevs(highest, tLevs);
+        linHi = lineSetter(gcf, 14);
+        set(linHi,'Visible','off')
+        
+        set(handles.setHiLo, 'Value', 0);
+    end
+    
+    
     
     subplot(2,1,1)
     axis([w(end - startIndx,1), w(end - endIndx,1)+2,...
@@ -174,9 +159,32 @@ while(true)
         min(w(end-(endIndx+4):end-startIndx,4))*0.95, max(w(end-(endIndx+4):end-startIndx,3))*1.05]);
     datetick('x',12, 'keeplimits');
     
-   
     pause(0.025)
+    
 end
+
+
+
+
+
+% FOR ADDITIONAL Y AXIS FOR VOLUME
+
+% ax1 = gca;
+% hold on
+%
+% ax2 = axes('Position',get(ax1,'Position'),...
+%     'XAxisLocation','top',...
+%     'YAxisLocation','right',...
+%     'Color','none',...
+%     'XColor','k','YColor','k');
+% set(ax2, 'YLim', [0 80000000])
+% linkaxes([ax1 ax2],'x');
+% hold on
+% bar(m(:,1),m(:,6),'Parent',ax2);
+% hold off
+
+
+
 
 % Add feature to delete previous level
 % Build strategies in walk through for sideways and trending markets

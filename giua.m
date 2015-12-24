@@ -22,7 +22,7 @@ function varargout = giua(varargin)
 
 % Edit the above text to modify the response to help giua
 
-% Last Modified by GUIDE v2.5 06-Dec-2015 11:11:56
+% Last Modified by GUIDE v2.5 24-Dec-2015 14:16:10
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -269,3 +269,76 @@ function edit_pr_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+
+function HiLevView_Callback(hObject, eventdata, handles)
+% hObject    handle to HiLevView (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of HiLevView as text
+%        str2double(get(hObject,'String')) returns contents of HiLevView as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function HiLevView_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to HiLevView (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function LoLevView_Callback(hObject, eventdata, handles)
+% hObject    handle to LoLevView (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of LoLevView as text
+%        str2double(get(hObject,'String')) returns contents of LoLevView as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function LoLevView_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to LoLevView (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in viewHiLevs.
+function viewHiLevs_Callback(hObject, eventdata, handles)
+% hObject    handle to viewHiLevs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of viewHiLevs
+
+
+% --- Executes on button press in viewFluctLevs.
+function viewFluctLevs_Callback(hObject, eventdata, handles)
+% hObject    handle to viewFluctLevs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of viewFluctLevs
+
+
+% --- Executes on button press in setHiLo.
+function setHiLo_Callback(hObject, eventdata, handles)
+% hObject    handle to setHiLo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of setHiLo
