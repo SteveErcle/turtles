@@ -5,7 +5,7 @@ close all
 delete(giua)
 
 
-stock = 'XLE';
+stock = 'USO'; %XLE
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
@@ -40,22 +40,22 @@ hold on
 set(gcf, 'Position', [0, 0, 1460, 700]);
 set(giua, 'Position', [15, 210, 210, 5]);
 
-initView = 100
+initView = 100;
 set(handles.slider1, 'Value', 0);
 set(handles.slider1, 'Max', size(w,1)-initView-1, 'Min', 0);
 set(handles.slider1, 'SliderStep', [1/(size(w,1)-initView), 10/(size(w,1)-initView)]);
 set(handles.button, 'Value', 0);
 set(handles.view, 'Value', 0);
 
-highestR = 0%91.42;
-lowestS  = 0%19.38;
+highestR = 0;%91.42;
+lowestS  = 0;%19.38;
 subplot(2,1,1)
 hold on;
 
 for i = 1:9
     fluctLevs(i) = (highestR-lowestS)*((i-1)/8)+lowestS;
 end
-fluctLevs(end+1) = (highestR-lowestS)*(1.5)+lowestS
+fluctLevs(end+1) = (highestR-lowestS)*(1.5)+lowestS;
 fluctLevs(end+1) = (highestR-lowestS)*(2)+lowestS;
 fluctLevs(end+1) = (highestR-lowestS)*(2.5)+lowestS;
 fluctLevs(end+1) = (highestR-lowestS)*(1/3)+lowestS;
@@ -92,14 +92,14 @@ for i = 1:length(highLevs)
 end
 
 
-storedValues = [25.6875000000000;29.1250000000000;30.1718810000000;24;32.3125000000000;27.6250000000000]
-
-for i = 1:length(storedValues)
-    subplot(2,1,1)     
-    plot(tLevs , ones(1,length(tLevs))*storedValues(i), 'k')
-    subplot(2,1,2)     
-    plot(tLevs , ones(1,length(tLevs))*storedValues(i), 'k')
-end
+% storedValues = [25.6875000000000;29.1250000000000;30.1718810000000;24;32.3125000000000;27.6250000000000]
+% % [34.9000020000000;19.3799990000000;21.0937500000000;37.9000020000000;44.9199980000000;54.6500020000000;58.2799990000000;62.1300010000000;50.0099980000000;74;80.7500000000000]
+% for i = 1:length(storedValues)
+%     subplot(2,1,1)     
+%     plot(tLevs , ones(1,length(tLevs))*storedValues(i), 'k')
+%     subplot(2,1,2)     
+%     plot(tLevs , ones(1,length(tLevs))*storedValues(i), 'k')
+% end
 
 
 values = [];
@@ -165,18 +165,21 @@ while(true)
     end
     
     subplot(2,1,1)
-    axis([w(end - startIndx,1)+1, w(end - endIndx,1)+1,...
-        min(w(end-endIndx:end-startIndx,4))*0.95, max(w(end-endIndx:end-startIndx,3))*1.05]);
-    datetick('x',12, 'keeplimits');
-    
-    subplot(2,1,2)
     axis([w(end - startIndx,1), w(end - endIndx,1)+2,...
         min(w(end-endIndx:end-startIndx,4))*0.95, max(w(end-endIndx:end-startIndx,3))*1.05]);
     datetick('x',12, 'keeplimits');
     
-     (w(end-endIndx:end-endIndx+5,4))
+    subplot(2,1,2)
+    axis([w(end - startIndx,1), w(end - (endIndx+4),1)+2,...
+        min(w(end-(endIndx+4):end-startIndx,4))*0.95, max(w(end-(endIndx+4):end-startIndx,3))*1.05]);
+    datetick('x',12, 'keeplimits');
     
+   
     pause(0.025)
 end
 
 % Add feature to delete previous level
+% Build strategies in walk through for sideways and trending markets
+% Test those strategies by playing
+% Build macro viewer
+% Build micro viewer
