@@ -22,7 +22,7 @@ function varargout = giua(varargin)
 
 % Edit the above text to modify the response to help giua
 
-% Last Modified by GUIDE v2.5 24-Dec-2015 14:16:10
+% Last Modified by GUIDE v2.5 26-Dec-2015 20:11:57
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -342,3 +342,12 @@ function setHiLo_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of setHiLo
+
+
+% --- Executes on button press in currentPos.
+function currentPos_Callback(hObject, eventdata, handles)
+% hObject    handle to currentPos (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of currentPos
