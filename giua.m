@@ -22,7 +22,7 @@ function varargout = giua(varargin)
 
 % Edit the above text to modify the response to help giua
 
-% Last Modified by GUIDE v2.5 26-Dec-2015 20:11:57
+% Last Modified by GUIDE v2.5 27-Dec-2015 13:03:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -351,3 +351,58 @@ function currentPos_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of currentPos
+
+
+
+function edit_loss_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_loss (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_loss as text
+%        str2double(get(hObject,'String')) returns contents of edit_loss as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_loss_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_loss (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_limit_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_limit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_limit as text
+%        str2double(get(hObject,'String')) returns contents of edit_limit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_limit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_limit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in trade.
+function trade_Callback(hObject, eventdata, handles)
+% hObject    handle to trade (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of trade
