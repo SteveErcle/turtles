@@ -4,14 +4,13 @@ clear all
 close all
 delete(giua)
 
-stock = 'USO'; %XLE
+stock = 'JO'; %XLE
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
 d = fetch(c,stock,now, now-7000, 'd');
-close(c)
 
-apple = 1;
+close(c)
 
 handles = guihandles(giua);
 
@@ -21,6 +20,7 @@ for initSubPlots = 1:1
     highlow(hi, lo, hi, lo,'blue', da);
     hold on
     highlow(hi, lo, cl, op, 'blue', da);
+
     title('Monthly')
     
     subplot(3,1,2)
@@ -35,6 +35,7 @@ for initSubPlots = 1:1
     highlow(hi, lo, hi, lo,'blue', da);
     hold on
     highlow(hi, lo, cl, op, 'blue', da);
+    
     title('Daily')
 end
 
@@ -43,14 +44,15 @@ for initProps = 1:1
     set(gcf, 'Position', [-1077,1017,1077,1822]);
     set(giua, 'Position', [44.5,60.41,150.7,10]);
     
-    initView = 100;
+    initView = 490;
     set(handles.slider1, 'Value', 0);
-    set(handles.slider1, 'Max', size(w,1)-initView-1, 'Min', 0);
-    set(handles.slider1, 'SliderStep', [1/(size(w,1)-initView), 10/(size(w,1)-initView)]);
+    set(handles.slider1, 'Max', size(d,1)-initView-1, 'Min', 0);
+    set(handles.slider1, 'SliderStep', [1/(size(d,1)-initView), 10/(size(d,1)-initView)]);
     set(handles.button, 'Value', 0);
     set(handles.view, 'Value', 0);
     
     tLevs = m(end,1):m(1,1);
+    
     enter = 0;
     loss  = 0;
     limit = 0;
@@ -60,7 +62,7 @@ for initProps = 1:1
     
     values = [];
     flagView = -1;
-    flagHi = -1;  
+    flagHi = -1;
     flagFluct = -1;
     flagTrade = 0;
     
@@ -174,7 +176,7 @@ while(true)
     
     for setNaturalLevels = 1:1
         if get(handles.setHiLo, 'Value')
-            dataTips = findall(gca, 'Type', 'hggroup', 'HandleVisibility', 'off');
+            dataTips = findall(axesObjs, 'Type', 'hggroup', 'HandleVisibility', 'off');
             if length(dataTips) > 0
                 delete(dataTips);
             end
@@ -252,26 +254,23 @@ while(true)
         endIndx  = ceil(val)+initView;
         
         subplot(3,1,1)
-        axis([w(end - startIndx,1), w(end - endIndx,1)+2,...
-            min(w(end-endIndx:end-startIndx,4))*0.95,...
-            max(w(end-endIndx:end-startIndx,3))*1.05]);
+        axis([d(end - startIndx,1), d(end - (endIndx+2),1),...
+            min(d(end-(endIndx+20):end-startIndx,4))*0.95,...
+            max(d(end-(endIndx+20):end-startIndx,3))*1.05]);
         datetick('x',12, 'keeplimits');
         
         subplot(3,1,2)
-        axis([w(end - startIndx,1), w(end - (endIndx+4),1)+2,...
-            min(w(end-(endIndx+4):end-startIndx,4))*0.95,...
-            max(w(end-(endIndx+4):end-startIndx,3))*1.05]);
+        axis([d(end - startIndx,1), d(end - (endIndx+21),1)+2,...
+            min(d(end-(endIndx+21):end-startIndx,4))*0.95,...
+            max(d(end-(endIndx+21):end-startIndx,3))*1.05]);
         datetick('x',12, 'keeplimits');
         
-%         if apple == 1
-%             subplot(3,1,3)
-%             axis([w(end - (startIndx+90),1), w(end - (endIndx+4),1)+1,...
-%                 min(w(end-(endIndx+4):end-(startIndx+90),4))*0.95,...
-%                 max(w(end-(endIndx+4):end-(startIndx+90),3))*1.05]);
-%             datetick('x',12, 'keeplimits');
-%             apple = 0;
-%         end
-        
+        subplot(3,1,3)
+        axis([d(end - (startIndx+440),1)+0.4, d(end - (endIndx+25),1)+0.4,...
+            min(d(end-(endIndx+25):end-(startIndx+440),4))*0.98,...
+            max(d(end-(endIndx+25):end-(startIndx+440),3))*1.02]);
+        datetick('x',12, 'keeplimits');
+            
     end
     
     pause(0.025)
@@ -300,7 +299,5 @@ end
 
 
 % Add feature to delete previous level
-% Build strategies in walk through for sideways and trending markets
-% Test those strategies by playing
+% Build volume viewer
 % Build macro viewer
-% Build micro viewer
