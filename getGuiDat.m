@@ -11,6 +11,7 @@ w = fetch(c,stock,now, now-7000, 'w');
 d = fetch(c,stock,now, now-7000, 'd');
 close(c)
 
+apple = 1;
 
 handles = guihandles(giua);
 
@@ -59,7 +60,7 @@ for initProps = 1:1
     
     values = [];
     flagView = -1;
-    flagHi = -1;
+    flagHi = -1;  
     flagFluct = -1;
     flagTrade = 0;
     
@@ -236,7 +237,7 @@ while(true)
                 linTrade = lineSetter(gcf, 3);
                 set(linTrade, 'Visible', 'on');
                 dataTips = findall(axesObjs, 'Type', 'hggroup', 'HandleVisibility', 'off');
-                delete(dataTips);  
+                delete(dataTips);
             else
                 set(linTrade,'Visible','off');
             end
@@ -245,25 +246,32 @@ while(true)
     end
     
     for setAxisLimits = 1:1
+        
         val = get(handles.slider1,'Value');
         startIndx = ceil(val);
         endIndx  = ceil(val)+initView;
         
         subplot(3,1,1)
         axis([w(end - startIndx,1), w(end - endIndx,1)+2,...
-            min(w(end-endIndx:end-startIndx,4))*0.95, max(w(end-endIndx:end-startIndx,3))*1.05]);
+            min(w(end-endIndx:end-startIndx,4))*0.95,...
+            max(w(end-endIndx:end-startIndx,3))*1.05]);
         datetick('x',12, 'keeplimits');
-        
-        %     subplot(3,1,3)
-        %     axis([w(end - (startIndx+90),1), w(end - endIndx,1)+2,...
-        %         min(w(end-endIndx:end-(startIndx+90),4))*0.95,...
-        %         max(w(end-endIndx:end-(startIndx+90),3))*1.05]);
-        %     datetick('x',12, 'keeplimits');
         
         subplot(3,1,2)
         axis([w(end - startIndx,1), w(end - (endIndx+4),1)+2,...
-            min(w(end-(endIndx+4):end-startIndx,4))*0.95, max(w(end-(endIndx+4):end-startIndx,3))*1.05]);
+            min(w(end-(endIndx+4):end-startIndx,4))*0.95,...
+            max(w(end-(endIndx+4):end-startIndx,3))*1.05]);
         datetick('x',12, 'keeplimits');
+        
+%         if apple == 1
+%             subplot(3,1,3)
+%             axis([w(end - (startIndx+90),1), w(end - (endIndx+4),1)+1,...
+%                 min(w(end-(endIndx+4):end-(startIndx+90),4))*0.95,...
+%                 max(w(end-(endIndx+4):end-(startIndx+90),3))*1.05]);
+%             datetick('x',12, 'keeplimits');
+%             apple = 0;
+%         end
+        
     end
     
     pause(0.025)
