@@ -4,7 +4,7 @@ clear all
 close all
 delete(giua)
 
-stock = 'JO'; %XLE
+stock = 'UNG'; %XLE
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
@@ -40,7 +40,7 @@ for initSubPlots = 1:1
 end
 
 for initProps = 1:1
-    % set(gcf, 'Position', [0, 0, 1460, 700]);
+%     set(gcf, 'Position', [0, 0, 1460, 700]);
     set(gcf, 'Position', [-1077,1017,1077,1822]);
     set(giua, 'Position', [44.5,60.41,150.7,10]);
     
