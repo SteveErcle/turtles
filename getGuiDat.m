@@ -4,7 +4,7 @@ clear all
 close all
 delete(giua)
 
-stock = 'UNG'; %XLE
+stock = 'SGG';
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
@@ -15,43 +15,77 @@ close(c)
 handles = guihandles(giua);
 
 for initSubPlots = 1:1
+    
+    
+    dayMonth = '1/1/';
+    dayMonth2 = '12/31/';
+    
+    yearlyHL = [];
+    
+    
+    
+    for i = 2011:2015
+        year1 = i
+        year2 = i;
+        
+        d = fetch(c,stock,strcat(dayMonth, num2str(year1)), strcat(dayMonth2, num2str(year2)), 'm');
+        
+        high = max(d(:,3));
+        low = min(d(:,4));
+        
+        datestr(d(end,1));
+        
+        yearlyHL = [yearlyHL; year1, high, low, d(end,1)];
+        
+        
+    end
+    
+    subplot(1,1,1)
+    
+    
+    highlow(yearlyHL(:,2), yearlyHL(:,3), yearlyHL(:,2),...
+        yearlyHL(:,3),'blue',yearlyHL(:,4));
+    title('Yearly High and Low Prices')
+    dateFormat = 12;
+    datetick('x',dateFormat)
+    
+    
+    
     subplot(3,1,1)
     hi = m(:,3); lo = m(:,4); cl = m(:,5); op = m(:,2); da = m(:,1);
     highlow(hi, lo, hi, lo,'blue', da);
     hold on
-    highlow(hi, lo, cl, op, 'blue', da);
-
+    highlow(hi, lo, op, cl, 'blue', da);
     title('Monthly')
     
     subplot(3,1,2)
     hi = w(:,3); lo = w(:,4); cl = w(:,5); op = w(:,2); da = w(:,1);
     highlow(hi, lo, hi, lo,'blue', da);
     hold on
-    highlow(hi, lo, cl, op, 'blue', da);
+    highlow(hi, lo, op, cl, 'blue', da);
     title('Weekly')
     
     subplot(3,1,3)
     hi = d(:,3); lo = d(:,4); cl = d(:,5); op = d(:,2); da = d(:,1);
     highlow(hi, lo, hi, lo,'blue', da);
     hold on
-    highlow(hi, lo, cl, op, 'blue', da);
-    
+    highlow(hi, lo, op, cl, 'blue', da);
     title('Daily')
 end
 
 for initProps = 1:1
-%     set(gcf, 'Position', [0, 0, 1460, 700]);
+    %     set(gcf, 'Position', [0, 0, 1460, 700]);
     set(gcf, 'Position', [-1077,1017,1077,1822]);
     set(giua, 'Position', [44.5,60.41,150.7,10]);
     
     initView = 490;
     set(handles.slider1, 'Value', 0);
-    set(handles.slider1, 'Max', size(d,1)-initView-1, 'Min', 0);
+    set(handles.slider1, 'Max', size(d,1)-initView-25-1, 'Min', 0);
     set(handles.slider1, 'SliderStep', [1/(size(d,1)-initView), 10/(size(d,1)-initView)]);
     set(handles.button, 'Value', 0);
     set(handles.view, 'Value', 0);
     
-    tLevs = m(end,1):m(1,1);
+    tLevs = d(end,1):d(1,1);
     
     enter = 0;
     loss  = 0;
@@ -270,7 +304,7 @@ while(true)
             min(d(end-(endIndx+25):end-(startIndx+440),4))*0.98,...
             max(d(end-(endIndx+25):end-(startIndx+440),3))*1.02]);
         datetick('x',12, 'keeplimits');
-            
+        
     end
     
     pause(0.025)
