@@ -8,8 +8,16 @@ quarterlyHL = [];
 
 c = yahoo;
 
-stock = 'SGG';
+stock = 'TSLA';
 
+figure
+hold on
+trades = []
+while(true)
+    trades = [trades; get_last_trade_google(stock)];
+    plot(trades)
+    pause(10)
+end
 
 
 m = fetch(c,stock,now, now-7000, 'm');

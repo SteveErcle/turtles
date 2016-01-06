@@ -4,7 +4,7 @@ clear all
 close all
 delete(giua)
 
-stock = 'SGG';
+stock = 'TSLA';
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
@@ -15,41 +15,6 @@ close(c)
 handles = guihandles(giua);
 
 for initSubPlots = 1:1
-    
-    
-    dayMonth = '1/1/';
-    dayMonth2 = '12/31/';
-    
-    yearlyHL = [];
-    
-    
-    
-    for i = 2011:2015
-        year1 = i
-        year2 = i;
-        
-        d = fetch(c,stock,strcat(dayMonth, num2str(year1)), strcat(dayMonth2, num2str(year2)), 'm');
-        
-        high = max(d(:,3));
-        low = min(d(:,4));
-        
-        datestr(d(end,1));
-        
-        yearlyHL = [yearlyHL; year1, high, low, d(end,1)];
-        
-        
-    end
-    
-    subplot(1,1,1)
-    
-    
-    highlow(yearlyHL(:,2), yearlyHL(:,3), yearlyHL(:,2),...
-        yearlyHL(:,3),'blue',yearlyHL(:,4));
-    title('Yearly High and Low Prices')
-    dateFormat = 12;
-    datetick('x',dateFormat)
-    
-    
     
     subplot(3,1,1)
     hi = m(:,3); lo = m(:,4); cl = m(:,5); op = m(:,2); da = m(:,1);
@@ -335,3 +300,6 @@ end
 % Add feature to delete previous level
 % Build volume viewer
 % Build macro viewer
+% Build overlays
+% Add volume
+% Wide viewer
