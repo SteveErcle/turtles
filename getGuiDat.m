@@ -4,7 +4,7 @@ clear all
 close all
 delete(giua)
 
-stock = 'TSLA';
+stock = 'ATAI';
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
