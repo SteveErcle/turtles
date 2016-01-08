@@ -4,14 +4,14 @@ clear all
 close all
 delete(giua)
 
-stock = 'TVIX' %'MMYT';
+stock = 'TVIX' %'MMYT'; %'SGG'
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
 d = fetch(c,stock,now, now-7000, 'd');
 close(c)
 
-TODAY = 0;
+TODAY = 1;
 if TODAY == 1
     exchange = 'NASDAQ'
     today = IntraDayStockData(stock,exchange,'60','1d');
