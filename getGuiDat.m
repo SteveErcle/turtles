@@ -4,13 +4,21 @@ clear all
 close all
 delete(giua)
 
-stock = 'ATAI';
+stock = 'TVIX' %'MMYT';
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
 d = fetch(c,stock,now, now-7000, 'd');
-
 close(c)
+
+TODAY = 0;
+if TODAY == 1
+    exchange = 'NASDAQ'
+    today = IntraDayStockData(stock,exchange,'60','1d');
+    dToday = [today.date(1), today.close(1), max(today.high), min(today.low),...
+        today.close(end), sum(today.volume), today.close(end)]
+d = [dToday;d];
+end
 
 handles = guihandles(giua);
 
@@ -40,7 +48,7 @@ end
 
 for initProps = 1:1
     %     set(gcf, 'Position', [0, 0, 1460, 700]);
-    set(gcf, 'Position', [-1077,1017,1077,1822]);
+    set(gcf, 'Position', [1441,1,1080,1824]);
     set(giua, 'Position', [44.5,60.41,150.7,10]);
     
     initView = 490;
@@ -101,7 +109,6 @@ for initLines = 1:1
     end
     linTrade = lineSetter(gcf, 3);
 end
-
 
 while(true)
     
