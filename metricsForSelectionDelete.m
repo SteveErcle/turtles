@@ -2,7 +2,7 @@
 
 clear; close all; clc;
 
-stock = 'TSLA';
+stock = 'ZIV';
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
@@ -25,7 +25,7 @@ for initSubPlots = 1:1
     title('Weekly')
     
     subplot(3,1,3)
-    hi = w(:,3); lo = w(:,4); cl = w(:,5); op = w(:,2); da = w(:,1);
+    hi = d(:,3); lo = d(:,4); cl = d(:,5); op = d(:,2); da = d(:,1);
     highlow(hi, lo, hi, lo,'blue', da);
     hold on
     title('Daily')
@@ -39,52 +39,150 @@ hi = w(:,3); lo = w(:,4); cl = w(:,5); op = w(:,2); da = w(:,1);
 
 set(gcf, 'Position', [1441,1,1080,1824]);
 
-BestLevs = [];
-for k = 1:length(w)-1
+
+% autoTrendFinder
+
+
+for autoLevelFinder = 1:1
     
-    levelsFound = [];
-    datesFound = [];
+    numBestLevs = [];
+    for k = 2:length(w)
+        
+        levels = (hi(k)-hi)/hi(k);
+        daysOfLevelPrice = sortrows([da,abs(levels)], 2);
+        indxOfSelectedDays = [];
+        
+        for j = 2:length(daysOfLevelPrice)
+            indx = find(daysOfLevelPrice(j,1) == da);
+            
+            if indx ~= 1 & hi(k-1) < hi(k)
+                if daysOfLevelPrice(j,2) <= 1 & hi(indx-1) < hi(indx)
+                    indxOfSelectedDays = [indxOfSelectedDays; indx];
+                else
+                    indxOfSelectedDays = [indxOfSelectedDays; k];
+                    break
+                end
+            end
+            
+        end
+        
+        numBestLevs = [numBestLevs; length(indxOfSelectedDays), k];
+        
+    end
     
-    levelsFound = sortrows([da,abs(hi(k)-hi)], 2);
-    for j = 2:length(levelsFound)
-        if levelsFound(j,2) <= 1 & hi(find(levelsFound(j,1) == da)-1) < hi(find(levelsFound(j,1) == da))
-            datesFound = [datesFound; find(levelsFound(j,1) == da)];
-        else
-            break
+    numBestLevs = sortrows(numBestLevs, -1);
+    
+    foundResistanceLevels = [];
+    for iplotter = 1:10
+        k = numBestLevs(iplotter,2);
+        
+        levels = (hi(k)-hi)/hi(k);
+        daysOfLevelPrice = sortrows([da,abs(levels)], 2);
+        indxOfSelectedDays = [];
+        
+        for j = 2:length(daysOfLevelPrice)
+            indx = find(daysOfLevelPrice(j,1) == da);
+            
+            if indx ~= 1 & hi(k-1) < hi(k)
+                if daysOfLevelPrice(j,2) <= 1 & hi(indx-1) < hi(indx)
+                    indxOfSelectedDays = [indxOfSelectedDays; indx];
+                else
+                    indxOfSelectedDays = [indxOfSelectedDays; k];
+                    break
+                end
+            end
+            
+        end
+        
+        foundResistanceLevels = [foundResistanceLevels; max(hi(indxOfSelectedDays))];
+        
+        
+    end
+    
+    foundResistanceLevels = sort(unique(foundResistanceLevels));
+    for i = 1:length(foundResistanceLevels)-1
+        if foundResistanceLevels(i)/foundResistanceLevels(i+1) > 0.97
+            foundResistanceLevels(i+1) = 0;
         end
     end
     
-    BestLevs = [BestLevs; da(k), length(datesFound)];
+    foundResistanceLevels([find(0 == foundResistanceLevels)]) = [];
+    
+    subplot(3,1,2)
+    for i_rl = 1:length(foundResistanceLevels)
+        plot(da, ones(length(da),1) * foundResistanceLevels(i_rl),'k')
+    end
+    
+    numBestLevs = [];
+    for k = 2:length(w)
+        
+        levels = (lo(k)-lo)/lo(k);
+        daysOfLevelPrice = sortrows([da,abs(levels)], 2);
+        indxOfSelectedDays = [];
+        
+        for j = 2:length(daysOfLevelPrice)
+            indx = find(daysOfLevelPrice(j,1) == da);
+            
+            if indx ~= 1 & lo(k-1) > lo(k)
+                if daysOfLevelPrice(j,2) <= 1 & lo(indx-1) > lo(indx)
+                    indxOfSelectedDays = [indxOfSelectedDays; indx];
+                else
+                    indxOfSelectedDays = [indxOfSelectedDays; k];
+                    break
+                end
+            end
+            
+        end
+        
+        numBestLevs = [numBestLevs; length(indxOfSelectedDays), k];
+        
+    end
+    
+    numBestLevs = sortrows(numBestLevs, -1);
+    
+    foundSupportLevels = [];
+    for iplotter = 1:10
+        k = numBestLevs(iplotter,2);
+        
+        levels = (lo(k)-lo)/lo(k);
+        daysOfLevelPrice = sortrows([da,abs(levels)], 2);
+        indxOfSelectedDays = [];
+        
+        for j = 2:length(daysOfLevelPrice)
+            indx = find(daysOfLevelPrice(j,1) == da);
+            
+            if indx ~= 1 & lo(k-1) > lo(k)
+                if daysOfLevelPrice(j,2) <= 1 & lo(indx-1) > lo(indx)
+                    indxOfSelectedDays = [indxOfSelectedDays; indx];
+                else
+                    indxOfSelectedDays = [indxOfSelectedDays; k];
+                    break
+                end
+            end
+            
+        end
+        
+        foundSupportLevels = [foundSupportLevels; min(lo(indxOfSelectedDays))];
+        %     subplot(3,1,2)
+        %     plot(da(indxOfSelectedDays), lo(indxOfSelectedDays), 'go');
+        
+    end
+    
+    foundSupportLevels = sort(unique(foundSupportLevels));
+    for i = 1:length(foundSupportLevels)-1
+        if foundSupportLevels(i)/foundSupportLevels(i+1) > 0.97
+            foundSupportLevels(i+1) = 0;
+        end
+    end
+    
+    foundSupportLevels([find(0 == foundSupportLevels)]) = [];
+    
+    subplot(3,1,2)
+    for i_sl = 1:length(foundSupportLevels)
+        plot(da, ones(length(da),1) * foundSupportLevels(i_sl),'r')
+    end
     
 end
-
-BestLevs = sortrows(BestLevs, -2)
-
-levelsFound = [];
-datesFound = [];
-
-k = find(BestLevs(1,1) == da)
-
-
-levelsFound = sortrows([da,abs(hi(k)-hi)], 2);
-for j = 1:length(levelsFound)
-    if levelsFound(j,2) <= 1
-        datesFound = [datesFound; find(levelsFound(j,1) == da)];
-    else
-        break
-    end
-end
-
-subplot(3,1,2)
-plot(da(datesFound),hi(datesFound),'go')
-
-
-
-
-
-
-
-
 
 %
 for filterFinder = 1:1
