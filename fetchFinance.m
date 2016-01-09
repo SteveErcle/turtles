@@ -8,7 +8,7 @@ quarterlyHL = [];
 
 c = yahoo;
 
-stock = 'ZIV';
+stock = 'IWM';
 
 % figure
 % hold on
