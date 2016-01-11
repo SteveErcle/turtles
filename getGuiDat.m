@@ -4,7 +4,20 @@ clear all
 close all
 delete(giua)
 
-stock = 'IWM - Buy maybe' %'XLF - Buy' %'EEM-Short' %'TVIX' %'MMYT'; %'SGG'
+stock = 'PBR' %'IWM - Buy maybe' %'XLF - Buy' %'EEM-Short' %'TVIX' %'MMYT'; %'SGG'
+
+%'SYY - Buy - Trend up, small reaction'
+%'TWX - Watch to buy' 
+%'IWM - Watch to buy' 
+
+%'PBR - Short - Trend down, close to support'
+%'EEM - Short - Just broke out' 
+%'FCX - Short - already broke out'
+ 
+ 
+ %'TVIX' %'MMYT'; %'SGG'
+
+
 c = yahoo;
 m = fetch(c,stock,now, now-7000, 'm');
 w = fetch(c,stock,now, now-7000, 'w');
