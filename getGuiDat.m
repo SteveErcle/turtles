@@ -4,18 +4,18 @@ clear all
 close all
 delete(giua)
 
-stock = 'PBR' %'IWM - Buy maybe' %'XLF - Buy' %'EEM-Short' %'TVIX' %'MMYT'; %'SGG'
+stock = 'FCX' %'IWM - Buy maybe' %'XLF - Buy' %'EEM-Short' %'TVIX' %'MMYT'; %'SGG'
 
 %'SYY - Buy - Trend up, small reaction'
-%'TWX - Watch to buy' 
-%'IWM - Watch to buy' 
+%'TWX - Watch to buy'
+%'IWM - Watch to buy'
 
 %'PBR - Short - Trend down, close to support'
-%'EEM - Short - Just broke out' 
+%'EEM - Short - Just broke out'
 %'FCX - Short - already broke out'
- 
- 
- %'TVIX' %'MMYT'; %'SGG'
+
+
+%'TVIX' %'MMYT'; %'SGG'
 
 
 c = yahoo;
@@ -26,17 +26,49 @@ close(c)
 
 TODAY = 0;
 if TODAY == 1
-    exchange = 'NASDAQ'
+    exchange = 'NYSE'
     today = IntraDayStockData(stock,exchange,'60','1d');
     dToday = [today.date(1), today.close(1), max(today.high), min(today.low),...
         today.close(end), sum(today.volume), today.close(end)]
-d = [dToday;d];
+    d = [dToday;d];
 end
 
 handles = guihandles(giua);
 
+hi = d(:,3); lo = d(:,4); cl = d(:,5); op = d(:,2); da = d(:,1);
+figure(1)
+
+% vol = flipud(d(:,6));
+% vol = [10;9;8;7;6;5;4;3;2;1];
+% vol = flipud(vol);
+
+vol = d(:,6);
+
+vo = ones(length(vol),1);
+for i = 1:length(vol)
+        meanVol = mean(vol(i:end));
+%     meanVol = mean(vol);
+    vo(i) = (vol(i) - meanVol)/meanVol;
+end
+
+
+
+% vo = flipud(vo)
+% bar(da, vo)
+bar(da, vo);
+grip = gca;
+
+%
+% axis([grip grip],...
+%     [d(end - (1+440),1)+0.4, ...
+%     d(end - (700+25),1)+0.4,...
+%     0,5]);
+
+
+
 for initSubPlots = 1:1
     
+    figure(2)
     subplot(3,1,1)
     hi = m(:,3); lo = m(:,4); cl = m(:,5); op = m(:,2); da = m(:,1);
     highlow(hi, lo, hi, lo,'blue', da);
@@ -57,6 +89,7 @@ for initSubPlots = 1:1
     hold on
     highlow(hi, lo, op, cl, 'blue', da);
     title('Daily')
+    
 end
 
 for initProps = 1:1
@@ -122,6 +155,7 @@ for initLines = 1:1
     end
     linTrade = lineSetter(gcf, 3);
 end
+
 
 while(true)
     
@@ -272,6 +306,7 @@ while(true)
         startIndx = ceil(val);
         endIndx  = ceil(val)+initView;
         
+        figure(2)
         subplot(3,1,1)
         axis([d(end - startIndx,1), d(end - (endIndx+2),1),...
             min(d(end-(endIndx+20):end-startIndx,4))*0.95,...
@@ -289,6 +324,19 @@ while(true)
             min(d(end-(endIndx+25):end-(startIndx+440),4))*0.98,...
             max(d(end-(endIndx+25):end-(startIndx+440),3))*1.02]);
         datetick('x',12, 'keeplimits');
+        
+        
+        axis([grip grip],...
+            [d(end - (startIndx+440),1)+0.4, ...
+            d(end - (endIndx+25),1)+0.4,...
+            min(vo(end-(endIndx+25):end-(startIndx+440)))*0.98,...
+            max(vo(end-(endIndx+25):end-(startIndx+440)))*1.02]);
+        
+        title('Monthly Volume')
+        datetick(grip, 'x',12, 'keeplimits');
+        
+        
+        
         
     end
     

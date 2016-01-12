@@ -4,8 +4,8 @@
 clear; close all; clc
 
 
-stock = 'TSLA'
-exchange = 'NASDAQ';
+stock = 'FCX'
+exchange = 'NYSE';
 
 subplot(2,1,1)
 data = IntraDayStockData(stock,exchange,'900','1d');

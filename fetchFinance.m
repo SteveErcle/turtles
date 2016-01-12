@@ -9,20 +9,68 @@ clc;
 stock =  'PBR'
 
 %'SYY - Buy - Trend up, small reaction'
-%'TWX - Watch to buy' 
-%'IWM - Watch to buy' 
+%'TWX - Watch to buy'
+%'IWM - Watch to buy'
 
 %'PBR - Short - Trend down, close to support'
-%'EEM - Short - Just broke out' 
+%'EEM - Short - Just broke out'
 %'FCX - Short - already broke out'
- 
- 
- %'TVIX' %'MMYT'; %'SGG'
+
+
+%'TVIX' %'MMYT'; %'SGG'
 
 c = yahoo;
 m = fetch(c,stock,now, now-17000, 'm');
 w = fetch(c,stock,now, now-17000, 'w');
 close(c)
+
+
+figure
+hi = m(:,3); lo = m(:,4); cl = m(:,5); op = m(:,2); da = m(:,1); vo = m(:,6);
+highlow(hi, lo, hi, lo,'blue', da);
+axis([da(100), da(1)+15,...
+    min(lo(1:100))*0.95, max(hi(1:100))*1.05])
+title('Monthly')
+datetick('x',12, 'keeplimits');
+set(gcf, 'Position', [1444,1018,1075,799]);
+
+
+
+
+
+figure
+subplot(2,1,1)
+bar(da, vo)
+axis([da(100), da(1)+15,...
+    min(vo(1:100))*0.95, max(vo(1:100))*1.05])
+
+title('Monthly Volume')
+datetick('x',12, 'keeplimits');
+
+
+subplot(2,1,2)
+
+vo = (vo-mean(vo))/mean(vo);
+
+bar(da, vo)
+axis([da(100), da(1)+15,...
+    min(vo(1:100))*0.95, max(vo(1:100))*1.05])
+
+title('Monthly Volume')
+datetick('x',12, 'keeplimits');
+
+return 
+
+
+
+
+
+
+
+
+
+
+
 
 for init = 1:1
     
@@ -98,9 +146,12 @@ for i_plot = 1:1
     datetick('x',12, 'keeplimits');
     set(gcf, 'Position', [1443,4,1075,877]);
     
-    pause
+%     pause
     
     close all
     
 end
- 
+
+close all
+
+
