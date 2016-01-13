@@ -4,7 +4,7 @@ clear all
 close all
 delete(giua)
 
-stock = 'FCX' %'IWM - Buy maybe' %'XLF - Buy' %'EEM-Short' %'TVIX' %'MMYT'; %'SGG'
+stock = 'PBR' %'IWM - Buy maybe' %'XLF - Buy' %'EEM-Short' %'TVIX' %'MMYT'; %'SGG'
 
 %'SYY - Buy - Trend up, small reaction'
 %'TWX - Watch to buy'

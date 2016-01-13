@@ -4,7 +4,7 @@
 clear; close all; clc
 
 
-stock = 'FCX'
+stock = 'PBR'
 exchange = 'NYSE';
 
 subplot(2,1,1)

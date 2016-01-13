@@ -6,7 +6,7 @@ clc;
 
 
 
-stock =  'PBR'
+stock =  'FCX'
 
 %'SYY - Buy - Trend up, small reaction'
 %'TWX - Watch to buy'
@@ -22,7 +22,61 @@ stock =  'PBR'
 c = yahoo;
 m = fetch(c,stock,now, now-17000, 'm');
 w = fetch(c,stock,now, now-17000, 'w');
+d = fetch(c,stock,now, now-70, 'd');
 close(c)
+
+
+
+
+stock = 'FCX'
+exchange = 'NYSE';
+
+
+data = IntraDayStockData(stock,exchange,'300', '60d');
+hi = data.high; lo = data.low; vo = data.volume; da = data.date;
+
+datar = [vo,str2num(datestr(da,7))];
+
+storez = [datar(2,1), da(2)];
+
+for i = 1:length(datar)-2
+    if datar(i,2) ~= datar(i+1,2)
+        storez = [storez; datar(i+2,1), da(i+2)];
+    end
+end
+
+
+storez(:,1) = mean(d(:,3))*(storez/max(storez))/1.5
+
+
+hi = d(:,3); lo = d(:,4); cl = d(:,5); op = d(:,2); da = d(:,1);
+highlow(hi, lo, op, cl, 'blue', da);
+title('Daily')
+datetick('x',12, 'keeplimits');
+hold on
+
+
+bar(storez(:,2),  storez(:,1), 1)
+datetick('x',12, 'keeplimits');
+
+
+for i = 1:length(storez)
+    if storez(i) > 2.75
+        
+        find(da == storez(i,2))
+        
+        plot(storez(i,2), mean(hi), 'ro')
+        
+    end
+    
+end
+
+
+
+return
+
+
+
 
 
 figure
@@ -33,9 +87,6 @@ axis([da(100), da(1)+15,...
 title('Monthly')
 datetick('x',12, 'keeplimits');
 set(gcf, 'Position', [1444,1018,1075,799]);
-
-
-
 
 
 figure
@@ -58,8 +109,6 @@ axis([da(100), da(1)+15,...
 
 title('Monthly Volume')
 datetick('x',12, 'keeplimits');
-
-return 
 
 
 
@@ -146,12 +195,11 @@ for i_plot = 1:1
     datetick('x',12, 'keeplimits');
     set(gcf, 'Position', [1443,4,1075,877]);
     
-%     pause
+    pause
     
     close all
     
 end
 
-close all
 
 
