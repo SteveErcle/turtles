@@ -1,11 +1,11 @@
 % intraDayViewer
 
 
-clear; close all; clc
+clear; close all; clc;
 
 
-stock = 'PBR'
-exchange = 'NYSE';
+stock = 'PSEC'
+exchange = 'NASDAQ';
 
 subplot(2,1,1)
 data = IntraDayStockData(stock,exchange,'900','1d');
