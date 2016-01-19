@@ -2,22 +2,28 @@ clear all;
 close all;
 clc;
 
-
+%TSEM 
+%EXC
+%NBR watch
+%AXL watch
+%BC watch
+%ECPG
+%CSX
+%PSEC
+%ETE
+%SWC watch
+%HTZ
+%KBE
+%GIS
+%ROK
+%WMB
+%RY
 
 
 [~,allStocks] = xlsread('listOfStocks')
 
-for i = 8:length(allStocks)
+for i = 1:length(allStocks)
     stock = allStocks(i)
-    
-    %'SYY - Buy - Trend up, small reaction'
-    %'TWX - Watch to buy'
-    %'IWM - Watch to buy'
-    
-    %'PBR - Short - Trend down, close to support'
-    %'EEM - Short - Just broke out'
-    %'FCX - Short - already broke out'
-    
     
     c = yahoo;
     m = fetch(c,stock,now, now-17000, 'm');
@@ -25,15 +31,11 @@ for i = 8:length(allStocks)
     d = fetch(c,stock,now, now-17000, 'd');
     close(c)
     
-    exchange = 'NYSE';
+    %     exchange = 'NYSE';
+    %     d = getTodaysOHLC(stock, exchange, d);
     
     datestr(d(1))
-%     d = getTodaysOHLC(stock, exchange, d);
-%     datestr(d(1))
-    
     [quarterlyHL yearlyHL] = getQYHL(m);
-    
-    
     
     for i_plot = 1:1
         
@@ -52,6 +54,8 @@ for i = 8:length(allStocks)
         dateFormat = 12;
         datetick('x',dateFormat)
         set(gcf, 'Position', [750,12,690,793]);
+        hold on
+        autoPlotLevs(quarterlyHL, yearlyHL, quarterlyHL)
         
         
         figure
@@ -62,18 +66,9 @@ for i = 8:length(allStocks)
         title('Monthly')
         datetick('x',12, 'keeplimits');
         set(gcf, 'Position', [1444,1018,1075,799]);
-        
         hold on
-        for j = 2:3
-            for i = 2:5
-                if j == 2
-                    color = 'g';
-                else
-                    color = 'r';
-                end
-                plot(da , ones(1,length(da))*yearlyHL(i,j), color)
-            end
-        end
+        autoPlotLevs(quarterlyHL, yearlyHL, da)
+        
         
         figure
         hi = w(:,3); lo = w(:,4); cl = w(:,5); op = w(:,2); da = w(:,1);
@@ -86,17 +81,7 @@ for i = 8:length(allStocks)
         datetick('x',12, 'keeplimits');
         set(gcf, 'Position', [1443,4,1075,877]);
         
-        for j = 2:3
-            for i = 2:7
-                if j == 2
-                    color = 'g';
-                else
-                    color = 'r';
-                end
-                plot(da , ones(1,length(da))*quarterlyHL(i,j), color)
-            end
-        end
-        
+        autoPlotLevs(quarterlyHL, yearlyHL, da)
         
         
         figure
@@ -109,18 +94,7 @@ for i = 8:length(allStocks)
         
         hold on
         
-        for j = 2:3
-            for i = 2:7
-                if j == 2
-                    color = 'g';
-                else
-                    color = 'r';
-                end
-                plot(da , ones(1,length(da))*quarterlyHL(i,j), color)
-                
-            end
-        end
-        
+        autoPlotLevs(quarterlyHL, yearlyHL, da)
         
         
         pause
@@ -130,10 +104,11 @@ for i = 8:length(allStocks)
     end
     
 end
-% 
+
+
 % (cl(1)-quarterlyHL(2:5,2))./ quarterlyHL(2:5,2);
 % (cl(1)-yearlyHL(2:5,2))./ yearlyHL(2:5,2);
-% 
+
 % (cl(1)-quarterlyHL(2:5,3))./ quarterlyHL(2:5,3);
 % (cl(1)-yearlyHL(2:5,3))./ yearlyHL(2:5,3);
 
