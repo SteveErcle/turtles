@@ -19,10 +19,11 @@ clc;
 %WMB
 %RY
 
-
+selection = [3, 9, 37, 6, 19, 30] %[23, 24, 30, 31, 37, 42, 47, 48, 5, 6, 8, 9, 11, 13, 15, 19];
 [~,allStocks] = xlsread('listOfStocks')
 
-for i = 1:length(allStocks)
+for i = selection
+ %1:length(allStocks)
     stock = allStocks(i)
     
     c = yahoo;
@@ -31,8 +32,8 @@ for i = 1:length(allStocks)
     d = fetch(c,stock,now, now-17000, 'd');
     close(c)
     
-    %     exchange = 'NYSE';
-    %     d = getTodaysOHLC(stock, exchange, d);
+        exchange = 'NYSE';
+%         d = getTodaysOHLC(stock, exchange, d);
     
     datestr(d(1))
     [quarterlyHL yearlyHL] = getQYHL(m);
@@ -89,7 +90,7 @@ for i = 1:length(allStocks)
         highlow(hi, lo, op, cl, 'blue', da);
         axis([da(100), da(1)+5,...
             min(lo(1:100))*0.95, max(hi(1:100))*1.05])
-        title('Daily')
+        title(strcat(stock,' Daily'))
         datetick('x',12, 'keeplimits');
         
         hold on
