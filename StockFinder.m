@@ -1,6 +1,6 @@
-clear all;
-close all;
-clc;
+clear all
+close all
+clc
 
 %TSEM 
 %EXC
@@ -19,11 +19,10 @@ clc;
 %WMB
 %RY
 
-selection = [44,46]%[3, 21, 22, 24, 34, 45, 48, 56, 61] %[23, 24, 30, 31, 37, 42, 47, 48, 5, 6, 8, 9, 11, 13, 15, 19];
+selection = [];
 [~,allStocks] = xlsread('listOfStocks')
 
-for i = selection
- %1:length(allStocks)
+for i = 1:length(allStocks)
     stock = allStocks(i)
     
     c = yahoo;
@@ -32,12 +31,35 @@ for i = selection
     d = fetch(c,stock,now, now-17000, 'd');
     close(c)
     
-        exchange = 'NYSE';
-        d = getTodaysOHLC(stock, exchange, d);
+    exchange = 'NYSE';
+    d = getTodaysOHLC(stock, exchange, d);
     
     datestr(d(1))
     [quarterlyHL yearlyHL] = getQYHL(m);
     
+    d_ago = 30;
+    w_ago = 12;
+    m_ago = 6;
+    q_ago = 4;
+    y_ago = 2;
+    
+    py = polyfit((1:length(yearlyHL(1:y_ago,3)))',yearlyHL(1:y_ago,3),1);
+    pq = polyfit((1:length(quarterlyHL(1:q_ago,3)))',quarterlyHL(1:q_ago,3),1);
+    pm = polyfit((1:length(m(1:m_ago)))',m(1:m_ago,4),1);
+    pw = polyfit((1:length(w(1:w_ago,4)))',w(1:w_ago,4),1);
+    pd = polyfit((1:length(d(1:d_ago,4)))',d(1:d_ago,4),1);
+    
+    if py(1)<0 && pq(1)<0 && pm(1)<0 && pw(1)<0 %&& pd(1)<0
+        selection = [selection, i];
+        %compareCurrentToSup = sort(abs((lo(1)-foundSupportLevels)/lo(1)));
+    end
+  
+end 
+
+selection
+%%
+return
+
     for i_plot = 1:1
         
         figure
@@ -46,7 +68,7 @@ for i = selection
         title('Yearly High and Low Prices')
         dateFormat = 12;
         datetick('x',dateFormat)
-        set(gcf, 'Position', [22,24,632,781]);
+        %set(gcf, 'Position', [22,24,632,781]);
         
         figure
         highlow(quarterlyHL(:,2), quarterlyHL(:,3), quarterlyHL(:,2),...
@@ -54,7 +76,7 @@ for i = selection
         title('Quarterly High and Low Prices')
         dateFormat = 12;
         datetick('x',dateFormat)
-        set(gcf, 'Position', [750,12,690,793]);
+        %set(gcf, 'Position', [750,12,690,793]);
         hold on
         autoPlotLevs(quarterlyHL, yearlyHL, quarterlyHL)
         
@@ -104,7 +126,6 @@ for i = selection
         
     end
     
-end
 
 
 % (cl(1)-quarterlyHL(2:5,2))./ quarterlyHL(2:5,2);
@@ -194,4 +215,3 @@ for volumeRedDots = 1:1
     
 end
 %
-
