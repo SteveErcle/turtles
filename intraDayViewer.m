@@ -53,7 +53,7 @@ plot(linspace(x1,x1+0.02,3), ones(1, 3)*cl(2), 'color', 'm', 'marker', 'x');
 
 
 while(true)
-
+    
     if y1 < min(minutely.low)
         y1 =  d(2,4);
     else
@@ -65,6 +65,18 @@ while(true)
     else
         y2 = max(minutely.high);
     end
+    
+    subplot(2,2,[1,3])
+    d(1,:) = [];
+    d = getTodaysOHLC(stock, exchange, d);
+    hi = d(:,3); lo = d(:,4); cl = d(:,5); op = d(:,2); da = d(:,1);
+    highlow(hi, lo, op, cl, 'blue', da);
+    axis([da(100), da(1)+5,...
+        min(lo(1:100))*0.95, max(hi(1:100))*1.05])
+    title(strcat(stock,' Daily'))
+    datetick('x',12, 'keeplimits');
+    hold on
+
     
     subplot(2,2,2)
     fifteenly = IntraDayStockData(stock,exchange,'900','1d');
@@ -82,7 +94,7 @@ while(true)
     datetick('x',15, 'keeplimits');
     axis([x1, x2, y1*0.995, y2*1.005])
     
-    pause(30)
+    pause
     
 end
 
