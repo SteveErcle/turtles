@@ -289,12 +289,17 @@ for autoTrendFinder = 1:1
     %                     y = (lo(snum:enum)');
     %                 end
     %
-    %                 fun = @(x)(y - (x(1)*(snum:enum)+x(2)));
-    %
-    %                 x0 = [2,3];
-    %                 lb = []; ub = []; options = optimset('Display', 'off');
-    %                 [x] = lsqnonlin(fun, x0, lb, ub, options);
-    %
+    
+    z = 0:100;
+    y = 10*z+5;
+    p = polyfit(z,y,1)
+    
+    plot(z,y, 'r')
+   
+    y = p(1)*z+p(2)
+    hold on
+    plot(z,y, 'b')
+    
     %                 xVals((i*2)-1:(i*2)) = x;
     %
     %                 if j == 200
