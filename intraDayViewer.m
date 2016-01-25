@@ -94,7 +94,7 @@ while(true)
     datetick('x',15, 'keeplimits');
     axis([x1, x2, y1*0.995, y2*1.005])
     
-    pause
+    pause(30)
     
 end
 
