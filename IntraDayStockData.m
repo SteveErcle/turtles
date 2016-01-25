@@ -1,7 +1,7 @@
 function data = IntraDayStockData(symbol,stockexchange,interval,prevdays)
 %% IntraDayStockData pulls intraday stock price from Google.
 %
-% Input: 
+% Input:
 %       symbol - stock symbol
 %       stockexchange - the market that the stock is traded in
 %       interval - (optional) frequency of the data in seconds, for example:
@@ -46,8 +46,46 @@ end
 data.field = 'd,c,h,l,v';
 
 %build and call url then save data in a temporary csv file.
-f = urlwrite(['http://www.google.com/finance/getprices?q=',data.symbol,'&x=',...
-    data.stockexchange,'&i=',data.interval,'&p=',data.prevdays,'&f=',data.field],'tempStockPrice.csv');
+
+catchFlag = 0;
+
+try
+    f = urlwrite(['http://www.google.com/finance/getprices?q=',data.symbol,'&x=',...
+        data.stockexchange,'&i=',data.interval,'&p=',data.prevdays,'&f=',data.field],'tempStockPrice.csv');
+    googledata = importdata(f);
+    data.close = googledata.data(:,1);
+catch
+    catchFlag = 1;
+    data.stockexchange = 'NASDAQ';
+end
+
+if catchFlag == 1
+    try
+        f = urlwrite(['http://www.google.com/finance/getprices?q=',data.symbol,'&x=',...
+            data.stockexchange,'&i=',data.interval,'&p=',data.prevdays,'&f=',data.field],'tempStockPrice.csv');
+        googledata = importdata(f);
+        data.close = googledata.data(:,1);
+    catch
+        catchFlag = 2;
+        data.stockexchange = 'NYSEMKT';
+    end
+end
+
+if catchFlag == 2
+    try
+        f = urlwrite(['http://www.google.com/finance/getprices?q=',data.symbol,'&x=',...
+            data.stockexchange,'&i=',data.interval,'&p=',data.prevdays,'&f=',data.field],'tempStockPrice.csv');
+        googledata = importdata(f);
+        data.close = googledata.data(:,1);
+    catch
+        catchFlag = 3;
+        data.stockexchange = 'NYSEARCA';
+    end
+end
+
+
+
+
 
 %import data from csv file
 googledata = importdata(f);

@@ -19,6 +19,7 @@ clc;
 %WMB
 %RY
 
+
 selection = [3, 9, 37, 6, 19, 30] %[23, 24, 30, 31, 37, 42, 47, 48, 5, 6, 8, 9, 11, 13, 15, 19];
 [~,allStocks] = xlsread('listOfStocks')
 
