@@ -83,6 +83,15 @@ if catchFlag == 2
     end
 end
 
+if catchFlag == 3
+    try
+        f = urlwrite(['http://www.google.com/finance/getprices?q=',data.symbol,'&x=',...
+            data.stockexchange,'&i=',data.interval,'&p=',data.prevdays,'&f=',data.field],'tempStockPrice.csv');
+        googledata = importdata(f);
+        data.close = googledata.data(:,1);
+    catch
+    end
+end
 
 
 
