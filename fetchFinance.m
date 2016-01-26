@@ -28,6 +28,7 @@ for i = selection
  %1:length(allStocks)
     stock = allStocks(i)
     
+    
     c = yahoo;
     m = fetch(c,stock,now, now-17000, 'm');
     w = fetch(c,stock,now, now-17000, 'w');
@@ -68,7 +69,7 @@ for i = selection
             min(lo(1:100))*0.95, max(hi(1:100))*1.05])
         title('Monthly')
         datetick('x',12, 'keeplimits');
-        %set(gcf, 'Position', [1444,1018,1075,799]);
+        set(gcf, 'Position', [1444,1018,1075,799]);
         hold on
         autoPlotLevs(quarterlyHL, yearlyHL, da)
         
@@ -82,7 +83,7 @@ for i = selection
             min(lo(1:100))*0.95, max(hi(1:100))*1.05])
         title(strcat(stock,' Weekly'))
         datetick('x',12, 'keeplimits');
-        %set(gcf, 'Position', [1443,4,1075,877]);
+        set(gcf, 'Position', [1443,4,1075,877]);
         
         autoPlotLevs(quarterlyHL, yearlyHL, da)
         
@@ -108,12 +109,6 @@ for i = selection
     
 end
 
-
-% (cl(1)-quarterlyHL(2:5,2))./ quarterlyHL(2:5,2);
-% (cl(1)-yearlyHL(2:5,2))./ yearlyHL(2:5,2);
-
-% (cl(1)-quarterlyHL(2:5,3))./ quarterlyHL(2:5,3);
-% (cl(1)-yearlyHL(2:5,3))./ yearlyHL(2:5,3);
 
 
 %
