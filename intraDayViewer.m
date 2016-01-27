@@ -4,17 +4,12 @@
 clear; close all; clc;
 
 
-delete(intraDayGui)
-
+delete(intraDayGui);
 handles = guihandles(intraDayGui);
-
-
 set(handles.radiobutton1, 'Value', 0);
-
 
 [~,allStocks] = xlsread('listOfStocks');
 
-stock = allStocks(1)
 stock = 'PSEC'
 
 minutely = IntraDayStockData(stock,'NYSE','60','1d');
@@ -100,7 +95,6 @@ while(true)
         axis([x1, x2, y1*0.995, y2*1.005])
         
         subplot(2,2,4)
-        
         hi = minutely.high; lo = minutely.low; da = minutely.date;
         highlow(hi, lo, hi, lo,'blue', da);
         hold on;
@@ -120,8 +114,9 @@ while(true)
         [c idxOfNowMinusHours] = min(abs(da-nowMinusHours));
         y1 = min(lo(idxOfNowMinusHours:end));
         y2 = max(hi(idxOfNowMinusHours:end));
-       axis([nowMinusHours, now + 1/48, y1*0.995, y2*1.005]) 
+        axis([nowMinusHours, now + 1/48, y1*0.995, y2*1.005])
     else
+        subplot(2,2,4)
         axis([x1, x2, y1*0.995, y2*1.005])
     end
     
