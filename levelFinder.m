@@ -18,16 +18,59 @@ title(strcat(stock,' Daily'))
 datetick('x',12, 'keeplimits');
 hold on
 
-numFound = [];
-for i = 1:length(hi)
-    numFound = [numFound; i, length(find(hi(i) == hi))];
+foundMeSalson = [];
+for j = 50:1000
+    
+    founder = [];
+    x = j;
+    for i = 1 : (length(hi) - x)
+        
+        res = max(hi(i:x+i));
+        sup = min(lo(i:x+i));
+        
+        founder = [founder; i, x, (res-sup)/sup];
+        
+    end
+    founder = sortrows(founder, 3);
+    foundMeSalson = [foundMeSalson; founder(1,:)];
+    j
 end
 
+uniqueNY = unique(foundMeSalson(:,1));
+foundX = [];
+for i = 1:length(uniqueNY)
+
+specific = find(uniqueNY(i) == foundMeSalson(:,1));
+
+foundX = [foundX; uniqueNY(i), max(foundMeSalson(specific,2))];
+
+end 
 
 
-numFound = sortrows(numFound,-2)
+for i = 1:length(foundX)
 
-i = numFound(22,1);
-dots = find(hi(i) == hi);
+indxStart   = foundX(i,1)
+indxEnd     = foundX(i,1) + foundX(i,2)
 
-plot(da(dots), hi(dots), 'ro')
+foundDates  = da(indxStart:indxEnd);
+foundRes    = max(hi(indxStart:indxEnd));
+foundSup    = min(lo(indxStart:indxEnd));
+
+plot(foundDates, ones(length(foundDates),1)*foundRes, 'r')
+plot(foundDates, ones(length(foundDates),1)*foundSup, 'r')
+pause
+end 
+
+% numFound = [];
+% for i = 1:length(hi)
+%     numFound = [numFound; i, length(find(hi(i) == hi))];
+% end
+%
+%
+%
+% numFound = sortrows(numFound,-2)
+%
+% i = numFound(22,1);
+% dots = find(hi(i) == hi);
+%
+% plot(da(dots), hi(dots), 'ro')
