@@ -9,11 +9,6 @@ function recipient = matlabmail(recipient, subject, message, sender, psswd)
 %
 % MATLABMAIL( recipient, subkect, message, sender, passwd ) 
 
-
-close all
-clear all
-clc
-
 % if nargin<4
 %     sender = '';
 %     psswd = '';
