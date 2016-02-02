@@ -2,31 +2,13 @@ clear all;
 close all;
 clc;
 
-%TSEM 
-%EXC
-%NBR watch
-%AXL watch
-%BC watch
-%ECPG
-%CSX
-%PSEC
-%ETE
-%SWC watch
-%HTZ
-%KBE
-%GIS
-%ROK
-%WMB
-%RY
-
-
-
-selection = [10 9 37] %[3, 9, 37, 6, 19, 30] %[23, 24, 30, 31, 37, 42, 47, 48, 5, 6, 8, 9, 11, 13, 15, 19];
+selection = [8 27 36] %[3, 9, 37, 6, 19, 30] %[23, 24, 30, 31, 37, 42, 47, 48, 5, 6, 8, 9, 11, 13, 15, 19];
 [~,allStocks] = xlsread('listOfStocks')
 
 for i = selection
- %1:length(allStocks)
+%     1:length(allStocks)
     stock = allStocks(i)
+    
     
     
     c = yahoo;
@@ -35,8 +17,28 @@ for i = selection
     d = fetch(c,stock,now, now-17000, 'd');
     close(c)
     
-        exchange = 'NYSE';
-        d = getTodaysOHLC(stock, exchange, d);
+    for iLen = 1:1
+        if size(m,1) >=  100
+            mLen = 100;
+        else
+            mLen = size(m,1);
+        end
+        
+        if size(w,1) >=  100
+            wLen = 100;
+        else
+            wLen = size(w,1);
+        end
+        
+        if size(d,1) >=  100
+            dLen = 100;
+        else
+            dLen = size(d,1);
+        end
+    end
+    
+    exchange = 'NYSE';
+%     d = getTodaysOHLC(stock, exchange, d);
     
     datestr(d(1))
     [quarterlyHL yearlyHL] = getQYHL(m);
@@ -65,8 +67,8 @@ for i = selection
         figure
         hi = m(:,3); lo = m(:,4); cl = m(:,5); op = m(:,2); da = m(:,1);
         highlow(hi, lo, hi, lo,'blue', da);
-        axis([da(100), da(1)+15,...
-            min(lo(1:100))*0.95, max(hi(1:100))*1.05])
+        axis([da(mLen), da(1)+15,...
+            min(lo(1:mLen))*0.95, max(hi(1:mLen))*1.05])
         title('Monthly')
         datetick('x',12, 'keeplimits');
         set(gcf, 'Position', [1444,1018,1075,799]);
@@ -79,8 +81,8 @@ for i = selection
         highlow(hi, lo, hi, lo,'blue', da);
         hold on
         highlow(hi, lo, op, cl, 'blue', da);
-        axis([da(100), da(1)+5,...
-            min(lo(1:100))*0.95, max(hi(1:100))*1.05])
+        axis([da(wLen), da(1)+5,...
+            min(lo(1:wLen))*0.95, max(hi(1:wLen))*1.05])
         title(strcat(stock,' Weekly'))
         datetick('x',12, 'keeplimits');
         set(gcf, 'Position', [1443,4,1075,877]);
@@ -91,8 +93,8 @@ for i = selection
         figure
         hi = d(:,3); lo = d(:,4); cl = d(:,5); op = d(:,2); da = d(:,1);
         highlow(hi, lo, op, cl, 'blue', da);
-        axis([da(100), da(1)+5,...
-            min(lo(1:100))*0.95, max(hi(1:100))*1.05])
+        axis([da(dLen), da(1)+5,...
+            min(lo(1:dLen))*0.95, max(hi(1:dLen))*1.05])
         title(strcat(stock,' Daily'))
         datetick('x',12, 'keeplimits');
         
