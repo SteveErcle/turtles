@@ -4,82 +4,41 @@ stock = 'AXL'
 exchange = 'NYSE';
 
 
-c = yahoo;
-m = fetch(c,stock,now, now-500, 'm');
-d = fetch(c,stock,now, now-500, 'd');
-d = getTodaysOHLC(stock, exchange, d);
-close(c)
+[~,allStocks] = xlsread('listOfStocks')
 
-
-datestr(d(1))
-tf = TurtleFun;
-
-
-tf.plotHiLo(d);
-set(gcf, 'Position', [9,5,1423,800])
-title(strcat(stock,' Daily'))
-
-[hi, lo, cl, op, da] = tf.returnOHLCDarray(d);
-foundLevels = tf.getContainerLevels(50, hi, lo, da);
-
-
-tf.plotContainer(foundLevels)
-
-
-
-
-return
-
-
-
-
-
-
-foundMeSalson = [];
-for j = 50:1000
+for i = 19:length(allStocks)
     
-    founder = [];
-    x = j;
-    for i = 1 : (length(hi) - x)
-        
-        res = max(hi(i:x+i));
-        sup = min(lo(i:x+i));
-        
-        founder = [founder; i, x, (res-sup)/sup];
-        
-    end
-    founder = sortrows(founder, 3);
-    foundMeSalson = [foundMeSalson; founder(1,:)];
-    j
-end
-
-
-
-
-for i = 1:length(foundX)
+    stock = allStocks(i)
+   
+    c = yahoo;
+    m = fetch(c,stock,now, now-500, 'm');
+    d = fetch(c,stock,now, now-500, 'd');
+    d = getTodaysOHLC(stock, exchange, d);
+    close(c)
     
-    indxStart   = foundX(i,1)
-    indxEnd     = foundX(i,1) + foundX(i,2)
     
-    foundDates  = da(indxStart:indxEnd);
-    foundRes    = max(hi(indxStart:indxEnd));
-    foundSup    = min(lo(indxStart:indxEnd));
+    datestr(d(1))
+    tf = TurtleFun;
     
-    plot(foundDates, ones(length(foundDates),1)*foundRes, 'r')
-    plot(foundDates, ones(length(foundDates),1)*foundSup, 'r')
+    
+    tf.plotHiLo(d);
+    set(gcf, 'Position', [9,5,1423,800])
+    title(strcat(stock,' Daily'))
+    
+    [hi, lo, cl, op, da] = tf.returnOHLCDarray(d);
+    [foundRes, foundSup, foundDates, closestRes, closestSup] = tf.getContainerLevels(100, hi, lo, da);
+    
+    
+    tf.plotContainer([foundRes, foundSup, foundDates])
+    
+    sprintf('Closest Resistant: %0.2f',closestRes*100)
+    sprintf('Closest Support:   %0.2f',closestSup*100)
     pause
+    close all
+    
 end
 
-% numFound = [];
-% for i = 1:length(hi)
-%     numFound = [numFound; i, length(find(hi(i) == hi))];
-% end
-%
-%
-%
-% numFound = sortrows(numFound,-2)
-%
-% i = numFound(22,1);
-% dots = find(hi(i) == hi);
-%
-% plot(da(dots), hi(dots), 'ro')
+
+
+% Use series filtering not weighing. Return all under X%, sort by longest
+% time first

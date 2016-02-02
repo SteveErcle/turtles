@@ -26,7 +26,7 @@ selection = [10 9 37] %[3, 9, 37, 6, 19, 30] %[23, 24, 30, 31, 37, 42, 47, 48, 5
 
 for i = selection
  %1:length(allStocks)
-    stock = 'PSEC' %allStocks(i)
+    stock = allStocks(i)
     
     
     c = yahoo;
