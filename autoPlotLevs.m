@@ -13,8 +13,14 @@ function [] = autoPlotLevs(quarterlyHL, yearlyHL, da)
 %     end
 % end
 
+if size(yearlyHL,1) >= 10
+    yLen = 10;
+else
+    yLen = size(yearlyHL,1);
+end
+
 for j = 2:3
-    for i = 2:10
+    for i = 2:yLen
         if j == 2
             color = 'b';
         else
