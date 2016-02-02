@@ -1,77 +1,34 @@
 clear; close all; clc;
 
 stock = 'AXL'
+exchange = 'NYSE';
 
-minutely = IntraDayStockData(stock,'NYSE','60','1d');
+
 c = yahoo;
 m = fetch(c,stock,now, now-500, 'm');
 d = fetch(c,stock,now, now-500, 'd');
+d = getTodaysOHLC(stock, exchange, d);
 close(c)
- 
 
-for begin = 2:1:100
-    
-    set(gcf, 'Position', [9,5,1423,800])
-    hi = d(:,3); lo = d(:,4); cl = d(:,5); op = d(:,2); da = d(:,1);
-    highlow(hi, lo, op, cl, 'black', da);
-    % axis([da(100), da(1)+5,...
-    %     min(lo(1:100))*0.95, max(hi(1:100))*1.05])
-    title(strcat(stock,' Daily'))
-    datetick('x',12, 'keeplimits');
-    hold on
-    
-    
-    founder = [];
-    
-    for i = 10:50
-        
-        res = max(hi(begin:begin+i));
-        sup = min(lo(begin:begin+i));
-        
-        founder = [founder; begin + i, (res-sup)/sup];
-        
-    end
-    
-    
-    uniqueNY = unique(founder(:,2));
-    foundX = [];
-    for i = 1:length(uniqueNY)
-        
-        specific = find(uniqueNY(i) == founder(:,2));
-        
-        foundX = [foundX; uniqueNY(i), max(founder(specific,1))];
-        
-      end
-    
-  
-    
-    for i = 1: size(foundX,1)
-        
-        indxStart   = begin;
-        indxEnd     = foundX(i,2);
-        
-        foundDates  = da(indxStart:indxEnd);
-        foundRes    = max(hi(indxStart:indxEnd));
-        foundSup    = min(lo(indxStart:indxEnd));
-        
-        plot(foundDates, ones(length(foundDates),1)*foundRes, 'b')
-        plot(foundDates, ones(length(foundDates),1)*foundSup, 'b')
-        
-%         if hi(begin-1)- 
-        plot(da(begin-1), hi(begin-1), 'mo')
-        
-        
-    end
-    
-    pause
-    close all
-    
-end
+
+datestr(d(1))
+tf = TurtleFun;
+
+
+tf.plotHiLo(d);
+set(gcf, 'Position', [9,5,1423,800])
+title(strcat(stock,' Daily'))
+
+[hi, lo, cl, op, da] = tf.returnOHLCDarray(d);
+foundLevels = tf.getContainerLevels(50, hi, lo, da);
+
+
+tf.plotContainer(foundLevels)
+
+
 
 
 return
-
-
 
 
 
