@@ -37,7 +37,7 @@ for i = 1:length(allStocks)
     
     datestr(d(1))
     [quarterlyHL yearlyHL] = getQYHL(m);
-    foundSupportLevels = [quarterlyHL(2:10,2);quarterlyHL(2:10,3)];
+    foundSupportLevels = sort([quarterlyHL(2:10,2);quarterlyHL(2:10,3)]);
     
     d_ago = 30;
     w_ago = 12;
@@ -52,7 +52,8 @@ for i = 1:length(allStocks)
     pd = polyfit((1:length(d(1:d_ago,4)))',flipud(d(1:d_ago,4)),1);
     
     if py(1)<0 && pq(1)<0 && pm(1)<0 && pw(1)<0 && pd(1)<0
-        compareCurrentToSup = min(abs((d(1,4)-foundSupportLevels)/(d(1,4))));
+        dfromlevel = d(1,4)-foundSupportLevels
+        compareCurrentToSup = min(abs((dfromlevel)/(d(1,4))));
 %         sortedSupportDistance = [sortedSupportDistance; i , compareCurrentToSup];
 %         selection = [selection, i];
 %         selection
