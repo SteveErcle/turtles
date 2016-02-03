@@ -5,8 +5,8 @@ clc;
 selection = [8 27 36] %[3, 9, 37, 6, 19, 30] %[23, 24, 30, 31, 37, 42, 47, 48, 5, 6, 8, 9, 11, 13, 15, 19];
 [~,allStocks] = xlsread('listOfStocks')
 
-for i = selection
-%     1:length(allStocks)
+for i = 1:length(allStocks)
+% i = selection
     stock = allStocks(i)
     
     
@@ -38,7 +38,7 @@ for i = selection
     end
     
     exchange = 'NYSE';
-%     d = getTodaysOHLC(stock, exchange, d);
+    d = getTodaysOHLC(stock, exchange, d);
     
     datestr(d(1))
     [quarterlyHL yearlyHL] = getQYHL(m);
