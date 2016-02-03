@@ -5,9 +5,9 @@ clc;
 selection = [8 27 36] %[3, 9, 37, 6, 19, 30] %[23, 24, 30, 31, 37, 42, 47, 48, 5, 6, 8, 9, 11, 13, 15, 19];
 [~,allStocks] = xlsread('listOfStocks')
 
-for i = 1:length(allStocks)
+for i = 12:length(allStocks)
 % i = selection
-    stock = allStocks(i)
+    stock = 'MOTR'%allStocks(i)
     
     
     
@@ -38,7 +38,7 @@ for i = 1:length(allStocks)
     end
     
     exchange = 'NYSE';
-    d = getTodaysOHLC(stock, exchange, d);
+    %d = getTodaysOHLC(stock, exchange, d);
     
     datestr(d(1))
     [quarterlyHL yearlyHL] = getQYHL(m);
@@ -51,7 +51,7 @@ for i = 1:length(allStocks)
         title('Yearly High and Low Prices')
         dateFormat = 12;
         datetick('x',dateFormat)
-        set(gcf, 'Position', [22,24,632,781]);
+        %set(gcf, 'Position', [22,24,632,781]);
         
         figure
         highlow(quarterlyHL(:,2), quarterlyHL(:,3), quarterlyHL(:,2),...
@@ -59,7 +59,7 @@ for i = 1:length(allStocks)
         title('Quarterly High and Low Prices')
         dateFormat = 12;
         datetick('x',dateFormat)
-        set(gcf, 'Position', [750,12,690,793]);
+        %set(gcf, 'Position', [750,12,690,793]);
         hold on
         autoPlotLevs(quarterlyHL, yearlyHL, quarterlyHL)
         
@@ -71,7 +71,7 @@ for i = 1:length(allStocks)
             min(lo(1:mLen))*0.95, max(hi(1:mLen))*1.05])
         title('Monthly')
         datetick('x',12, 'keeplimits');
-        set(gcf, 'Position', [1444,1018,1075,799]);
+        %set(gcf, 'Position', [1444,1018,1075,799]);
         hold on
         autoPlotLevs(quarterlyHL, yearlyHL, da)
         
@@ -85,7 +85,7 @@ for i = 1:length(allStocks)
             min(lo(1:wLen))*0.95, max(hi(1:wLen))*1.05])
         title(strcat(stock,' Weekly'))
         datetick('x',12, 'keeplimits');
-        set(gcf, 'Position', [1443,4,1075,877]);
+        %set(gcf, 'Position', [1443,4,1075,877]);
         
         autoPlotLevs(quarterlyHL, yearlyHL, da)
         
