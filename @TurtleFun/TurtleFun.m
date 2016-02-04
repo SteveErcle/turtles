@@ -46,9 +46,9 @@ classdef TurtleFun
             end
             
             
-%             weightedContainer = (100 - foundX(:,1)*100).*[(1./power(1:size(foundX,1),.1))]'
-%             weightedTime = foundX(:,2)
-%             fScore = weightedContainer.*weightedTime ./ (weightedContainer+weightedTime)
+            %             weightedContainer = (100 - foundX(:,1)*100).*[(1./power(1:size(foundX,1),.1))]'
+            %             weightedTime = foundX(:,2)
+            %             fScore = weightedContainer.*weightedTime ./ (weightedContainer+weightedTime)
             
             foundLevels = [];
             for i = 1: size(foundX,1)
@@ -87,8 +87,21 @@ classdef TurtleFun
         end
         
         
-        
-        
+        function typeOfLevel = matchToResOrSup(obj, t, values)
+            
+            [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
+            dateOnPlot = values(end,1);
+            [M indx] = min(abs(da-dateOnPlot))
+            
+            if values(end,2) == hi(indx)
+                typeOfLevel = 1;
+            elseif values(end,2) == lo(indx)
+                typeOfLevel = -1;
+            else
+                typeOfLevel = 0;
+            end
+            
+        end
         
         
     end
