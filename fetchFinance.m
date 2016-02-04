@@ -38,7 +38,7 @@ for i = 1:length(allStocks)
     end
     
     exchange = 'NYSE';
-%     d = getTodaysOHLC(stock, exchange, d);
+    d = getTodaysOHLC(stock, exchange, d);
     
     datestr(d(1))
     [quarterlyHL yearlyHL] = getQYHL(m);

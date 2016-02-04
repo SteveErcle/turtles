@@ -4,7 +4,7 @@ clear all
 close all
 delete(giua)
 
-stock = 'CFX'
+stock = 'R'
 exchange = 'NYSE'
 
 c = yahoo;
@@ -15,7 +15,7 @@ close(c)
 
 TODAY = 0;
 if TODAY == 1
-    [d] = getTodaysOHLC(stock, exchange, d)
+    [d] = getTodaysOHLC(stock, exchange, d);
 end
 
 handles = guihandles(giua);
@@ -91,6 +91,8 @@ for initProps = 1:1
     set(handles.button, 'Value', 0);
     set(handles.view, 'Value', 0);
     
+    tf = TurtleFun;
+    
     tLevs = d(end,1):d(1,1);
     
     enter = 0;
@@ -101,6 +103,8 @@ for initProps = 1:1
     position = [0,0];
     
     values = [];
+    resistanceVals = [];
+    supportVals = [];
     flagView = -1;
     flagHi = -1;
     flagFluct = -1;
@@ -190,7 +194,14 @@ while(true)
                 for i = 1:length(cursor_info)
                     value = getfield(cursor_info, {i},'Position');
                     datestr(value)
-                    values = [values;value(2)];
+                    values = [values;value];
+                    
+                    if tf.matchToResOrSup(w, value) == 1
+                        resistanceVals = [resistanceVals; value];
+                    elseif tf.matchToResOrSup(w, value) == -1
+                        supportVals = [supportVals; value];
+                    end
+                    
                     for i = 1:3
                         subplot(3,1,i)
                         hold on
@@ -201,8 +212,16 @@ while(true)
             else
                 if length(dataTips) > 0
                     cursor = datacursormode(gcf);
+                    dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
                     value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
-                    values = [values;value];
+                    values = [values; dateOnPlot, value];
+                    
+                    if tf.matchToResOrSup(w, [dateOnPlot, value]) == 1
+                        resistanceVals = [resistanceVals; dateOnPlot, value];
+                    elseif tf.matchToResOrSup(w, [dateOnPlot, value]) == -1
+                        supportVals = [supportVals; dateOnPlot, value];
+                    end
+                    
                     for i = 1:3
                         subplot(3,1,i)
                         hold on
