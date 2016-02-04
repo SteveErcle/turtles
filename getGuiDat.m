@@ -4,7 +4,7 @@ clear all
 close all
 delete(giua)
 
-stock = 'CRR'
+stock = 'CFX'
 exchange = 'NYSE'
 
 c = yahoo;
@@ -44,6 +44,7 @@ for volumeView = 1:1
     % bar(da, vo)
     bar(da, vo);
     grip = gca;
+    title('Monthly Volume')
     
     %
     % axis([grip grip],...
@@ -201,6 +202,7 @@ while(true)
                 if length(dataTips) > 0
                     cursor = datacursormode(gcf);
                     value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
+                    values = [values;value];
                     for i = 1:3
                         subplot(3,1,i)
                         hold on
@@ -317,8 +319,6 @@ while(true)
             d(end - (endIndx+25),1)+0.4,...
             min(vo(end-(endIndx+25):end-(startIndx+440)))*0.98,...
             max(vo(end-(endIndx+25):end-(startIndx+440)))*1.02]);
-        
-        title('Monthly Volume')
         datetick(grip, 'x',12, 'keeplimits');
         
         
