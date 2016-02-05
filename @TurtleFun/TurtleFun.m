@@ -12,11 +12,14 @@ classdef TurtleFun
         end
         
         
-        function plotHiLo(obj, t)
+        function figHandle = plotHiLo(obj, t)
             [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
-            highlow(hi, lo, op, cl, 'black', da);
+            highlow(hi, lo, op, cl, 'blue', da);
             datetick('x',12, 'keeplimits');
             hold on
+            
+            figHandle = gcf;
+            
         end
         
         
