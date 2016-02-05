@@ -5,11 +5,13 @@ clc;
 selection = [8 27 36] %[3, 9, 37, 6, 19, 30] %[23, 24, 30, 31, 37, 42, 47, 48, 5, 6, 8, 9, 11, 13, 15, 19];
 [~,allStocks] = xlsread('listOfStocks')
 
-EAD = 0;
 
-for i = 1:length(allStocks)
-    % i = selection
-    stock = allStocks(i)
+for i = 12:length(allStocks)
+% i = selection
+    stock = 'DV'%allStocks(i)
+EAD = 1;
+
+
     
     c = yahoo;
     m = fetch(c,stock,now, now-17000, 'm');
@@ -38,7 +40,9 @@ for i = 1:length(allStocks)
     end
     
     exchange = 'NYSE';
+
     d = getTodaysOHLC(stock, exchange, d);
+
     
     datestr(d(1))
     [quarterlyHL yearlyHL] = getQYHL(m);
@@ -74,6 +78,7 @@ for i = 1:length(allStocks)
         if EAD == 0
             set(gcf, 'Position', [1444,1018,1075,799]);
         end
+
         hold on
         autoPlotLevs(quarterlyHL, yearlyHL, da)
         
@@ -87,6 +92,7 @@ for i = 1:length(allStocks)
             min(lo(1:wLen))*0.95, max(hi(1:wLen))*1.05])
         title(strcat(stock,' Weekly'))
         datetick('x',12, 'keeplimits');
+
         if EAD == 0
             set(gcf, 'Position', [1443,4,1075,877]);
         end
