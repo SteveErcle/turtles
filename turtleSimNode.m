@@ -10,9 +10,9 @@ stock = 'CLDX'
 exchange = 'NYSE'
 
 c = yahoo;
-m = fetch(c,stock,now-50, now-100, 'm');
-w = fetch(c,stock,now-50, now-100, 'w');
-d = fetch(c,stock,now-50, now-100, 'd');
+m = fetch(c,stock,now-50, now-400, 'm');
+w = fetch(c,stock,now-50, now-400, 'w');
+d = fetch(c,stock,now-50, now-400, 'd');
 
 [hiM, loM, clM, opM, daM] = tf.returnOHLCDarray(m);
 hlcoM = TurtleVal(hiM, loM, clM, opM, daM);
@@ -24,10 +24,9 @@ hlcoW = TurtleVal(hiW, loW, clW, opW, daW);
 hlcoD = TurtleVal(hiD, loD, clD, opD, daD);
 
 
-
-m = fetch(c,stock,now-10, now-100, 'm');
-w = fetch(c,stock,now-10, now-100, 'w');
-d = fetch(c,stock,now-10, now-100, 'd');
+m = fetch(c,stock,now-10, now-400, 'm');
+w = fetch(c,stock,now-10, now-400, 'w');
+d = fetch(c,stock,now-10, now-400, 'd');
 
 [hiMs, loMs, clMs, opMs, daMs] = tf.returnOHLCDarray(m);
 hlcoMs = TurtleVal(hiMs, loMs, clMs, opMs, daMs);
@@ -39,54 +38,70 @@ hlcoWs = TurtleVal(hiWs, loWs, clWs, opWs, daWs);
 hlcoDs = TurtleVal(hiDs, loDs, clDs, opDs, daDs);
 
 
-
 startSimIndx = find(daD(1) == daDs)-1;
 startSimDate = datestr(daDs(startSimIndx))
 
+figure
+[fM,pM] = tf.plotHiLo(hlcoM)
+figure
+[fW,pW] = tf.plotHiLo(hlcoW)
+% figure
+% tf.plotHiLo(hlcoD)
 
 
 for i = 0:startSimIndx-1
     
     curIndx = startSimIndx-i;
     datestr(hlcoDs.da(curIndx))
-    hlcoM = ts.updateMonth(curIndx, hlcoM, hlcoMs, hlcoDs)
+    
+    hlcoD.op = [hlcoDs.op(curIndx); hlcoD.op];
+    hlcoD.cl = [hlcoDs.cl(curIndx); hlcoD.cl];
+    hlcoD.hi = [hlcoDs.hi(curIndx); hlcoD.hi];
+    hlcoD.lo = [hlcoDs.lo(curIndx); hlcoD.lo];
+    hlcoD.da = [hlcoDs.da(curIndx); hlcoD.da];
+    
+    hlcoM = ts.updateMonth(hlcoM, hlcoMs, hlcoD);
+    hlcoW = ts.updateWeek(hlcoW, hlcoWs, hlcoD);
+    
+    
+    
+    %     figure(fM)
+    %     delete(pM)
+    %     [~,pM] = tf.plotHiLo(hlcoM)
+    %     pause
+    
+    %     figure(fW)
+    %     delete(pW)
+    %     [~,pW] = tf.plotHiLo(hlcoW)
+    %     pause
+    
+    %     m = fetch(c,stock,now-50, hlcoDs.da(curIndx), 'm');
+    %     w = fetch(c,stock,now-50, hlcoDs.da(curIndx) , 'w');
+    %
+    %     figure(3)
+    %     tf.plotHiLo(m)
+    %     figure(4)
+    %     tf.plotHiLo(w)
+    
+    %     pause(0.1)
+    
+    
     
 end
 
+m = fetch(c,stock, now-10, now-400, 'm');
+[hiMt, loMt, clMt, opMt, daMt] = tf.returnOHLCDarray(m);
+
+hlcoM.hi == hiMt
+hlcoM.lo == loMt
+hlcoM.cl == clMt
+hlcoM.op == opMt
+hlcoM.da == daMt
 
 
 
 
 
-
-for i = 0:startSimIndx-1
-    daDs(startSimIndx-i)
-    datestr(daDs(startSimIndx-i))
-    if sum((daDs(startSimIndx-i) == daMs)) == 1
-        1
-        opM = [opDs(startSimIndx-i); opM]
-        clM = [clDs(startSimIndx-i); clM]
-        hiM = [hiDs(startSimIndx-i); hiM]
-        loM = [loDs(startSimIndx-i); loM]
-    else
-        clM(1) = clDs(startSimIndx-i)
-    end
-    
-    if hiDs(startSimIndx-i) > hiM(1)
-        hiM(1) = hiDs(startSimIndx-i)
-    end
-    
-    if loDs(startSimIndx-i) < loM(1)
-        loM(1) = loDs(startSimIndx-i)
-    end
-    %     sum((daDs(startSimIndx-i) == daWs)) == 1
-    
-end
-
-hlcoM.hi == hiM
-hlcoM.lo == loM
-hlcoM.cl == clM
-hlcoM.op == opM
 
 
 sprintf('Done')

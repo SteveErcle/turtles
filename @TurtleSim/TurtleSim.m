@@ -17,32 +17,51 @@ classdef TurtleSim
             
         end
         
-        
-        function [hlcoM] = updateMonth(obj, curIndx, hlcoM, hlcoMs, hlcoDs)
+        function [hlcoM] = updateMonth(obj, hlcoM, hlcoMs, hlcoD)
             
             
-            if sum((hlcoDs.da(curIndx) == hlcoMs.da)) == 1
-                1
-                hlcoM.op = [hlcoDs.op(curIndx); hlcoM.op]
-                hlcoM.cl = [hlcoDs.cl(curIndx); hlcoM.cl]
-                hlcoM.hi = [hlcoDs.hi(curIndx); hlcoM.hi]
-                hlcoM.lo = [hlcoDs.lo(curIndx); hlcoM.lo]
+            if sum((hlcoD.da(1) == hlcoMs.da)) == 1
+                hlcoM.op = [hlcoD.op(1); hlcoM.op];
+                hlcoM.cl = [hlcoD.cl(1); hlcoM.cl];
+                hlcoM.hi = [hlcoD.hi(1); hlcoM.hi];
+                hlcoM.lo = [hlcoD.lo(1); hlcoM.lo];
+                hlcoM.da = [hlcoD.da(1); hlcoM.da];
             else
-                hlcoM.cl(1) = hlcoDs.cl(curIndx);
+                hlcoM.cl(1) = hlcoD.cl(1);
             end
             
-            if hlcoDs.hi(curIndx) > hlcoM.hi(1)
-                hlcoM.hi(1) = hlcoDs.hi(curIndx);
+            if hlcoD.hi(1) > hlcoM.hi(1)
+                hlcoM.hi(1) = hlcoD.hi(1);
             end
             
-            if hlcoDs.lo(curIndx) < hlcoM.lo(1)
-                hlcoM.lo(1) = hlcoDs.lo(curIndx);
+            if hlcoD.lo(1) < hlcoM.lo(1)
+                hlcoM.lo(1) = hlcoD.lo(1);
             end
-            %     sum((daDs(curIndx) == daWs)) == 1
+            
             
         end
         
-        
+        function [hlcoW] = updateWeek(obj, hlcoW, hlcoWs, hlcoD)
+            
+            if sum((hlcoD.da(1) == hlcoWs.da)) == 1
+                hlcoW.op = [hlcoD.op(1); hlcoW.op];
+                hlcoW.cl = [hlcoD.cl(1); hlcoW.cl];
+                hlcoW.hi = [hlcoD.hi(1); hlcoW.hi];
+                hlcoW.lo = [hlcoD.lo(1); hlcoW.lo];
+                hlcoW.da = [hlcoD.da(1); hlcoW.da];
+            else
+                hlcoW.cl(1) = hlcoD.cl(1);
+            end
+            
+            if hlcoD.hi(1) > hlcoW.hi(1)
+                hlcoW.hi(1) = hlcoD.hi(1);
+            end
+            
+            if hlcoD.lo(1) < hlcoW.lo(1)
+                hlcoW.lo(1) = hlcoD.lo(1);
+            end
+            
+        end
         
     end
     
