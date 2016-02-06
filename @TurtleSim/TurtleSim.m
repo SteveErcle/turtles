@@ -17,10 +17,19 @@ classdef TurtleSim
             
         end
         
+        function [newTimePeriod] = isNewTimePeriod(obj, hlcoTs, hlcoD)
+            
+            if sum((hlcoD.da(1) == hlcoTs.da)) == 1
+                newTimePeriod = 1;
+            else
+                newTimePeriod = 0;
+            end
+            
+        end
+        
         function [hlcoM] = updateMonth(obj, hlcoM, hlcoMs, hlcoD)
             
-            
-            if sum((hlcoD.da(1) == hlcoMs.da)) == 1
+            if obj.isNewTimePeriod(hlcoMs, hlcoD)
                 hlcoM.op = [hlcoD.op(1); hlcoM.op];
                 hlcoM.cl = [hlcoD.cl(1); hlcoM.cl];
                 hlcoM.hi = [hlcoD.hi(1); hlcoM.hi];
@@ -43,7 +52,7 @@ classdef TurtleSim
         
         function [hlcoW] = updateWeek(obj, hlcoW, hlcoWs, hlcoD)
             
-            if sum((hlcoD.da(1) == hlcoWs.da)) == 1
+            if obj.isNewTimePeriod(hlcoWs, hlcoD)
                 hlcoW.op = [hlcoD.op(1); hlcoW.op];
                 hlcoW.cl = [hlcoD.cl(1); hlcoW.cl];
                 hlcoW.hi = [hlcoD.hi(1); hlcoW.hi];
@@ -62,6 +71,18 @@ classdef TurtleSim
             end
             
         end
+        
+        function [hlcoD] = updateDay(obj, curIndx, hlcoDs, hlcoD)
+            
+            hlcoD.op = [hlcoDs.op(curIndx); hlcoD.op];
+            hlcoD.cl = [hlcoDs.cl(curIndx); hlcoD.cl];
+            hlcoD.hi = [hlcoDs.hi(curIndx); hlcoD.hi];
+            hlcoD.lo = [hlcoDs.lo(curIndx); hlcoD.lo];
+            hlcoD.da = [hlcoDs.da(curIndx); hlcoD.da];
+            
+        end
+        
+        
         
     end
     

@@ -33,6 +33,27 @@ classdef TurtleFun
         end
         
         
+        function [figHandle, pHandle] = plotOpen(obj, t)
+            
+            if (isa(t, 'TurtleVal'))
+                hi = t.hi;
+                lo = t.lo;
+                cl = t.cl;
+                op = t.op;
+                da = t.da;
+            else
+                [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
+            end
+            
+            pHandle = plot([da(1)-1,da(1)+1], [1,1]*op(1), 'b');
+            datetick('x',12, 'keeplimits');
+            hold on
+            
+            figHandle = gcf;
+            
+        end
+        
+        
         function  [foundRes, foundSup, foundDates,...
                 closestRes, closestSup] = getContainerLevels(obj, maxNumDays, hi, lo, da)
             

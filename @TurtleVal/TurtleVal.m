@@ -2,7 +2,7 @@
 classdef TurtleVal
     
     properties
-       
+        
         hi;
         lo;
         cl;
@@ -14,12 +14,17 @@ classdef TurtleVal
     
     methods
         
-        function obj = TurtleVal(hi, lo, cl, op, da)
-            obj.hi  = hi;
-            obj.lo  = lo;
-            obj.cl  = cl;
-            obj.op  = op;
-            obj.da  = da;
+        function obj = TurtleVal(t)
+            
+            tf = TurtleFun;
+            [hiT, loT, clT, opT, daT] = tf.returnOHLCDarray(t);
+            
+            obj.hi  = hiT;
+            obj.lo  = loT;
+            obj.cl  = clT;
+            obj.op  = opT;
+            obj.da  = daT;
+            
         end
         
     end

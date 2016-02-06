@@ -9,60 +9,84 @@ ts.resetButtons(handles);
 stock = 'CLDX'
 exchange = 'NYSE'
 
+
 c = yahoo;
 m = fetch(c,stock,now-50, now-400, 'm');
 w = fetch(c,stock,now-50, now-400, 'w');
 d = fetch(c,stock,now-50, now-400, 'd');
 
-[hiM, loM, clM, opM, daM] = tf.returnOHLCDarray(m);
-hlcoM = TurtleVal(hiM, loM, clM, opM, daM);
-
-[hiW, loW, clW, opW, daW] = tf.returnOHLCDarray(w);
-hlcoW = TurtleVal(hiW, loW, clW, opW, daW);
-
-[hiD, loD, clD, opD, daD] = tf.returnOHLCDarray(d);
-hlcoD = TurtleVal(hiD, loD, clD, opD, daD);
-
+hlcoM = TurtleVal(m);
+hlcoW = TurtleVal(w);
+hlcoD = TurtleVal(d);
 
 m = fetch(c,stock,now-10, now-400, 'm');
 w = fetch(c,stock,now-10, now-400, 'w');
 d = fetch(c,stock,now-10, now-400, 'd');
 
-[hiMs, loMs, clMs, opMs, daMs] = tf.returnOHLCDarray(m);
-hlcoMs = TurtleVal(hiMs, loMs, clMs, opMs, daMs);
+hlcoMs = TurtleVal(m);
+hlcoWs = TurtleVal(w);
+hlcoDs = TurtleVal(d);
 
-[hiWs, loWs, clWs, opWs, daWs] = tf.returnOHLCDarray(w);
-hlcoWs = TurtleVal(hiWs, loWs, clWs, opWs, daWs);
-
-[hiDs, loDs, clDs, opDs, daDs] = tf.returnOHLCDarray(d);
-hlcoDs = TurtleVal(hiDs, loDs, clDs, opDs, daDs);
-
-
-startSimIndx = find(daD(1) == daDs)-1;
-startSimDate = datestr(daDs(startSimIndx))
+startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
+startSimDate = datestr(hlcoDs.da(startSimIndx))
 
 figure
 [fM,pM] = tf.plotHiLo(hlcoM)
+
 figure
 [fW,pW] = tf.plotHiLo(hlcoW)
-% figure
-% tf.plotHiLo(hlcoD)
 
+figure
+[fD,pD] = tf.plotHiLo(hlcoD)
+
+pause
 
 for i = 0:startSimIndx-1
     
     curIndx = startSimIndx-i;
     datestr(hlcoDs.da(curIndx))
     
-    hlcoD.op = [hlcoDs.op(curIndx); hlcoD.op];
-    hlcoD.cl = [hlcoDs.cl(curIndx); hlcoD.cl];
-    hlcoD.hi = [hlcoDs.hi(curIndx); hlcoD.hi];
-    hlcoD.lo = [hlcoDs.lo(curIndx); hlcoD.lo];
-    hlcoD.da = [hlcoDs.da(curIndx); hlcoD.da];
-    
-    hlcoM = ts.updateMonth(hlcoM, hlcoMs, hlcoD);
+    hlcoD = ts.updateDay(curIndx, hlcoDs, hlcoD);
     hlcoW = ts.updateWeek(hlcoW, hlcoWs, hlcoD);
+    hlcoM = ts.updateMonth(hlcoM, hlcoMs, hlcoD);
     
+    figure(fD)
+    [~,pDo] = tf.plotOpen(hlcoD);
+    
+    if ts.isNewTimePeriod(hlcoWs, hlcoD)
+        figure(fW)
+        [~,pWo] = tf.plotOpen(hlcoW);
+    end
+    
+    if ts.isNewTimePeriod(hlcoMs, hlcoD)
+        figure(fM)
+        [~,pMo] = tf.plotOpen(hlcoM);
+    end
+    
+    pause(0.1)
+    
+    
+    figure(fD)
+    delete(pDo);
+    delete(pD);
+    [~,pD] = tf.plotHiLo(hlcoD);
+    
+    figure(fW)
+    if ts.isNewTimePeriod(hlcoWs, hlcoD)
+        delete(pWo);
+    end
+    delete(pW);
+    [~,pW] = tf.plotHiLo(hlcoW);
+    
+    figure(fM)
+    if ts.isNewTimePeriod(hlcoMs, hlcoD)
+        delete(pMo);
+    end
+    
+    delete(pM)
+    [~,pM] = tf.plotHiLo(hlcoM)
+    
+    pause(0.1)
     
     
     %     figure(fM)
@@ -89,7 +113,7 @@ for i = 0:startSimIndx-1
     
 end
 
-m = fetch(c,stock, now-10, now-400, 'm');
+% m = fetch(c,stock, now-50 , now-400, 'm');
 [hiMt, loMt, clMt, opMt, daMt] = tf.returnOHLCDarray(m);
 
 hlcoM.hi == hiMt
