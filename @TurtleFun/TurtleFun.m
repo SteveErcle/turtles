@@ -45,7 +45,7 @@ classdef TurtleFun
                 [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
             end
             
-            pHandle = plot([da(1)-1,da(1)+1], [1,1]*op(1), 'b');
+            pHandle = plot([da(1)-1,da(1)+2], [1,1]*op(1), 'b');
             datetick('x',12, 'keeplimits');
             hold on
             

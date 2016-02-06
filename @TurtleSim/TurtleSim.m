@@ -7,13 +7,24 @@ classdef TurtleSim
     
     methods
         
-        function [] = resetButtons(obj, handles)
+        function [] = setButtons(obj, handles, select)
             
             set(handles.M, 'Value', 0);
             set(handles.W, 'Value', 0);
             set(handles.D, 'Value', 0);
             set(handles.I, 'Value', 0);
             set(handles.V, 'Value', 0);
+            
+            if select == 'M'
+                set(handles.M, 'Value', 1);
+                
+            elseif select == 'W'
+                set(handles.W, 'Value', 1);
+                
+            elseif select == 'D'
+                set(handles.D, 'Value', 1);
+                
+            end
             
         end
         
@@ -82,6 +93,68 @@ classdef TurtleSim
             
         end
         
+        function [pT] = animateDay(obj, aniSpeed, isT, hlcoT, fT, pT)
+                     
+            tf = TurtleFun;
+            
+            if isT
+                figure(fT)
+                [~,pTo] = tf.plotOpen(hlcoT);
+                pause(aniSpeed)
+                delete(pTo);
+                delete(pT);
+                figure(fT)
+                [~,pT] = tf.plotHiLo(hlcoT);
+            end
+        end
+        
+        function [pT] = animate(obj, aniSpeed, isT, isNew, hlcoT, fT, pT)
+            
+            tf = TurtleFun;
+            
+            if isT
+                if isNew
+                    figure(fT)
+                    [~,pTo] = tf.plotOpen(hlcoT);
+                end
+                
+                pause(aniSpeed)
+                
+                if isNew
+                    delete(pTo);
+                end
+                
+                delete(pT);
+                figure(fT)
+                [~,pT] = tf.plotHiLo(hlcoT);
+                
+            end
+
+        end
+     
+%         function [pT] = animateMonth(obj, aniSpeed, isT, isNew, hlcoT, fT, pT)
+%             
+%             tf = TurtleFun;
+%             
+%             if isT
+%                 if isNew
+%                     figure(fT)
+%                     [~,pTo] = tf.plotOpen(hlcoT);
+%                 end
+%                 
+%                 pause(aniSpeed)
+%                 
+%                 if isNew
+%                     delete(pTo);
+%                 end
+%                 
+%                 delete(pT);
+%                 figure(fT)
+%                 [~,pT] = tf.plotHiLo(hlcoT);
+%                 
+%             end
+% 
+%         end
         
         
     end

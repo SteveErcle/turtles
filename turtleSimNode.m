@@ -4,7 +4,7 @@ ts = TurtleSim;
 tf = TurtleFun;
 delete(turtleSimGui)
 handles = guihandles(turtleSimGui);
-ts.resetButtons(handles);
+ts.setButtons(handles, 'none');
 
 stock = 'CLDX'
 exchange = 'NYSE'
@@ -32,14 +32,18 @@ startSimDate = datestr(hlcoDs.da(startSimIndx))
 
 figure
 [fM,pM] = tf.plotHiLo(hlcoM)
+title(strcat(stock,' Monthly'))
 
 figure
 [fW,pW] = tf.plotHiLo(hlcoW)
+title(strcat(stock,' Weekly'))
 
 figure
 [fD,pD] = tf.plotHiLo(hlcoD)
+title(strcat(stock,' Daily'))
 
-pause
+
+aniSpeed = 0.5
 
 for i = 0:startSimIndx-1
     
@@ -50,68 +54,63 @@ for i = 0:startSimIndx-1
     hlcoW = ts.updateWeek(hlcoW, hlcoWs, hlcoD);
     hlcoM = ts.updateMonth(hlcoM, hlcoMs, hlcoD);
     
-    figure(fD)
-    [~,pDo] = tf.plotOpen(hlcoD);
+    %     if get(handles.D, 'Value')
+    %         figure(fD)
+    %         [~,pDo] = tf.plotOpen(hlcoD);
+    %         pause(aniSpeed)
+    %         delete(pDo);
+    %         delete(pD);
+    %         figure(fD)
+    %         [~,pD] = tf.plotHiLo(hlcoD);
+    %     end
     
-    if ts.isNewTimePeriod(hlcoWs, hlcoD)
-        figure(fW)
-        [~,pWo] = tf.plotOpen(hlcoW);
-    end
+    pD = ts.animateDay(aniSpeed, get(handles.D, 'Value') , hlcoD, fD, pD)
     
-    if ts.isNewTimePeriod(hlcoMs, hlcoD)
-        figure(fM)
-        [~,pMo] = tf.plotOpen(hlcoM);
-    end
+    isNewWeek = ts.isNewTimePeriod(hlcoWs, hlcoD)
+    pW = ts.animate(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW, pW)
     
-    pause(0.1)
+    isNewMonth = ts.isNewTimePeriod(hlcoMs, hlcoD)
+    pM = ts.animate(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM, pM)
     
-    
-    figure(fD)
-    delete(pDo);
-    delete(pD);
-    [~,pD] = tf.plotHiLo(hlcoD);
-    
-    figure(fW)
-    if ts.isNewTimePeriod(hlcoWs, hlcoD)
-        delete(pWo);
-    end
-    delete(pW);
-    [~,pW] = tf.plotHiLo(hlcoW);
-    
-    figure(fM)
-    if ts.isNewTimePeriod(hlcoMs, hlcoD)
-        delete(pMo);
-    end
-    
-    delete(pM)
-    [~,pM] = tf.plotHiLo(hlcoM)
-    
-    pause(0.1)
-    
-    
-    %     figure(fM)
-    %     delete(pM)
-    %     [~,pM] = tf.plotHiLo(hlcoM)
-    %     pause
-    
-    %     figure(fW)
-    %     delete(pW)
-    %     [~,pW] = tf.plotHiLo(hlcoW)
-    %     pause
-    
-    %     m = fetch(c,stock,now-50, hlcoDs.da(curIndx), 'm');
-    %     w = fetch(c,stock,now-50, hlcoDs.da(curIndx) , 'w');
+    %     if get(handles.W, 'Value')
     %
-    %     figure(3)
-    %     tf.plotHiLo(m)
-    %     figure(4)
-    %     tf.plotHiLo(w)
+    %         if ts.isNewTimePeriod(hlcoWs, hlcoD)
+    %             figure(fW)
+    %             [~,pWo] = tf.plotOpen(hlcoW);
+    %         end
+    %
+    %         pause(aniSpeed)
+    %
+    %         if ts.isNewTimePeriod(hlcoWs, hlcoD)
+    %             delete(pWo);
+    %         end
+    %         delete(pW);
+    %         figure(fW)
+    %         [~,pW] = tf.plotHiLo(hlcoW);
+    %
+    %     end
     
-    %     pause(0.1)
+    if get(handles.M, 'Value')
+        
+        if ts.isNewTimePeriod(hlcoMs, hlcoD)
+            figure(fM)
+            [~,pMo] = tf.plotOpen(hlcoM);
+        end
+        
+        if ts.isNewTimePeriod(hlcoMs, hlcoD)
+            delete(pMo);
+        end
+        delete(pM)
+        figure(fM)
+        [~,pM] = tf.plotHiLo(hlcoM)
+    end
     
+    pause(aniSpeed)
     
     
 end
+
+
 
 % m = fetch(c,stock, now-50 , now-400, 'm');
 [hiMt, loMt, clMt, opMt, daMt] = tf.returnOHLCDarray(m);
@@ -124,55 +123,6 @@ hlcoM.da == daMt
 
 
 
-
-
-
-
 sprintf('Done')
 
-return
-figure()
-figM = tf.plotHiLo(m);
-title(strcat(stock,' Monthly'))
 
-figure()
-figW = tf.plotHiLo(w);
-title(strcat(stock,' Weekly'))
-
-figure()
-figD = tf.plotHiLo(d);
-title(strcat(stock,' Daily'))
-
-% m = fetch(c,stock,now-49, now-49, 'm');
-% w = fetch(c,stock,now-50, now-100, 'w');
-
-pause
-for i = 1:10
-    d = fetch(c,stock,now-(50-i-5), now-(50-i), 'd');
-    tf.plotHiLo(d);
-    
-    pause
-end
-
-
-
-while(true)
-    
-    
-    if get(handles.M, 'Value') == 1
-        figure(figM)
-    end
-    
-    if get(handles.W, 'Value') == 1
-        figure(figW)
-    end
-    
-    if get(handles.D, 'Value') == 1
-        figure(figD)
-    end
-    
-    ts.resetButtons(handles);
-    
-    pause(0.025)
-    
-end
