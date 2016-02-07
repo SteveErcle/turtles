@@ -6,6 +6,15 @@ delete(turtleSimGui)
 handles = guihandles(turtleSimGui);
 ts.setButtons(handles, 'none');
 
+set(handles.simPres, 'Value', 1);
+set(handles.simPres, 'Max', 150, 'Min', 1);
+set(handles.simPres, 'SliderStep', [1/150, 10/150]);
+
+
+set(handles.aniLen, 'Value', 10);
+set(handles.aniLen, 'Max', 150, 'Min', 1);
+set(handles.aniLen, 'SliderStep', [1/150, 10/150]);
+
 stock = 'CLDX'
 exchange = 'NYSE'
 
@@ -27,89 +36,95 @@ hlcoMs = TurtleVal(m);
 hlcoWs = TurtleVal(w);
 hlcoDs = TurtleVal(d);
 
+
+figure
+[fM,pM] = tf.plotHiLo(hlcoM);
+title(strcat(stock,' Monthly'))
+datetick('x',12, 'keeplimits');
+
+figure
+[fW,pW] = tf.plotHiLo(hlcoW);
+title(strcat(stock,' Weekly'))
+datetick('x',12, 'keeplimits');
+
+figure
+[fD,pD] = tf.plotHiLo(hlcoD);
+title(strcat(stock,' Daily'))
+datetick('x',12, 'keeplimits');
+
+hlcoMstore = hlcoM;
+hlcoWstore = hlcoW;
+hlcoDstore = hlcoD;
+
+
+aniSpeed = 0.025
+
 startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
 startSimDate = datestr(hlcoDs.da(startSimIndx))
 
-figure
-[fM,pM] = tf.plotHiLo(hlcoM)
-title(strcat(stock,' Monthly'))
-
-figure
-[fW,pW] = tf.plotHiLo(hlcoW)
-title(strcat(stock,' Weekly'))
-
-figure
-[fD,pD] = tf.plotHiLo(hlcoD)
-title(strcat(stock,' Daily'))
 
 
-aniSpeed = 0.5
-
-for i = 0:startSimIndx-1
+while(true)
     
-    curIndx = startSimIndx-i;
-    datestr(hlcoDs.da(curIndx))
+    simPres = get(handles.simPres, 'Value');
     
-    hlcoD = ts.updateDay(curIndx, hlcoDs, hlcoD);
-    hlcoW = ts.updateWeek(hlcoW, hlcoWs, hlcoD);
-    hlcoM = ts.updateMonth(hlcoM, hlcoMs, hlcoD);
-    
-    %     if get(handles.D, 'Value')
-    %         figure(fD)
-    %         [~,pDo] = tf.plotOpen(hlcoD);
-    %         pause(aniSpeed)
-    %         delete(pDo);
-    %         delete(pD);
-    %         figure(fD)
-    %         [~,pD] = tf.plotHiLo(hlcoD);
-    %     end
-    
-    pD = ts.animateDay(aniSpeed, get(handles.D, 'Value') , hlcoD, fD, pD)
-    
-    isNewWeek = ts.isNewTimePeriod(hlcoWs, hlcoD)
-    pW = ts.animate(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW, pW)
-    
-    isNewMonth = ts.isNewTimePeriod(hlcoMs, hlcoD)
-    pM = ts.animate(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM, pM)
-    
-    %     if get(handles.W, 'Value')
-    %
-    %         if ts.isNewTimePeriod(hlcoWs, hlcoD)
-    %             figure(fW)
-    %             [~,pWo] = tf.plotOpen(hlcoW);
-    %         end
-    %
-    %         pause(aniSpeed)
-    %
-    %         if ts.isNewTimePeriod(hlcoWs, hlcoD)
-    %             delete(pWo);
-    %         end
-    %         delete(pW);
-    %         figure(fW)
-    %         [~,pW] = tf.plotHiLo(hlcoW);
-    %
-    %     end
-    
-    if get(handles.M, 'Value')
+    for curIndx = startSimIndx:-1:simPres
         
-        if ts.isNewTimePeriod(hlcoMs, hlcoD)
-            figure(fM)
-            [~,pMo] = tf.plotOpen(hlcoM);
+        datestr(hlcoDs.da(curIndx))
+        
+        hlcoD = ts.updateDay(curIndx, hlcoDs, hlcoD);
+        hlcoW = ts.update(hlcoW, hlcoWs, hlcoD);
+        hlcoM = ts.update(hlcoM, hlcoMs, hlcoD);
+        
+        isNewDay = ts.isNewTimePeriod(hlcoDs, hlcoD);
+        pD = ts.animate(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD);
+        
+        isNewWeek = ts.isNewTimePeriod(hlcoWs, hlcoD);
+        pW = ts.animate(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW, pW);
+        
+        isNewMonth = ts.isNewTimePeriod(hlcoMs, hlcoD);
+        pM = ts.animate(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM, pM);
+        
+        %         if ~ts.isUpdateCorrect(hlcoMs, hlcoM) || ~ts.isUpdateCorrect(hlcoWs, hlcoW) ||...
+        %                 ~ts.isUpdateCorrect(hlcoDs, hlcoD)
+        %             return
+        %         end
+        
+        if ~ts.isUpdateCorrect(hlcoMs, hlcoM)
+            sprintf('Error M')
+            return
         end
         
-        if ts.isNewTimePeriod(hlcoMs, hlcoD)
-            delete(pMo);
+        if ~ts.isUpdateCorrect(hlcoWs, hlcoW)
+            sprintf('Error W')
+            return
         end
-        delete(pM)
-        figure(fM)
-        [~,pM] = tf.plotHiLo(hlcoM)
+        
+        if ~ts.isUpdateCorrect(hlcoDs, hlcoD)
+            sprintf('Error D')
+            return
+        end
+        
+        if get(handles.V, 'Value')
+            break
+        end
+        
+        pause(aniSpeed)
+        
     end
     
-    pause(aniSpeed)
+    pause
+    
+    daysFromCurrent = get(handles.aniLen, 'Value');
+    daysFromPresent = daysFromCurrent + simPres;
+    
+    [hlcoM, hlcoW, hlcoD] = ts.resetAnimation(daysFromPresent, hlcoM, hlcoW, hlcoD,...
+        hlcoMs, hlcoWs, hlcoDs);
+    
+    startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
     
     
 end
-
 
 
 % m = fetch(c,stock, now-50 , now-400, 'm');
@@ -122,7 +137,31 @@ hlcoM.op == opMt
 hlcoM.da == daMt
 
 
+for i  = 1:100
+    i
+    if i == 10
+        break
+    end
+end
+
 
 sprintf('Done')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

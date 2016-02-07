@@ -25,9 +25,7 @@ classdef TurtleFun
             end
             
             pHandle = highlow(hi, lo, op, cl, 'blue', da);
-            datetick('x',12, 'keeplimits');
             hold on
-            
             figHandle = gcf;
             
         end
@@ -46,9 +44,7 @@ classdef TurtleFun
             end
             
             pHandle = plot([da(1)-1,da(1)+2], [1,1]*op(1), 'b');
-            datetick('x',12, 'keeplimits');
-            hold on
-            
+            hold on            
             figHandle = gcf;
             
         end

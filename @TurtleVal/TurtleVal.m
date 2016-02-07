@@ -24,9 +24,24 @@ classdef TurtleVal
             obj.cl  = clT;
             obj.op  = opT;
             obj.da  = daT;
-            
+
+
         end
         
+        function [obj] = reset(obj, indxBack, hlcoTs)
+            
+         
+%             daysBack = curIndx+daysBack;
+            
+            obj.hi = hlcoTs.hi(indxBack:end);
+            obj.lo = hlcoTs.lo(indxBack:end);
+            obj.cl = hlcoTs.cl(indxBack:end);
+            obj.op = hlcoTs.op(indxBack:end);
+            obj.da = hlcoTs.da(indxBack:end);
+            
+        end 
+            
+     
     end
     
 end

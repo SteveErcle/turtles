@@ -38,47 +38,32 @@ classdef TurtleSim
             
         end
         
-        function [hlcoM] = updateMonth(obj, hlcoM, hlcoMs, hlcoD)
+        function [ok] = isUpdateCorrect(obj, hlcoTs, hlcoT)
             
-            if obj.isNewTimePeriod(hlcoMs, hlcoD)
-                hlcoM.op = [hlcoD.op(1); hlcoM.op];
-                hlcoM.cl = [hlcoD.cl(1); hlcoM.cl];
-                hlcoM.hi = [hlcoD.hi(1); hlcoM.hi];
-                hlcoM.lo = [hlcoD.lo(1); hlcoM.lo];
-                hlcoM.da = [hlcoD.da(1); hlcoM.da];
+            spot = find(hlcoT.da(2) == hlcoTs.da);
+            hiChecker = hlcoT.hi(2:end) == hlcoTs.hi(spot:end);
+            loChecker = hlcoT.lo(2:end) == hlcoTs.lo(spot:end);
+            clChecker = hlcoT.cl(2:end) == hlcoTs.cl(spot:end);
+            opChecker = hlcoT.op(2:end) == hlcoTs.op(spot:end);
+            
+            if length(hiChecker) ~= sum(hiChecker)
+                ok = 0;
+                
+            elseif length(loChecker) ~= sum(loChecker)
+                ok = 0;
+                
+            elseif   length(clChecker) ~= sum(clChecker)
+                ok = 0;
+                
+            elseif  length(opChecker) ~= sum(opChecker)
+                ok = 0;
+                
             else
-                hlcoM.cl(1) = hlcoD.cl(1);
+                ok = 1;
             end
             
-            if hlcoD.hi(1) > hlcoM.hi(1)
-                hlcoM.hi(1) = hlcoD.hi(1);
-            end
-            
-            if hlcoD.lo(1) < hlcoM.lo(1)
-                hlcoM.lo(1) = hlcoD.lo(1);
-            end
-            
-            
-        end
-        
-        function [hlcoW] = updateWeek(obj, hlcoW, hlcoWs, hlcoD)
-            
-            if obj.isNewTimePeriod(hlcoWs, hlcoD)
-                hlcoW.op = [hlcoD.op(1); hlcoW.op];
-                hlcoW.cl = [hlcoD.cl(1); hlcoW.cl];
-                hlcoW.hi = [hlcoD.hi(1); hlcoW.hi];
-                hlcoW.lo = [hlcoD.lo(1); hlcoW.lo];
-                hlcoW.da = [hlcoD.da(1); hlcoW.da];
-            else
-                hlcoW.cl(1) = hlcoD.cl(1);
-            end
-            
-            if hlcoD.hi(1) > hlcoW.hi(1)
-                hlcoW.hi(1) = hlcoD.hi(1);
-            end
-            
-            if hlcoD.lo(1) < hlcoW.lo(1)
-                hlcoW.lo(1) = hlcoD.lo(1);
+            if ok == 0
+                sprintf('ERROR, updater failed')
             end
             
         end
@@ -93,19 +78,27 @@ classdef TurtleSim
             
         end
         
-        function [pT] = animateDay(obj, aniSpeed, isT, hlcoT, fT, pT)
-                     
-            tf = TurtleFun;
+        function [hlcoT] = update(obj, hlcoT, hlcoTs, hlcoD)
             
-            if isT
-                figure(fT)
-                [~,pTo] = tf.plotOpen(hlcoT);
-                pause(aniSpeed)
-                delete(pTo);
-                delete(pT);
-                figure(fT)
-                [~,pT] = tf.plotHiLo(hlcoT);
+            if obj.isNewTimePeriod(hlcoTs, hlcoD)
+                hlcoT.op = [hlcoD.op(1); hlcoT.op];
+                hlcoT.cl = [hlcoD.cl(1); hlcoT.cl];
+                hlcoT.hi = [hlcoD.hi(1); hlcoT.hi];
+                hlcoT.lo = [hlcoD.lo(1); hlcoT.lo];
+                hlcoT.da = [hlcoD.da(1); hlcoT.da];
+            else
+                hlcoT.cl(1) = hlcoD.cl(1);
             end
+            
+            if hlcoD.hi(1) > hlcoT.hi(1)
+                hlcoT.hi(1) = hlcoD.hi(1);
+            end
+            
+            if hlcoD.lo(1) < hlcoT.lo(1)
+                hlcoT.lo(1) = hlcoD.lo(1);
+            end
+            
+            
         end
         
         function [pT] = animate(obj, aniSpeed, isT, isNew, hlcoT, fT, pT)
@@ -129,33 +122,39 @@ classdef TurtleSim
                 [~,pT] = tf.plotHiLo(hlcoT);
                 
             end
-
+            
         end
-     
-%         function [pT] = animateMonth(obj, aniSpeed, isT, isNew, hlcoT, fT, pT)
-%             
-%             tf = TurtleFun;
-%             
-%             if isT
-%                 if isNew
-%                     figure(fT)
-%                     [~,pTo] = tf.plotOpen(hlcoT);
-%                 end
-%                 
-%                 pause(aniSpeed)
-%                 
-%                 if isNew
-%                     delete(pTo);
-%                 end
-%                 
-%                 delete(pT);
-%                 figure(fT)
-%                 [~,pT] = tf.plotHiLo(hlcoT);
-%                 
-%             end
-% 
-%         end
         
+        function [hlcoM, hlcoW, hlcoD] = resetAnimation(obj, daysFromPresent, hlcoM, hlcoW, hlcoD,...
+                hlcoMs, hlcoWs, hlcoDs)
+            
+            hlcoReset = hlcoDs.reset(daysFromPresent, hlcoDs)
+            
+            i = 1;
+            while sum(hlcoReset.da(i) == hlcoM.da) == 0
+                i = i+1;
+            end
+            
+            resetDay = hlcoReset.da(i);
+            
+            [~, Im] = min(abs(hlcoM.da - resetDay));
+            hlcoM = hlcoM.reset(Im, hlcoMs);
+            
+            [~, Iw] = min(abs(hlcoW.da - resetDay));
+            hlcoW = hlcoW.reset(Iw, hlcoWs);
+            
+            [~, Id] = min(abs(hlcoD.da - resetDay));
+            hlcoD = hlcoD.reset(Id, hlcoDs);
+            
+            startUpdateIndx = Id - 1;
+            
+            for curIndx = startUpdateIndx:-1:daysFromPresent
+                hlcoD = obj.updateDay(curIndx, hlcoDs, hlcoD);
+                hlcoW = obj.update(hlcoW, hlcoWs, hlcoD);
+                hlcoM = obj.update(hlcoM, hlcoMs, hlcoD);
+            end
+            
+        end
         
     end
     
