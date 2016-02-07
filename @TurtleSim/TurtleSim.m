@@ -125,33 +125,33 @@ classdef TurtleSim
             
         end
         
-        function [hlcoM, hlcoW, hlcoD] = resetAnimation(obj, daysFromPresent, hlcoM, hlcoW, hlcoD,...
-                hlcoMs, hlcoWs, hlcoDs)
+        function [hlcoT] = resetAnimation(obj, daysFromPresent, hlcoTs, hlcoDs)
             
-            hlcoReset = hlcoDs.reset(daysFromPresent, hlcoDs)
-            
-            i = 1;
-            while sum(hlcoReset.da(i) == hlcoM.da) == 0
+            i = 0;
+            while sum(hlcoDs.da(daysFromPresent+i) == hlcoTs.da) == 0
                 i = i+1;
             end
             
-            resetDay = hlcoReset.da(i);
+            resetDay = hlcoDs.da(daysFromPresent+i);
             
-            [~, Im] = min(abs(hlcoM.da - resetDay));
-            hlcoM = hlcoM.reset(Im, hlcoMs);
+            %             [~, Im] = min(abs(hlcoM.da - resetDay))
+            It = find(resetDay == hlcoTs.da)
+            hlcoT = hlcoTs.reset(It, hlcoTs);
             
-            [~, Iw] = min(abs(hlcoW.da - resetDay));
-            hlcoW = hlcoW.reset(Iw, hlcoWs);
-            
-            [~, Id] = min(abs(hlcoD.da - resetDay));
-            hlcoD = hlcoD.reset(Id, hlcoDs);
+            %             [~, Iw] = min(abs(hlcoW.da - resetDay))
+%             Iw = find(resetDay == hlcoWs.da)
+%             hlcoW = hlcoWs.reset(Iw, hlcoWs);
+%             
+            %             [~, Id] = min(abs(hlcoD.da - resetDay))
+            Id = find(resetDay == hlcoDs.da)
+            hlcoUpdater = hlcoDs.reset(Id, hlcoDs);
             
             startUpdateIndx = Id - 1;
             
             for curIndx = startUpdateIndx:-1:daysFromPresent
-                hlcoD = obj.updateDay(curIndx, hlcoDs, hlcoD);
-                hlcoW = obj.update(hlcoW, hlcoWs, hlcoD);
-                hlcoM = obj.update(hlcoM, hlcoMs, hlcoD);
+                hlcoUpdater = obj.updateDay(curIndx, hlcoDs, hlcoUpdater);
+%                 hlcoW = obj.update(hlcoW, hlcoWs, hlcoD);
+                hlcoT = obj.update(hlcoT, hlcoTs, hlcoUpdater);
             end
             
         end

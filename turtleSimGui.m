@@ -22,7 +22,7 @@ function varargout = turtleSimGui(varargin)
 
 % Edit the above text to modify the response to help turtleSimGui
 
-% Last Modified by GUIDE v2.5 06-Feb-2016 18:58:42
+% Last Modified by GUIDE v2.5 07-Feb-2016 15:22:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -153,6 +153,38 @@ function aniLen_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function aniLen_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to aniLen (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on key press with focus on simPres and none of its controls.
+function simPres_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to simPres (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on slider movement.
+function aniSpeed_Callback(hObject, eventdata, handles)
+% hObject    handle to aniSpeed (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function aniSpeed_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to aniSpeed (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
