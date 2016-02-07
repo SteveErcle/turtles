@@ -134,33 +134,38 @@ classdef TurtleSim
             
             resetDay = hlcoDs.da(daysFromPresent+i);
             
-            %             [~, Im] = min(abs(hlcoM.da - resetDay))
-            It = find(resetDay == hlcoTs.da)
+            It = find(resetDay == hlcoTs.da);
             hlcoT = hlcoTs.reset(It, hlcoTs);
             
-            %             [~, Iw] = min(abs(hlcoW.da - resetDay))
-%             Iw = find(resetDay == hlcoWs.da)
-%             hlcoW = hlcoWs.reset(Iw, hlcoWs);
-%             
-            %             [~, Id] = min(abs(hlcoD.da - resetDay))
-            Id = find(resetDay == hlcoDs.da)
+            Id = find(resetDay == hlcoDs.da);
             hlcoUpdater = hlcoDs.reset(Id, hlcoDs);
             
             startUpdateIndx = Id - 1;
             
             for curIndx = startUpdateIndx:-1:daysFromPresent
                 hlcoUpdater = obj.updateDay(curIndx, hlcoDs, hlcoUpdater);
-%                 hlcoW = obj.update(hlcoW, hlcoWs, hlcoD);
                 hlcoT = obj.update(hlcoT, hlcoTs, hlcoUpdater);
             end
             
         end
         
+        function [hlcoD, hlcoW, hlcoM] = resetAll(obj, handles, hlcoDs, hlcoWs, hlcoMs)
+            
+            daysFromCurrent = get(handles.aniLen, 'Max') - floor(get(handles.aniLen, 'Value')) + 1;
+            simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
+            daysFromPresent = daysFromCurrent + simPres;
+            
+            [hlcoD] = obj.resetAnimation(daysFromPresent, hlcoDs, hlcoDs);
+            [hlcoW] = obj.resetAnimation(daysFromPresent, hlcoWs, hlcoDs);
+            [hlcoM] = obj.resetAnimation(daysFromPresent, hlcoMs, hlcoDs);
+            
+        end     
+            
     end
-    
+        
 end
-
-
-
-
-
+    
+    
+    
+    
+    
