@@ -49,7 +49,6 @@ plot([hlcoDs.da(simPres), hlcoDs.da(simPres)],  [0, 1000], 'c')
 title(strcat(stock,' Monthly'))
 datetick('x',12, 'keeplimits');
 
-
 figure
 [fW,pW] = tf.plotHiLo(hlcoW);
 plot([hlcoDs.da(simPres), hlcoDs.da(simPres)],  [0, 1000], 'c')
@@ -71,6 +70,10 @@ startSimDate = datestr(hlcoDs.da(startSimIndx))
 while(true)
     
     if get(handles.runAnimation, 'Value')
+        
+        [hlcoD, hlcoW, hlcoM] = ts.resetAll(handles, hlcoDs, hlcoWs, hlcoMs);
+        simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
+        startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
         
         for curIndx = startSimIndx:-1:simPres
             
@@ -121,17 +124,22 @@ while(true)
             
         end
         
-    end
+    else
     
-    [hlcoD, hlcoW, hlcoM] = ts.resetAll(handles, hlcoDs, hlcoWs, hlcoMs);
-    simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
-    startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
+    
     
     set(handles.axisLen, 'Max', length(hlcoD.da) , 'Min', 1);
     axisLen = floor(get(handles.axisLen, 'Value'));
     
     axis([hlcoD.da(axisLen), hlcoD.da(1)+7,...
         min(hlcoD.lo(1:axisLen)), max(hlcoD.hi(1:axisLen))])
+    
+    if get(handles.setLevel, 'Value')
+        plot( [hlcoDs.da(end), hlcoDs.da(1)], [1,1]*20, 'k')
+        set(handles.setLevel, 'Value', 0);
+    end
+    
+    end 
     
     pause(0.01)
     

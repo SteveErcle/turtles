@@ -22,7 +22,7 @@ function varargout = turtleSimGui(varargin)
 
 % Edit the above text to modify the response to help turtleSimGui
 
-% Last Modified by GUIDE v2.5 07-Feb-2016 17:30:51
+% Last Modified by GUIDE v2.5 07-Feb-2016 18:48:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -223,3 +223,12 @@ function runAnimation_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of runAnimation
+
+
+% --- Executes on button press in setLevel.
+function setLevel_Callback(hObject, eventdata, handles)
+% hObject    handle to setLevel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of setLevel
