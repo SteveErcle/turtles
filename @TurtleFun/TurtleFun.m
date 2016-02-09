@@ -117,6 +117,12 @@ classdef TurtleFun
         end
         
         
+        function plotStartDay(obj, simPres, hlcoDs)
+            
+            plot([hlcoDs.da(simPres), hlcoDs.da(simPres)],  [0, 1000], 'c')
+            
+        end 
+        
         function typeOfLevel = matchToResOrSup(obj, t, values)
             
             [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);

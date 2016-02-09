@@ -28,6 +28,93 @@ classdef TurtleSim
             
         end
         
+        function [] = initHandles(obj, handles, simPres, aniLen, axisLen, aniSpeed)
+            
+            set(handles.updateAxis, 'Value', 1);
+            
+            set(handles.simPres, 'Max', 150, 'Min', 1);
+            set(handles.simPres, 'SliderStep', [1/150, 10/150]);
+            set(handles.simPres, 'Value', get(handles.simPres, 'Max') - simPres + 1);
+            
+            set(handles.aniLen, 'Max', 150, 'Min', 1);
+            set(handles.aniLen, 'SliderStep', [1/150, 10/150]);
+            set(handles.aniLen, 'Value', get(handles.aniLen, 'Max') - aniLen);
+            
+            set(handles.axisLen, 'Max', 500, 'Min', 1);
+            set(handles.axisLen, 'SliderStep', [1/500, 10/500]);
+            set(handles.axisLen, 'Value', axisLen);
+            
+            set(handles.aniSpeed, 'Max', 1, 'Min', 0.01);
+            set(handles.aniSpeed, 'SliderStep', [1/100, 10/100]);
+            set(handles.aniSpeed, 'Value', get(handles.aniSpeed, 'Max') - aniSpeed);
+            
+            set(handles.offsetAxis, 'Max', 500, 'Min', 0);
+            set(handles.offsetAxis, 'SliderStep', [1/500, 10/500]);
+            set(handles.offsetAxis, 'Value', 0);
+            
+        end
+        
+        function [simPres] = getSimulationPresent(obj, handles)
+            simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
+        end
+        
+        function [aniSpeed] = getAnimationSpeed(obj, handles)
+            aniSpeed = get(handles.aniSpeed, 'Max') - (get(handles.aniSpeed, 'Value'));
+            
+            if ~get(handles.runAnimation, 'Value')
+                aniSpeed = 0;
+            end
+            
+        end
+        
+        function [axisLen] = setAutoAxis(obj, handles, axisLen, hlcoD)
+            
+            if get(handles.updateAxis, 'Value')
+                
+                set(handles.axisLen, 'Max', length(hlcoD.da) , 'Min', 1);
+                if get(handles.axisLen, 'Max') < axisLen
+                    set(handles.axisLen, 'Value', floor(get(handles.axisLen, 'Max')) - 1);
+                end
+                
+                axisLen = floor(get(handles.axisLen, 'Value'));
+                
+                offset = floor(get(handles.offsetAxis, 'Value'));
+                
+                view = axisLen + offset;
+                
+                if view > length(hlcoD.da)
+                    view = length(hlcoD.da);
+                end
+                
+                if offset + 1 > length(hlcoD.da)
+                    offset = length(hlcoD.da) - 1;
+                end
+                
+                x1 = hlcoD.da(view);
+                x2 = hlcoD.da(1+offset)+7;
+                y1 = min(hlcoD.lo(1+offset:view))*.995;
+                y2 = max(hlcoD.hi(1+offset:view))*1.005;
+                
+                axis([x1, x2, y1, y2]);
+                
+            end
+            
+        end
+        
+        function [hlcoDs, hlcoWs, hlcoMs] = initData(obj, stock, daysForCrossVal, daysIntoPast)
+            
+            c = yahoo;
+            m = fetch(c,stock,now-daysForCrossVal, now-daysIntoPast, 'm');
+            w = fetch(c,stock,now-10, now-400, 'w');
+            d = fetch(c,stock,now-10, now-400, 'd');
+            
+            hlcoMs = TurtleVal(m);
+            hlcoWs = TurtleVal(w);
+            hlcoDs = TurtleVal(d);
+            close(c)
+            
+        end
+        
         function [newTimePeriod] = isNewTimePeriod(obj, hlcoTs, hlcoD)
             
             if sum((hlcoD.da(1) == hlcoTs.da)) == 1
@@ -159,13 +246,13 @@ classdef TurtleSim
             [hlcoW] = obj.resetAnimation(daysFromPresent, hlcoWs, hlcoDs);
             [hlcoM] = obj.resetAnimation(daysFromPresent, hlcoMs, hlcoDs);
             
-        end     
-            
-    end
+        end
         
+    end
+    
 end
-    
-    
-    
-    
-    
+
+
+
+
+

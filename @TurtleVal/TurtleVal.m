@@ -29,10 +29,7 @@ classdef TurtleVal
         end
         
         function [obj] = reset(obj, indxBack, hlcoTs)
-            
-         
-%             daysBack = curIndx+daysBack;
-            
+                   
             obj.hi = hlcoTs.hi(indxBack:end);
             obj.lo = hlcoTs.lo(indxBack:end);
             obj.cl = hlcoTs.cl(indxBack:end);

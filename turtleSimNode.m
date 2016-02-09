@@ -1,78 +1,58 @@
 clc; clear all; close all;
 
+simPres         = 50;
+aniLen          = 10;
+axisLen         = 100;
+aniSpeed        = 0.1;
+
+daysForCrossVal = 10;
+daysIntoPast    = 400;
+
+stock = 'CLDX'
+exchange = 'NYSE';
+
+%%
+
 ts = TurtleSim;
 tf = TurtleFun;
 delete(turtleSimGui)
 handles = guihandles(turtleSimGui);
+
+ts.initHandles(handles, simPres, aniLen, axisLen, aniSpeed)
 ts.setButtons(handles, 'none');
 
-for i_setHandles = 1:1
-    set(handles.simPres, 'Value', 100);
-    set(handles.simPres, 'Max', 150, 'Min', 1);
-    set(handles.simPres, 'SliderStep', [1/150, 10/150]);
-    
-    set(handles.aniLen, 'Value', 140);
-    set(handles.aniLen, 'Max', 150, 'Min', 1);
-    set(handles.aniLen, 'SliderStep', [1/150, 10/150]);
-    
-    set(handles.axisLen, 'Value', 100);
-    set(handles.axisLen, 'Max', 500, 'Min', 1);
-    set(handles.axisLen, 'SliderStep', [1/500, 10/500]);
-    
-    set(handles.aniSpeed, 'Value', 0.5);
-    set(handles.aniSpeed, 'Max', 1, 'Min', 0.01);
-    set(handles.aniSpeed, 'SliderStep', [1/100, 10/100]);
-end
-
-stock = 'CLDX'
-exchange = 'NYSE'
-
-c = yahoo;
-m = fetch(c,stock,now-10, now-400, 'm');
-w = fetch(c,stock,now-10, now-400, 'w');
-d = fetch(c,stock,now-10, now-400, 'd');
-
-hlcoMs = TurtleVal(m);
-hlcoWs = TurtleVal(w);
-hlcoDs = TurtleVal(d);
-
+[hlcoDs, hlcoWs, hlcoMs] = ts.initData(stock, daysForCrossVal, daysIntoPast);
 [hlcoD, hlcoW, hlcoM] = ts.resetAll(handles, hlcoDs, hlcoWs, hlcoMs);
 
-simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
-aniSpeed = get(handles.aniSpeed, 'Value');
-plot([hlcoDs.da(simPres), hlcoDs.da(simPres)],  [0, 1000], 'c')
-
-
-figure
-[fM,pM] = tf.plotHiLo(hlcoM);
-plot([hlcoDs.da(simPres), hlcoDs.da(simPres)],  [0, 1000], 'c')
-title(strcat(stock,' Monthly'))
-datetick('x',12, 'keeplimits');
-
-figure
-[fW,pW] = tf.plotHiLo(hlcoW);
-plot([hlcoDs.da(simPres), hlcoDs.da(simPres)],  [0, 1000], 'c')
-title(strcat(stock,' Weekly'))
-datetick('x',12, 'keeplimits');
-
-figure
-[fD,pD] = tf.plotHiLo(hlcoD);
-plot([hlcoDs.da(simPres), hlcoDs.da(simPres)],  [0, 1000], 'c')
-title(strcat(stock,' Daily'))
-datetick('x',12, 'keeplimits');
-
+for init_Plots = 1:1
+    figure
+    [fM,pM] = tf.plotHiLo(hlcoM);
+    tf.plotStartDay(simPres, hlcoDs);
+    title(strcat(stock,' Monthly'))
+    datetick('x',12, 'keeplimits');
+    
+    figure
+    [fW,pW] = tf.plotHiLo(hlcoW);
+    tf.plotStartDay(simPres, hlcoDs);
+    title(strcat(stock,' Weekly'))
+    datetick('x',12, 'keeplimits');
+    
+    figure
+    [fD,pD] = tf.plotHiLo(hlcoD);
+    tf.plotStartDay(simPres, hlcoDs);
+    title(strcat(stock,' Daily'))
+    datetick('x',12, 'keeplimits');
+end
 
 startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
-startSimDate = datestr(hlcoDs.da(startSimIndx))
-
-
 
 while(true)
     
     if get(handles.runAnimation, 'Value')
         
         [hlcoD, hlcoW, hlcoM] = ts.resetAll(handles, hlcoDs, hlcoWs, hlcoMs);
-        simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
+        [simPres] = ts.getSimulationPresent(handles);
+        
         startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
         
         for curIndx = startSimIndx:-1:simPres
@@ -108,38 +88,45 @@ while(true)
             end
             
             
-            aniSpeed = get(handles.aniSpeed, 'Value');
-            set(handles.axisLen, 'Max', length(hlcoD.da) , 'Min', 1);
-            axisLen = floor(get(handles.axisLen, 'Value'));
+            [axisLen] = ts.setAutoAxis(handles, axisLen, hlcoD);
             
-            axis([hlcoD.da(axisLen), hlcoD.da(1)+7,...
-                min(hlcoD.lo(1:axisLen)), max(hlcoD.hi(1:axisLen))])
+            [aniSpeed] = ts.getAnimationSpeed(handles)
             
-            if ~get(handles.runAnimation, 'Value')
-                aniSpeed = 0;
-            end
+            
+            if get(handles.play, 'Value')
+                
+                if curIndx ~= simPres
+                    
+                    maxMinusMin = get(handles.aniSpeed,'Max') - get(handles.aniSpeed,'Min');
+                    set(handles.aniSpeed,'Value', maxMinusMin);
+                    aniSpeed = 0;
+                else 
+                    set(handles.aniSpeed,'Value', 0.25);
+                end 
+                set(handles.aniLen, 'Value', get(handles.aniLen, 'Max'));
+                
+            end 
             
             pause(aniSpeed)
+
+                
             
             
         end
         
     else
-    
-    
-    
-    set(handles.axisLen, 'Max', length(hlcoD.da) , 'Min', 1);
-    axisLen = floor(get(handles.axisLen, 'Value'));
-    
-    axis([hlcoD.da(axisLen), hlcoD.da(1)+7,...
-        min(hlcoD.lo(1:axisLen)), max(hlcoD.hi(1:axisLen))])
-    
-    if get(handles.setLevel, 'Value')
-        plot( [hlcoDs.da(end), hlcoDs.da(1)], [1,1]*20, 'k')
-        set(handles.setLevel, 'Value', 0);
+        
+        
+        [axisLen] = ts.setAutoAxis(handles, axisLen, hlcoD);
+        
+        
+        
+        %         if get(handles.setLevel, 'Value')
+        %             plot( [hlcoDs.da(end), hlcoDs.da(1)], [1,1]*20, 'k')
+        %             set(handles.setLevel, 'Value', 0);
+        %         end
+        
     end
-    
-    end 
     
     pause(0.01)
     
@@ -155,6 +142,13 @@ sprintf('Done')
 % levels
 % market transactions
 
+
+
+% Trivial Fixes
+% --------------
+% M --> W should turn off M
+% Update gui text
+% View the future blank space
 
 
 
