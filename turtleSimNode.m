@@ -1,7 +1,7 @@
 clc; clear all; close all;
 
 simPres         = 50;
-aniLen          = 10;
+aniLen          = 1;
 axisLen         = 100;
 aniSpeed        = 0.1;
 
@@ -42,6 +42,8 @@ for init_Plots = 1:1
     tf.plotStartDay(simPres, hlcoDs);
     title(strcat(stock,' Daily'))
     datetick('x',12, 'keeplimits');
+    
+    axisParams = [1,1,1,1];
 end
 
 startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
@@ -64,7 +66,11 @@ while(true)
             hlcoM = ts.update(hlcoM, hlcoMs, hlcoD);
             
             isNewDay = ts.isNewTimePeriod(hlcoDs, hlcoD);
-            pD = ts.animate(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD);
+            [pDo] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD);
+            pause
+            [pD] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD, pDo);
+            pause
+%             pD = ts.animate(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD);
             
             isNewWeek = ts.isNewTimePeriod(hlcoWs, hlcoD);
             pW = ts.animate(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW, pW);
@@ -76,51 +82,19 @@ while(true)
                     ~ts.isUpdateCorrect(hlcoDs, hlcoD)
                 return
             end
+                        
+            [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, hlcoD);
             
-            if get(handles.V, 'Value');
-                set(handles.V, 'Value', 0);
-                pause
-            end
+            [aniSpeed] = ts.setAnimation(handles, curIndx, simPres)
             
-            if get(handles.I, 'Value');
-                set(handles.I, 'Value', 0);
-                break
-            end
-            
-            
-            [axisLen] = ts.setAutoAxis(handles, axisLen, hlcoD);
-            
-            [aniSpeed] = ts.getAnimationSpeed(handles)
-            
-            
-            if get(handles.play, 'Value')
-                
-                if curIndx ~= simPres
-                    
-                    maxMinusMin = get(handles.aniSpeed,'Max') - get(handles.aniSpeed,'Min');
-                    set(handles.aniSpeed,'Value', maxMinusMin);
-                    aniSpeed = 0;
-                else 
-                    set(handles.aniSpeed,'Value', 0.25);
-                end 
-                set(handles.aniLen, 'Value', get(handles.aniLen, 'Max'));
-                
-            end 
-            
-            pause(aniSpeed)
+%             ts.playTurtles(handles, curIndx, simPres, hlcoDs)
 
-                
-            
-            
         end
         
     else
-        
-        
-        [axisLen] = ts.setAutoAxis(handles, axisLen, hlcoD);
-        
-        
-        
+              
+        [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, hlcoD);
+   
         %         if get(handles.setLevel, 'Value')
         %             plot( [hlcoDs.da(end), hlcoDs.da(1)], [1,1]*20, 'k')
         %             set(handles.setLevel, 'Value', 0);

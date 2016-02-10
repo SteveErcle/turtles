@@ -22,7 +22,7 @@ function varargout = turtleSimGui(varargin)
 
 % Edit the above text to modify the response to help turtleSimGui
 
-% Last Modified by GUIDE v2.5 08-Feb-2016 21:40:49
+% Last Modified by GUIDE v2.5 09-Feb-2016 19:25:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -295,3 +295,12 @@ function play_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of play
+
+
+% --- Executes on button press in next.
+function next_Callback(hObject, eventdata, handles)
+% hObject    handle to next (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of next

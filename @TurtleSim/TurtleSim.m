@@ -58,16 +58,31 @@ classdef TurtleSim
             simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
         end
         
-        function [aniSpeed] = getAnimationSpeed(obj, handles)
+        function [aniSpeed] = setAnimation(obj, handles, curIndx, simPres)
+            
             aniSpeed = get(handles.aniSpeed, 'Max') - (get(handles.aniSpeed, 'Value'));
             
             if ~get(handles.runAnimation, 'Value')
                 aniSpeed = 0;
             end
             
+            if get(handles.play, 'Value')
+                
+                if curIndx ~= simPres
+                    
+                    maxMinusMin = get(handles.aniSpeed,'Max') - get(handles.aniSpeed,'Min');
+                    set(handles.aniSpeed,'Value', maxMinusMin);
+                    aniSpeed = 0;
+                else
+                    set(handles.aniSpeed,'Value', 0.75);
+                end
+                set(handles.aniLen, 'Value', get(handles.aniLen, 'Max'));
+                
+            end
+            
         end
         
-        function [axisLen] = setAutoAxis(obj, handles, axisLen, hlcoD)
+        function [axisLen, axisParams] = setAxis(obj, handles, axisLen, axisParams, hlcoD)
             
             if get(handles.updateAxis, 'Value')
                 
@@ -97,7 +112,16 @@ classdef TurtleSim
                 
                 axis([x1, x2, y1, y2]);
                 
+                axisParams = [x1, x2, y1, y2];
+                
             end
+            
+            x1 = axisParams(1);
+            x2 = axisParams(2);
+            y1 = axisParams(3);
+            y2 = axisParams(4);
+            
+            axis([x1, x2, y1, y2]);
             
         end
         
@@ -196,6 +220,7 @@ classdef TurtleSim
                 if isNew
                     figure(fT)
                     [~,pTo] = tf.plotOpen(hlcoT);
+
                 end
                 
                 pause(aniSpeed)
@@ -209,6 +234,78 @@ classdef TurtleSim
                 [~,pT] = tf.plotHiLo(hlcoT);
                 
             end
+            
+        end
+        
+        
+        function [pTo] = animateOpen(obj, aniSpeed, isT, isNew, hlcoT, fT)
+            
+            tf = TurtleFun;
+            
+            pTo = 0;
+            
+            if isT
+                if isNew
+                    figure(fT)
+                    [~,pTo] = tf.plotOpen(hlcoT);
+                    
+                end
+                
+            end
+            
+            pause(aniSpeed)
+            
+        end
+        
+        
+           function [pT] = animateClose(obj, aniSpeed, isT, isNew, hlcoT, fT, pT, pTo)
+            
+            tf = TurtleFun;
+            
+            if isT
+
+                if isNew
+                    delete(pTo);
+                end
+                
+                delete(pT);
+                figure(fT)
+                [~,pT] = tf.plotHiLo(hlcoT);
+                
+            end
+            
+            pause(aniSpeed)
+            
+        end
+        
+        
+        
+        
+        function [] = playTurtles(obj, handles, curIndx, simPres, axisLen, axisParams,...
+                hlcoT, hlcoTs)
+            
+            if get(handles.play, 'Value') & curIndx == simPres
+                
+                
+                while ~get(handles.next, 'Value')
+                    
+                    pause(0.1);
+                    
+                    [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, hlcoT);
+                    
+                    if get(handles.setLevel, 'Value')
+                        plot( [hlcoTs.da(end), hlcoTs.da(1)], [1,1]*20, 'k')
+                        set(handles.setLevel, 'Value', 0);
+                    end
+                    
+                end
+                
+                newSimPres = floor(get(handles.simPres, 'Value')) + 1;
+                set(handles.simPres, 'Value', newSimPres);
+                
+            end
+            
+            set(handles.next, 'Value', 0)
             
         end
         
