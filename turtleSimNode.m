@@ -66,17 +66,22 @@ while(true)
             hlcoM = ts.update(hlcoM, hlcoMs, hlcoD);
             
             isNewDay = ts.isNewTimePeriod(hlcoDs, hlcoD);
-            [pDo] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD);
-            pause
-            [pD] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD, pDo);
-            pause
-%             pD = ts.animate(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD);
-            
+            [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD,...
+                handles, axisLen, axisParams, hlcoD);
+            [pD] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD, pDo,...
+                handles, axisLen, axisParams, hlcoD);
+
             isNewWeek = ts.isNewTimePeriod(hlcoWs, hlcoD);
-            pW = ts.animate(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW, pW);
+            [pWo] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW,...
+                handles, axisLen, axisParams, hlcoD);
+            [pW] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW, pW, pWo,...
+                handles, axisLen, axisParams, hlcoD);
             
             isNewMonth = ts.isNewTimePeriod(hlcoMs, hlcoD);
-            pM = ts.animate(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM, pM);
+            [pMo] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM,...
+                handles, axisLen, axisParams, hlcoD);
+            [pM] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM, pM, pMo,...
+                handles, axisLen, axisParams, hlcoD);
             
             if ~ts.isUpdateCorrect(hlcoMs, hlcoM) || ~ts.isUpdateCorrect(hlcoWs, hlcoW) ||...
                     ~ts.isUpdateCorrect(hlcoDs, hlcoD)

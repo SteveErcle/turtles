@@ -237,8 +237,8 @@ classdef TurtleSim
             
         end
         
-        
-        function [pTo] = animateOpen(obj, aniSpeed, isT, isNew, hlcoT, fT)
+        function [pTo, axisLen, axisParams] = animateOpen(obj, aniSpeed, isT, isNew, hlcoT, fT,...
+                 handles, axisLen, axisParams, hlcoD_axis)
             
             tf = TurtleFun;
             
@@ -247,24 +247,25 @@ classdef TurtleSim
             if isT
                 if isNew
                     figure(fT)
-                    [~,pTo] = tf.plotOpen(hlcoT);
-                    
+                    [~,pTo] = tf.plotOpen(hlcoT); 
                 end
                 
             end
             
+            [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, hlcoD_axis);
+                    
             pause(aniSpeed)
             
         end
         
-        
-           function [pT] = animateClose(obj, aniSpeed, isT, isNew, hlcoT, fT, pT, pTo)
+        function [pT, axisLen, axisParams] = animateClose(obj, aniSpeed, isT, isNew, hlcoT, fT, pT, pTo,...
+                handles, axisLen, axisParams, hlcoD_axis)
             
             tf = TurtleFun;
             
             if isT
-
-                if isNew
+                
+                if isNew & pTo ~= 0
                     delete(pTo);
                 end
                 
@@ -274,12 +275,11 @@ classdef TurtleSim
                 
             end
             
+            [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, hlcoD_axis);
+            
             pause(aniSpeed)
             
         end
-        
-        
-        
         
         function [] = playTurtles(obj, handles, curIndx, simPres, axisLen, axisParams,...
                 hlcoT, hlcoTs)

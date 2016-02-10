@@ -11,7 +11,6 @@ classdef TurtleFun
             hi = t(:,3); lo = t(:,4); cl = t(:,5); op = t(:,2); da = t(:,1);
         end
         
-        
         function [figHandle, pHandle] = plotHiLo(obj, t)
             
             if (isa(t, 'TurtleVal'))
@@ -29,8 +28,7 @@ classdef TurtleFun
             figHandle = gcf;
             
         end
-        
-        
+       
         function [figHandle, pHandle] = plotOpen(obj, t)
             
             if (isa(t, 'TurtleVal'))
@@ -48,7 +46,6 @@ classdef TurtleFun
             figHandle = gcf;
             
         end
-        
         
         function  [foundRes, foundSup, foundDates,...
                 closestRes, closestSup] = getContainerLevels(obj, maxNumDays, hi, lo, da)
@@ -107,7 +104,6 @@ classdef TurtleFun
             
         end
         
-        
         function plotContainer(obj, foundLevels)
             for i = 1:size(foundLevels,1)
                 plot([foundLevels(i,4); foundLevels(i,3)], ones(2,1)*foundLevels(i,1), 'b')
@@ -115,7 +111,6 @@ classdef TurtleFun
             end
             
         end
-        
         
         function plotStartDay(obj, simPres, hlcoDs)
             
@@ -138,8 +133,7 @@ classdef TurtleFun
             end
             
         end
-        
-        
+         
     end
     
 end
