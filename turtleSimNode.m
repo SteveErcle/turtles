@@ -44,7 +44,9 @@ for init_Plots = 1:1
     datetick('x',12, 'keeplimits');
     
     axisParams = [1,1,1,1];
+    pMarket = [0,0,0];
 end
+
 
 startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
 
@@ -53,7 +55,7 @@ while(true)
     if get(handles.runAnimation, 'Value')
         
         [hlcoD, hlcoW, hlcoM] = ts.resetAll(handles, hlcoDs, hlcoWs, hlcoMs);
-        [simPres] = ts.getSimulationPresent(handles);
+        [simPres] = ts.getSimulationPresent(handles)
         
         startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
         
@@ -66,34 +68,34 @@ while(true)
             hlcoM = ts.update(hlcoM, hlcoMs, hlcoD);
             
             isNewDay = ts.isNewTimePeriod(hlcoDs, hlcoD);
+            isNewWeek = ts.isNewTimePeriod(hlcoWs, hlcoD);
+            isNewMonth = ts.isNewTimePeriod(hlcoMs, hlcoD);
+            
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD,...
                 handles, axisLen, axisParams, hlcoD);
-            [pD] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD, pDo,...
+            [pWo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW,...
                 handles, axisLen, axisParams, hlcoD);
-
-            isNewWeek = ts.isNewTimePeriod(hlcoWs, hlcoD);
-            [pWo] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW,...
+            [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM,...
+                handles, axisLen, axisParams, hlcoD);
+           
+            ts.playTurtles(handles, pMarket, curIndx, simPres, hlcoDs);
+            
+            [pD] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD, pDo,...
                 handles, axisLen, axisParams, hlcoD);
             [pW] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, hlcoW, fW, pW, pWo,...
                 handles, axisLen, axisParams, hlcoD);
-            
-            isNewMonth = ts.isNewTimePeriod(hlcoMs, hlcoD);
-            [pMo] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM,...
-                handles, axisLen, axisParams, hlcoD);
             [pM] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM, pM, pMo,...
                 handles, axisLen, axisParams, hlcoD);
+            
+            ts.playTurtles(handles, pMarket, curIndx, simPres, hlcoDs);
             
             if ~ts.isUpdateCorrect(hlcoMs, hlcoM) || ~ts.isUpdateCorrect(hlcoWs, hlcoW) ||...
                     ~ts.isUpdateCorrect(hlcoDs, hlcoD)
                 return
             end
-                        
-            [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, hlcoD);
             
             [aniSpeed] = ts.setAnimation(handles, curIndx, simPres)
-            
-%             ts.playTurtles(handles, curIndx, simPres, hlcoDs)
-
+           
         end
         
     else
@@ -126,8 +128,7 @@ sprintf('Done')
 % Trivial Fixes
 % --------------
 % M --> W should turn off M
-% Update gui text
-% View the future blank space
+% Fix axis Len slider smaller should be further
 
 
 

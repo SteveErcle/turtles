@@ -55,6 +55,12 @@ classdef TurtleSim
         end
         
         function [simPres] = getSimulationPresent(obj, handles)
+            
+            if get(handles.play, 'Value')
+                newSimPres = floor(get(handles.simPres, 'Value')+1);
+                set(handles.simPres, 'Value', newSimPres);
+            end
+            
             simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
         end
         
@@ -281,32 +287,43 @@ classdef TurtleSim
             
         end
         
-        function [] = playTurtles(obj, handles, curIndx, simPres, axisLen, axisParams,...
-                hlcoT, hlcoTs)
+        function [pMarket] = playTurtles(obj, handles, pMarket, curIndx, simPres, hlcoDs_lev)
             
             if get(handles.play, 'Value') & curIndx == simPres
-                
-                
-                while ~get(handles.next, 'Value')
+                while ~get(handles.next, 'Value') 
                     
-                    pause(0.1);
+                    pause(0.1);  
                     
-                    [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, hlcoT);
-                    
-                    if get(handles.setLevel, 'Value')
-                        plot( [hlcoTs.da(end), hlcoTs.da(1)], [1,1]*20, 'k')
-                        set(handles.setLevel, 'Value', 0);
-                    end
-                    
+                    pMarket = obj.plotTrade(handles, pMarket, hlcoDs_lev);
+       
                 end
-                
-                newSimPres = floor(get(handles.simPres, 'Value')) + 1;
-                set(handles.simPres, 'Value', newSimPres);
                 
             end
             
-            set(handles.next, 'Value', 0)
+            set(handles.next, 'Value', 0);         
+        end
+        
+        function [pMarket] = plotTrade(obj, handles, pMarket, hlcoDs_lev)
             
+            if get(handles.setLevel, 'Value')
+                
+                ub = str2double(get(handles.ub,'String'));
+                enter = str2double(get(handles.enter,'String'));
+                lb = str2double(get(handles.lb,'String'));
+                
+                if pMarket(1) ~= 0
+                    delete(pMarket)
+                end
+                
+                for i = 1:3
+                    figure(i)          
+                    pMarket(i) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*ub, 'k')
+                    pMarket(i+1) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*enter, 'b')
+                    pMarket(i+2) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*lb, 'k')
+                    set(handles.setLevel, 'Value', 0);
+                    
+                end
+            end
         end
         
         function [hlcoT] = resetAnimation(obj, daysFromPresent, hlcoTs, hlcoDs)
