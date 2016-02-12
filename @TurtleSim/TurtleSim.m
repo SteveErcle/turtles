@@ -36,7 +36,7 @@ classdef TurtleSim
             set(handles.simPres, 'SliderStep', [1/150, 10/150]);
             set(handles.simPres, 'Value', get(handles.simPres, 'Max') - simPres + 1);
             
-            set(handles.aniLen, 'Max', 150, 'Min', 1);
+            set(handles.aniLen, 'Max', 150, 'Min', 0);
             set(handles.aniLen, 'SliderStep', [1/150, 10/150]);
             set(handles.aniLen, 'Value', get(handles.aniLen, 'Max') - aniLen);
             
@@ -317,9 +317,9 @@ classdef TurtleSim
                 
                 for i = 1:3
                     figure(i)          
-                    pMarket(i) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*ub, 'k')
-                    pMarket(i+1) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*enter, 'b')
-                    pMarket(i+2) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*lb, 'k')
+                    pMarket(i) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*ub, 'k');
+                    pMarket(i+1) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*enter, 'b');
+                    pMarket(i+2) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*lb, 'k');
                     set(handles.setLevel, 'Value', 0);
                     
                 end
@@ -352,7 +352,7 @@ classdef TurtleSim
         
         function [hlcoD, hlcoW, hlcoM] = resetAll(obj, handles, hlcoDs, hlcoWs, hlcoMs)
             
-            daysFromCurrent = get(handles.aniLen, 'Max') - floor(get(handles.aniLen, 'Value')) + 1;
+            daysFromCurrent = get(handles.aniLen, 'Max') - floor(get(handles.aniLen, 'Value'));
             simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
             daysFromPresent = daysFromCurrent + simPres;
             

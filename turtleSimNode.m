@@ -1,6 +1,6 @@
 clc; clear all; close all;
 
-simPres         = 50;
+simPres         = 42;
 aniLen          = 1;
 axisLen         = 100;
 aniSpeed        = 0.1;
@@ -23,6 +23,19 @@ ts.setButtons(handles, 'none');
 
 [hlcoDs, hlcoWs, hlcoMs] = ts.initData(stock, daysForCrossVal, daysIntoPast);
 [hlcoD, hlcoW, hlcoM] = ts.resetAll(handles, hlcoDs, hlcoWs, hlcoMs);
+
+c = yahoo;
+
+for i = 1000:-1:1
+   disp([datestr(now-i),'  ' datestr(now-(i-1))])
+    m = fetch(c,stock,now-i, now-(i-1), 'm');
+   
+end
+hlcoMs = TurtleVal(m);
+hlcoWs = TurtleVal(w);
+hlcoDs = TurtleVal(d);
+close(c)
+
 
 for init_Plots = 1:1
     figure
@@ -47,7 +60,6 @@ for init_Plots = 1:1
     pMarket = [0,0,0];
 end
 
-
 startSimIndx = find(hlcoD.da(1) == hlcoDs.da)-1;
 
 while(true)
@@ -63,10 +75,32 @@ while(true)
             
             datestr(hlcoDs.da(curIndx))
             
+            disp('Dates Before : D        M')
+            disp([,'    ',datestr(hlcoD.da(1)), '  ', datestr(hlcoM.da(1))])
+            
             hlcoD = ts.updateDay(curIndx, hlcoDs, hlcoD);
             hlcoW = ts.update(hlcoW, hlcoWs, hlcoD);
             hlcoM = ts.update(hlcoM, hlcoMs, hlcoD);
             
+
+            disp('Dates After : D        M')
+            disp([,'    ',datestr(hlcoD.da(1)), '  ', datestr(hlcoM.da(1))])
+            
+            disp('curIndx:  simPres:  ')
+            disp([curIndx, simPres])
+
+            disp('hi: D        M')
+            disp([hlcoD.hi(1),  hlcoM.hi(1)])
+            
+            disp('lo: D        M')
+            disp([hlcoD.lo(1), hlcoM.lo(1)])
+            
+            disp('cl: D        M')
+            disp([hlcoD.cl(1), hlcoM.cl(1)])
+            
+            disp('op: D        M')
+            disp([hlcoD.op(1), hlcoM.op(1)])
+ 
             isNewDay = ts.isNewTimePeriod(hlcoDs, hlcoD);
             isNewWeek = ts.isNewTimePeriod(hlcoWs, hlcoD);
             isNewMonth = ts.isNewTimePeriod(hlcoMs, hlcoD);
@@ -77,8 +111,8 @@ while(true)
                 handles, axisLen, axisParams, hlcoD);
             [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM,...
                 handles, axisLen, axisParams, hlcoD);
-           
-            ts.playTurtles(handles, pMarket, curIndx, simPres, hlcoDs);
+            
+            [pMarket] = ts.playTurtles(handles, pMarket, curIndx, simPres, hlcoDs);
             
             [pD] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, hlcoD, fD, pD, pDo,...
                 handles, axisLen, axisParams, hlcoD);
@@ -87,7 +121,7 @@ while(true)
             [pM] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, hlcoM, fM, pM, pMo,...
                 handles, axisLen, axisParams, hlcoD);
             
-            ts.playTurtles(handles, pMarket, curIndx, simPres, hlcoDs);
+            [pMarket] = ts.playTurtles(handles, pMarket, curIndx, simPres, hlcoDs);
             
             if ~ts.isUpdateCorrect(hlcoMs, hlcoM) || ~ts.isUpdateCorrect(hlcoWs, hlcoW) ||...
                     ~ts.isUpdateCorrect(hlcoDs, hlcoD)
@@ -95,13 +129,13 @@ while(true)
             end
             
             [aniSpeed] = ts.setAnimation(handles, curIndx, simPres)
-           
+            
         end
         
     else
-              
+        
         [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, hlcoD);
-   
+        
         %         if get(handles.setLevel, 'Value')
         %             plot( [hlcoDs.da(end), hlcoDs.da(1)], [1,1]*20, 'k')
         %             set(handles.setLevel, 'Value', 0);
