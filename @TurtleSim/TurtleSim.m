@@ -217,32 +217,7 @@ classdef TurtleSim
             
             
         end
-        
-        function [pT] = animate(obj, aniSpeed, isT, isNew, hlcoT, fT, pT)
-            
-            tf = TurtleFun;
-            
-            if isT
-                if isNew
-                    figure(fT)
-                    [~,pTo] = tf.plotOpen(hlcoT);
-
-                end
-                
-                pause(aniSpeed)
-                
-                if isNew
-                    delete(pTo);
-                end
-                
-                delete(pT);
-                figure(fT)
-                [~,pT] = tf.plotHiLo(hlcoT);
-                
-            end
-            
-        end
-        
+ 
         function [pTo, axisLen, axisParams] = animateOpen(obj, aniSpeed, isT, isNew, hlcoT, fT,...
                  handles, axisLen, axisParams, hlcoD_axis)
             
