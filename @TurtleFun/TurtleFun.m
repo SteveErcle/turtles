@@ -11,7 +11,7 @@ classdef TurtleFun
             hi = t(:,3); lo = t(:,4); cl = t(:,5); op = t(:,2); da = t(:,1);
         end
         
-        function [figHandle, pHandle] = plotHiLo(obj, t)
+        function [figHandle, pHandle] = plotHiLoMultiple(obj, t)
             
             if (isa(t, 'TurtleVal'))
                 hi = t.hi;
@@ -28,8 +28,21 @@ classdef TurtleFun
             figHandle = gcf;
             
         end
-       
-        function [figHandle, pHandle] = plotOpen(obj, t)
+        
+        
+        function [figHandle, pHandle] = plotHiLoSolo(obj, t, tickSize)
+           
+            [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
+            
+            pHandle(1) = plot([da,da], [lo,hi]);
+            pHandle(2) = plot([da-tickSize,da], [op,op]);
+            pHandle(3) = plot([da,da+tickSize], [cl,cl]);
+            hold on
+            figHandle = gcf;
+            
+        end
+        
+        function [figHandle, pHandle] = plotOp(obj, t, tickSize)
             
             if (isa(t, 'TurtleVal'))
                 hi = t.hi;
@@ -41,8 +54,8 @@ classdef TurtleFun
                 [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
             end
             
-            pHandle = plot([da(1)-1,da(1)+2], [1,1]*op(1), 'b');
-            hold on            
+            pHandle = plot([da(1)-tickSize,da(1)], [1,1]*op(1), 'b');
+            hold on
             figHandle = gcf;
             
         end
@@ -116,7 +129,7 @@ classdef TurtleFun
             
             plot([hlcoDs.da(simPres), hlcoDs.da(simPres)],  [0, 1000], 'c')
             
-        end 
+        end
         
         function typeOfLevel = matchToResOrSup(obj, t, values)
             
@@ -133,7 +146,7 @@ classdef TurtleFun
             end
             
         end
-         
+        
     end
     
 end

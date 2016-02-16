@@ -16,52 +16,43 @@ simulateTo = '1/1/16';
 hlcoDs = TurtleVal(dCong);
 
 figure()
-[figHandle, pHandle] = tf.plotHiLo(mPast(2:end,:))
+[figM, pHandle] = tf.plotHiLoMultiple(mPast(2:end,:))
 figure()
-[figHandle2, pHandle] = tf.plotHiLo(wPast(2:end,:))
+[figW, pHandle] = tf.plotHiLoMultiple(wPast(2:end,:))
+
 
 checkDateFrom = hlcoDs.da(10);
 checkDateTo = hlcoDs.da(10);
 
-ok = td.checkData(stock, mCong, hlcoDs, checkDateFrom, checkDateTo)
 
-return
+dateIndx = td.getDateIndx(mCong, checkDateTo)
 
+tf = TurtleFun;
+
+tf.plotOp(wCong(dateIndx,:), 3);
+pause
+tf.plotHiLoSolo(wCong(dateIndx,:), 3);
+
+pause
+ok = td.checkData(stock, wCong, hlcoDs, checkDateFrom, checkDateTo, 1, figW)
 
 p = 0;
 
-for i = flipud(dCong(:,1))'
+
+simDates = flipud(dCong(:,1))'
+
+for i = simDates
     
     
     if p(1) ~= 0 && isempty(find(mCong(:,1) == i))
         delete(p)
     end
     
-    
-    Indx = find(mCong(:,end) == i)
-    
-    datestr(i)
-    
-    t = mCong(Indx,:)
-    [hi, lo, cl, op, da] = tf.returnOHLCDarray(t);
-    
-    
-    mCheck = fetch(c,stock,i-50, i, 'm');
-    mCheck(1,:)
-    mCong(Indx,1:end-1)
-    
-    p(1) = plot([da,da], [lo,hi])
-    p(2) = plot([da-5,da], [op,op])
-    p(3) = plot([da,da+5], [cl,cl])
-    
-    hold on
+    i
     
     pause
-    
-    
+    s
 end
 
-
-close(c)
 
 

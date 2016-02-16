@@ -64,9 +64,10 @@ classdef TurtleSim
             simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
         end
         
-        function [aniSpeed] = setAnimation(obj, handles, curIndx, simPres)
+        function [aniSpeed, aniLen] = setAnimation(obj, handles, curIndx, simPres)
             
             aniSpeed = get(handles.aniSpeed, 'Max') - (get(handles.aniSpeed, 'Value'));
+            aniLen   = get(handles.aniLen, 'Max') - floor(get(handles.aniLen, 'Value'));
             
             if ~get(handles.runAnimation, 'Value')
                 aniSpeed = 0;
@@ -145,9 +146,9 @@ classdef TurtleSim
             
         end
         
-        function [newTimePeriod] = isNewTimePeriod(obj, hlcoTs, hlcoD)
+        function [newTimePeriod] = isNewTimePeriod(obj, dateIndx, tCong)
             
-            if sum((hlcoD.da(1) == hlcoTs.da)) == 1
+            if sum(tCong(dateIndx,1) == tCong(dateIndx,end)) == 1
                 newTimePeriod = 1;
             else
                 newTimePeriod = 0;
