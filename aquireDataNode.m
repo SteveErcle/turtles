@@ -8,27 +8,31 @@ stock = 'CLDX'
 exchange = 'NYSE';
 
 past = '1/1/15';
-simulateFrom = '10/15/15';
+simulateFrom = '11/15/15';
 simulateTo = '1/1/16';
 
 
 [mPast, mCong, wPast, wCong, dCong] = td.getData(stock, past, simulateFrom, simulateTo);
-            
+hlcoDs = TurtleVal(dCong);
+
 figure()
 [figHandle, pHandle] = tf.plotHiLo(mPast(2:end,:))
 figure()
 [figHandle2, pHandle] = tf.plotHiLo(wPast(2:end,:))
 
+checkDateFrom = hlcoDs.da(10);
+checkDateTo = hlcoDs.da(10);
 
+ok = td.checkData(stock, mCong, hlcoDs, checkDateFrom, checkDateTo)
 
-c = yahoo
+return
 
 
 p = 0;
 
 for i = flipud(dCong(:,1))'
     
-     
+    
     if p(1) ~= 0 && isempty(find(mCong(:,1) == i))
         delete(p)
     end
@@ -51,9 +55,9 @@ for i = flipud(dCong(:,1))'
     p(3) = plot([da,da+5], [cl,cl])
     
     hold on
-
-pause
-   
+    
+    pause
+    
     
 end
 

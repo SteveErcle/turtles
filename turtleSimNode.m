@@ -24,17 +24,17 @@ ts.setButtons(handles, 'none');
 [hlcoDs, hlcoWs, hlcoMs] = ts.initData(stock, daysForCrossVal, daysIntoPast);
 [hlcoD, hlcoW, hlcoM] = ts.resetAll(handles, hlcoDs, hlcoWs, hlcoMs);
 
-c = yahoo;
+% c =  yahoo;
 
-for i = 1000:-1:1
-   disp([datestr(now-i),'  ' datestr(now-(i-1))])
-    m = fetch(c,stock,now-i, now-(i-1), 'm');
-   
-end
-hlcoMs = TurtleVal(m);
-hlcoWs = TurtleVal(w);
-hlcoDs = TurtleVal(d);
-close(c)
+% for i = 1000:-1:1
+%    disp([datestr(now-i),'  ' datestr(now-(i-1))])
+%     m = fetch(c,stock,now-i, now-(i-1), 'm');
+%    
+% end
+% hlcoMs = TurtleVal(m);
+% hlcoWs = TurtleVal(w);
+% hlcoDs = TurtleVal(d);
+% close(c)
 
 
 for init_Plots = 1:1
