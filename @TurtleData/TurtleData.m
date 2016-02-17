@@ -6,27 +6,20 @@ classdef TurtleData
     
     methods
         
-        function [mPast, mCong, wPast, wCong, dPast, dCong] = getData(obj, stock, past, simulateFrom, simulateTo)
+        function [mAll, mCong, wAll, wCong, dAll, dCong] = getData(obj, stock, past, simulateFrom, simulateTo)
             
             c = yahoo;
             
-            dPast = fetch(c,stock,past, simulateFrom, 'd');
+            dAll = fetch(c,stock,past, simulateTo, 'd');
+            wAll = fetch(c,stock,past, simulateTo, 'w');
+            mAll = fetch(c,stock,past, simulateTo, 'm');
+            
             dCong = fetch(c,stock,simulateFrom, simulateTo, 'd');
             dCong(:,end) = dCong(:,1);
        
             hlcoDs = TurtleVal(dCong);
-            
-            mPast = fetch(c,stock,past, simulateFrom, 'm');
-            mCong = [];
-            for i=1:length(hlcoDs.da)
-                disp(datestr(hlcoDs.da(i)))
-                m = fetch(c,stock,hlcoDs.da(i)-50, hlcoDs.da(i),'m');
-                m(1,end+1) = hlcoDs.da(i);
-                mCong = [mCong; m(1,:)];
-            end
-            
-            wPast = fetch(c,stock,past, simulateFrom, 'w');
-            wCong = [];
+
+             wCong = [];
             for i=1:length(hlcoDs.da)
                 disp(datestr(hlcoDs.da(i)))
                 w = fetch(c,stock,hlcoDs.da(i)-20, hlcoDs.da(i),'w');
@@ -34,8 +27,27 @@ classdef TurtleData
                 wCong = [wCong; w(1,:)];
             end
             
+            
+            mCong = [];
+            for i=1:length(hlcoDs.da)
+                disp(datestr(hlcoDs.da(i)))
+                m = fetch(c,stock,hlcoDs.da(i)-50, hlcoDs.da(i),'m');
+                m(1,end+1) = hlcoDs.da(i);
+                mCong = [mCong; m(1,:)];
+            end
+  
             close(c)
             
+        end
+        
+        function [tPast] = resetPast(obj, tCong, tAll, pastDate)
+                
+            allDate = tCong(obj.getDateIndx(tCong(:,end), pastDate),1);
+            
+            dateIndx = obj.getDateIndx(tAll(:,1), allDate);
+ 
+            tPast = tAll(dateIndx+1:end,:);
+        
         end
         
         function [ok] = checkData(obj, stock, tCong, hlcoDs, checkDateFrom, checkDateTo, isPlot, figHandle)
@@ -100,6 +112,18 @@ classdef TurtleData
             
         end
         
+        function [] = saveData(obj, stock, mAll, mCong, wAll, wCong, dAll,dCong)
+            
+            save(strcat(stock, 'data'), 'mAll', 'mCong', 'wAll', 'wCong', 'dAll', 'dCong');
+       
+        end
+        
+        function [mAll, mCong, wAll, wCong, dAll, dCong] = loadData(obj, stock)
+            
+            load(strcat(stock, 'data'));
+            
+        end
+
     end
     
     

@@ -89,46 +89,46 @@ classdef TurtleSim
             
         end
         
-        function [axisLen, axisParams] = setAxis(obj, handles, axisLen, axisParams, hlcoD)
+        function [axisLen, axisParams] = setAxis(obj, handles, axisLen, axisParams, dAll)
             
-            if get(handles.updateAxis, 'Value')
-                
-                set(handles.axisLen, 'Max', length(hlcoD.da) , 'Min', 1);
-                if get(handles.axisLen, 'Max') < axisLen
-                    set(handles.axisLen, 'Value', floor(get(handles.axisLen, 'Max')) - 1);
-                end
-                
-                axisLen = floor(get(handles.axisLen, 'Value'));
-                
-                offset = floor(get(handles.offsetAxis, 'Value'));
-                
-                view = axisLen + offset;
-                
-                if view > length(hlcoD.da)
-                    view = length(hlcoD.da);
-                end
-                
-                if offset + 1 > length(hlcoD.da)
-                    offset = length(hlcoD.da) - 1;
-                end
-                
-                x1 = hlcoD.da(view);
-                x2 = hlcoD.da(1+offset)+7;
-                y1 = min(hlcoD.lo(1+offset:view))*.995;
-                y2 = max(hlcoD.hi(1+offset:view))*1.005;
-                
-                axis([x1, x2, y1, y2]);
-                
-                axisParams = [x1, x2, y1, y2];
-                
-            end
-            
-            x1 = axisParams(1);
-            x2 = axisParams(2);
-            y1 = axisParams(3);
-            y2 = axisParams(4);
-            
-            axis([x1, x2, y1, y2]);
+%             if get(handles.updateAxis, 'Value')
+%                 
+%                 set(handles.axisLen, 'Max', length(dAll) , 'Min', 1);
+%                 if get(handles.axisLen, 'Max') < axisLen
+%                     set(handles.axisLen, 'Value', floor(get(handles.axisLen, 'Max')) - 1);
+%                 end
+%                 
+%                 axisLen = floor(get(handles.axisLen, 'Value'));
+%                 
+%                 offset = floor(get(handles.offsetAxis, 'Value'));
+%                 
+%                 view = axisLen + offset;
+%                 
+%                 if view > length(dAll(:,1))
+%                     view = length(dAll(:,1));
+%                 end
+%                 
+%                 if offset + 1 > length(dAll(:,1))
+%                     offset = length(dAll(:,1)) - 1;
+%                 end
+%                 
+%                 x1 = dAll(:,1)(view);
+%                 x2 = dAll(:,1)(1+offset)+7;
+%                 y1 = min(dAll.lo(1+offset:view))*.995;
+%                 y2 = max(dAll.hi(1+offset:view))*1.005;
+%                 
+%                 axis([x1, x2, y1, y2]);
+%                 
+%                 axisParams = [x1, x2, y1, y2];
+%                 
+%             end
+%             
+%             x1 = axisParams(1);
+%             x2 = axisParams(2);
+%             y1 = axisParams(3);
+%             y2 = axisParams(4);
+%             
+%             axis([x1, x2, y1, y2]);
             
         end
         
@@ -146,104 +146,59 @@ classdef TurtleSim
             
         end
         
-        function [newTimePeriod] = isNewTimePeriod(obj, dateIndx, tCong)
+        function [newTimePeriod] = isNewTimePeriod(obj, tCong, i_date)
             
-            if sum(tCong(dateIndx,1) == tCong(dateIndx,end)) == 1
+            
+            td = TurtleData;
+            
+            dateIndx = td.getDateIndx(tCong, i_date);
+            
+            if tCong(dateIndx,1) == tCong(dateIndx,end) == 1
                 newTimePeriod = 1;
             else
                 newTimePeriod = 0;
             end
             
         end
-        
-        function [ok] = isUpdateCorrect(obj, hlcoTs, hlcoT)
-            
-            spot = find(hlcoT.da(2) == hlcoTs.da);
-            hiChecker = hlcoT.hi(2:end) == hlcoTs.hi(spot:end);
-            loChecker = hlcoT.lo(2:end) == hlcoTs.lo(spot:end);
-            clChecker = hlcoT.cl(2:end) == hlcoTs.cl(spot:end);
-            opChecker = hlcoT.op(2:end) == hlcoTs.op(spot:end);
-            
-            if length(hiChecker) ~= sum(hiChecker)
-                ok = 0;
-                
-            elseif length(loChecker) ~= sum(loChecker)
-                ok = 0;
-                
-            elseif   length(clChecker) ~= sum(clChecker)
-                ok = 0;
-                
-            elseif  length(opChecker) ~= sum(opChecker)
-                ok = 0;
-                
-            else
-                ok = 1;
-            end
-            
-            if ok == 0
-                sprintf('ERROR, updater failed')
-            end
-            
-        end
-        
-        function [hlcoD] = updateDay(obj, curIndx, hlcoDs, hlcoD)
-            
-            hlcoD.op = [hlcoDs.op(curIndx); hlcoD.op];
-            hlcoD.cl = [hlcoDs.cl(curIndx); hlcoD.cl];
-            hlcoD.hi = [hlcoDs.hi(curIndx); hlcoD.hi];
-            hlcoD.lo = [hlcoDs.lo(curIndx); hlcoD.lo];
-            hlcoD.da = [hlcoDs.da(curIndx); hlcoD.da];
-            
-        end
-        
-        function [hlcoT] = update(obj, hlcoT, hlcoTs, hlcoD)
-            
-            if obj.isNewTimePeriod(hlcoTs, hlcoD)
-                hlcoT.op = [hlcoD.op(1); hlcoT.op];
-                hlcoT.cl = [hlcoD.cl(1); hlcoT.cl];
-                hlcoT.hi = [hlcoD.hi(1); hlcoT.hi];
-                hlcoT.lo = [hlcoD.lo(1); hlcoT.lo];
-                hlcoT.da = [hlcoD.da(1); hlcoT.da];
-            else
-                hlcoT.cl(1) = hlcoD.cl(1);
-            end
-            
-            if hlcoD.hi(1) > hlcoT.hi(1)
-                hlcoT.hi(1) = hlcoD.hi(1);
-            end
-            
-            if hlcoD.lo(1) < hlcoT.lo(1)
-                hlcoT.lo(1) = hlcoD.lo(1);
-            end
-            
-            
-        end
- 
-        function [pTo, axisLen, axisParams] = animateOpen(obj, aniSpeed, isT, isNew, hlcoT, fT,...
-                 handles, axisLen, axisParams, hlcoD_axis)
+       
+        function [pTo, axisLen, axisParams] = animateOpen(obj, aniSpeed, isT, isNew, tCong, i_date,...
+                fT, handles, axisLen, axisParams, dAll_axis)
             
             tf = TurtleFun;
+            td = TurtleData;
+            
+            dateIndx = td.getDateIndx(tCong, i_date);
+            tSim = tCong(dateIndx,:);
             
             pTo = 0;
             
             if isT
                 if isNew
                     figure(fT)
-                    [~,pTo] = tf.plotOpen(hlcoT); 
+                    [~,pTo] = tf.plotOp(tSim,1/2);
                 end
                 
             end
             
-            [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, hlcoD_axis);
-                    
-            pause(aniSpeed)
+            axisLen = 1; %obj.setAxis(handles, axisLen, axisParams, hlcoD_axis);
+            axisParams = 1;
+            %             [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, dAll_axis);
+            
+            
+            pause(aniSpeed);
             
         end
         
-        function [pT, axisLen, axisParams] = animateClose(obj, aniSpeed, isT, isNew, hlcoT, fT, pT, pTo,...
-                handles, axisLen, axisParams, hlcoD_axis)
+        function [pT, axisLen, axisParams] = animateClose(obj, aniSpeed, isT, isNew, tCong, i_date,...
+                fT, pT, pTo, handles, axisLen, axisParams, hlcoD_axis)
+            
             
             tf = TurtleFun;
+            td = TurtleData;
+            
+            dateIndx = td.getDateIndx(tCong, i_date);
+            tSim = tCong(dateIndx,:);
+            
             
             if isT
                 
@@ -251,32 +206,36 @@ classdef TurtleSim
                     delete(pTo);
                 end
                 
-                delete(pT);
+                if ~isNew & pT(1) ~= 0
+                    delete(pT);
+                end
+                
                 figure(fT)
-                [~,pT] = tf.plotHiLo(hlcoT);
+                [~,pT] = tf.plotHiLoSolo(tSim,1/2);
                 
             end
             
-            [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, hlcoD_axis);
+            axisLen = 1; %obj.setAxis(handles, axisLen, axisParams, hlcoD_axis);
+            axisParams = 1;
             
-            pause(aniSpeed)
+            pause(aniSpeed);
             
         end
         
         function [pMarket] = playTurtles(obj, handles, pMarket, curIndx, simPres, hlcoDs_lev)
             
             if get(handles.play, 'Value') & curIndx == simPres
-                while ~get(handles.next, 'Value') 
+                while ~get(handles.next, 'Value')
                     
-                    pause(0.1);  
+                    pause(0.1);
                     
                     pMarket = obj.plotTrade(handles, pMarket, hlcoDs_lev);
-       
+                    
                 end
                 
             end
             
-            set(handles.next, 'Value', 0);         
+            set(handles.next, 'Value', 0);
         end
         
         function [pMarket] = plotTrade(obj, handles, pMarket, hlcoDs_lev)
@@ -292,7 +251,7 @@ classdef TurtleSim
                 end
                 
                 for i = 1:3
-                    figure(i)          
+                    figure(i)
                     pMarket(i) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*ub, 'k');
                     pMarket(i+1) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*enter, 'b');
                     pMarket(i+2) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*lb, 'k');
@@ -301,43 +260,7 @@ classdef TurtleSim
                 end
             end
         end
-        
-        function [hlcoT] = resetAnimation(obj, daysFromPresent, hlcoTs, hlcoDs)
-            
-            i = 0;
-            while sum(hlcoDs.da(daysFromPresent+i) == hlcoTs.da) == 0
-                i = i+1;
-            end
-            
-            resetDay = hlcoDs.da(daysFromPresent+i);
-            
-            It = find(resetDay == hlcoTs.da);
-            hlcoT = hlcoTs.reset(It, hlcoTs);
-            
-            Id = find(resetDay == hlcoDs.da);
-            hlcoUpdater = hlcoDs.reset(Id, hlcoDs);
-            
-            startUpdateIndx = Id - 1;
-            
-            for curIndx = startUpdateIndx:-1:daysFromPresent
-                hlcoUpdater = obj.updateDay(curIndx, hlcoDs, hlcoUpdater);
-                hlcoT = obj.update(hlcoT, hlcoTs, hlcoUpdater);
-            end
-            
-        end
-        
-        function [hlcoD, hlcoW, hlcoM] = resetAll(obj, handles, hlcoDs, hlcoWs, hlcoMs)
-            
-            daysFromCurrent = get(handles.aniLen, 'Max') - floor(get(handles.aniLen, 'Value'));
-            simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
-            daysFromPresent = daysFromCurrent + simPres;
-            
-            [hlcoD] = obj.resetAnimation(daysFromPresent, hlcoDs, hlcoDs);
-            [hlcoW] = obj.resetAnimation(daysFromPresent, hlcoWs, hlcoDs);
-            [hlcoM] = obj.resetAnimation(daysFromPresent, hlcoMs, hlcoDs);
-            
-        end
-        
+ 
     end
     
 end

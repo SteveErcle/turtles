@@ -28,8 +28,7 @@ classdef TurtleFun
             figHandle = gcf;
             
         end
-        
-        
+          
         function [figHandle, pHandle] = plotHiLoSolo(obj, t, tickSize)
            
             [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
@@ -60,6 +59,18 @@ classdef TurtleFun
             
         end
         
+        function [figHandle, pHandle] = resetPlot(obj, figHandle, tPast, startDay)
+            
+            figure(figHandle)
+            
+            handle = gca;
+            cla(handle);
+            
+            obj.plotStartDay(startDay);
+            [figHandle,pHandle] = obj.plotHiLoMultiple(tPast);
+
+        end 
+             
         function  [foundRes, foundSup, foundDates,...
                 closestRes, closestSup] = getContainerLevels(obj, maxNumDays, hi, lo, da)
             
@@ -125,9 +136,10 @@ classdef TurtleFun
             
         end
         
-        function plotStartDay(obj, simPres, hlcoDs)
+        function plotStartDay(obj, startDay)
             
-            plot([hlcoDs.da(simPres), hlcoDs.da(simPres)],  [0, 1000], 'c')
+            plot([startDay, startDay],  [0, 1000], 'c')
+            hold on;
             
         end
         
@@ -150,6 +162,7 @@ classdef TurtleFun
     end
     
 end
+
 
 
 
