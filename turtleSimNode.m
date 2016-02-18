@@ -1,6 +1,6 @@
 clc; clear all; close all;
 
-simPres         = 10;
+simPres         = 20;
 aniLen          = 1;
 axisLen         = 100;
 aniSpeed        = 0.1;
@@ -24,10 +24,6 @@ td = TurtleData;
 delete(turtleSimGui)
 handles = guihandles(turtleSimGui);
 
-ts.initHandles(handles, simPres, aniLen, axisLen, aniSpeed);
-ts.setButtons(handles, 'none');
-
-
 % [mPast, mCong, wPast, wCong, dPast, dCong] = td.getData(stock, past, simulateFrom, simulateTo)
 [mAll, mCong, wAll, wCong, dAll, dCong] = td.loadData(stock);
 
@@ -39,6 +35,13 @@ mPast = td.resetPast(mCong, mAll, startDay);
 
 hlcoDs = TurtleVal(dCong);
 hlcoDp = TurtleVal(dAll);
+
+
+ts.initHandles(handles, simPres, aniLen, axisLen, aniSpeed, dAll);
+ts.setButtons(handles, 'none');
+
+
+
 
 for init_Plots = 1:1
     
@@ -61,9 +64,7 @@ for init_Plots = 1:1
     axisParams = [1,1,1,1];
     pMarket = [0,0,0];
     
-    pD = 0;
-    pW = 0;
-    pM = 0;
+   
     
 end
 
@@ -80,9 +81,10 @@ while(true)
         wPast = td.resetPast(wCong, wAll, simDates(1));
         mPast = td.resetPast(mCong, mAll, simDates(1));
         
-        [~, pDp] = tf.resetPlot(fD, dPast, startDay);
-        [~, pWp] = tf.resetPlot(fW, wPast, startDay);
-        [~, pMp] = tf.resetPlot(fM, mPast, startDay);
+        [~, pDp, pD] = tf.resetPlot(fD, dPast, startDay);
+        [~, pWp, pW] = tf.resetPlot(fW, wPast, startDay);
+        [~, pMp, pM] = tf.resetPlot(fM, mPast, startDay);
+        
         
         axis([simDates(1)-50, simDates(end)+10, 0, 20])
         
@@ -100,18 +102,18 @@ while(true)
             isNewMonth = ts.isNewTimePeriod(mCong, i_date)
             
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, handles, axisLen, axisParams, 1);
+                fD, 0.5, handles, axisLen, axisParams);
             [pWo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
-                fW, handles, axisLen, axisParams, 1);
+                fW, 3, handles, axisLen, axisParams);
             [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
-                fM, handles, axisLen, axisParams, 1);
-            
+                fM, 5, handles, axisLen, axisParams);
+
             [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, pD, pDo, handles, axisLen, axisParams, 1);
+                fD, pD, pDo, 0.5, handles, axisLen, axisParams);
             [pW, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
-                fW, pW, pWo, handles, axisLen, axisParams, 1);
+                fW, pW, pWo, 3, handles, axisLen, axisParams);
             [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
-                fM, pM, pMo, handles, axisLen, axisParams, 1);
+                fM, pM, pMo, 5, handles, axisLen, axisParams);
             
             [aniSpeed, aniLen] = ts.setAnimation(handles, 0, simPres);
             

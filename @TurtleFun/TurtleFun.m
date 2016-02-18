@@ -53,21 +53,23 @@ classdef TurtleFun
                 [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
             end
             
-            pHandle = plot([da(1)-tickSize,da(1)], [1,1]*op(1), 'b');
+            pHandle = plot([da(1)-tickSize,da(1)], [1,1]*op(1));
             hold on
             figHandle = gcf;
             
         end
         
-        function [figHandle, pHandle] = resetPlot(obj, figHandle, tPast, startDay)
+        function [figHandle, pHandle, pT] = resetPlot(obj, figHandle, tPast, startDay)
             
-            figure(figHandle)
+            set(0,'CurrentFigure',figHandle)
             
             handle = gca;
             cla(handle);
             
             obj.plotStartDay(startDay);
             [figHandle,pHandle] = obj.plotHiLoMultiple(tPast);
+            
+            pT = 0;
 
         end 
              

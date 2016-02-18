@@ -50,15 +50,9 @@ classdef TurtleData
         
         end
         
-        function [ok] = checkData(obj, stock, tCong, hlcoDs, checkDateFrom, checkDateTo, isPlot, figHandle)
+        function [timePeriod, tickSize] = determineTimePeriod(obj, tCong)
             
-            
-            if isPlot
-                tf = TurtleFun;
-            end
-            
-            
-            for i = 1:size(tCong,1)
+             for i = 1:size(tCong,1)
                 if abs(tCong(1,1) - tCong(i,1)) ~= 0 & abs(tCong(1,1) - tCong(i,1)) < 20
                     timePeriod  = 'w';
                     tickSize = 3;
@@ -68,7 +62,18 @@ classdef TurtleData
                     tickSize = 5;
                     break
                 end
+             end    
+        end 
+        
+        function [ok] = checkData(obj, stock, tCong, hlcoDs, checkDateFrom, checkDateTo, isPlot, figHandle)
+            
+            
+            if isPlot
+                tf = TurtleFun;
             end
+            
+            
+            [timePeriod, tickSize] = obj.determineTimePeriod(tCong)
             
             indxFrom = find(hlcoDs.da == checkDateFrom);
             indxTo = find(hlcoDs.da == checkDateTo);
