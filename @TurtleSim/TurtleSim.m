@@ -3,9 +3,20 @@ classdef TurtleSim
     
     properties
         
+        dAll;
+        
     end
     
+    
     methods
+        
+        function obj = TurtelSim(varargin)
+            
+            if nargin == 1
+                obj.dAll = varargin{1};
+            end
+            
+        end
         
         function [] = setButtons(obj, handles, select)
             
@@ -32,18 +43,19 @@ classdef TurtleSim
             
             set(handles.updateAxis, 'Value', 1);
             
-            set(handles.simPres, 'Max', 150, 'Min', 1);
-            set(handles.simPres, 'SliderStep', [1/150, 10/150]);
+            lenD = length(dAll(:,1));
+            set(handles.simPres, 'Max', lenD, 'Min', 1);
+            set(handles.simPres, 'SliderStep', [1/lenD, 10/lenD]);
             set(handles.simPres, 'Value', get(handles.simPres, 'Max') - simPres + 1);
             
-            set(handles.aniLen, 'Max', 150, 'Min', 0);
-            set(handles.aniLen, 'SliderStep', [1/150, 10/150]);
+            set(handles.aniLen, 'Max', lenD, 'Min', 0);
+            set(handles.aniLen, 'SliderStep', [1/lenD, 10/lenD]);
             set(handles.aniLen, 'Value', get(handles.aniLen, 'Max') - aniLen);
             
-            set(handles.axisLen, 'Max', dAll(1,1), 'Min', dAll(end,1));
             lenOfTime = dAll(1,1) - dAll(end,1);
+            set(handles.axisLen, 'Max', lenOfTime, 'Min', 1);
             set(handles.axisLen, 'SliderStep', [1/lenOfTime, 10/lenOfTime]);
-            set(handles.axisLen, 'Value', dAll(1,1) - axisLen);
+            set(handles.axisLen, 'Value', axisLen);
             
             set(handles.aniSpeed, 'Max', 1, 'Min', 0.01);
             set(handles.aniSpeed, 'SliderStep', [1/100, 10/100]);
@@ -65,7 +77,7 @@ classdef TurtleSim
             simPres = get(handles.simPres, 'Max') - floor(get(handles.simPres, 'Value')) + 1;
         end
         
-        function [aniSpeed, aniLen] = setAnimation(obj, handles, curIndx, simPres)
+        function [aniSpeed, aniLen] = setAnimation(obj, handles, i_date, simDates)
             
             aniSpeed = get(handles.aniSpeed, 'Max') - (get(handles.aniSpeed, 'Value'));
             aniLen   = get(handles.aniLen, 'Max') - floor(get(handles.aniLen, 'Value'));
@@ -76,14 +88,14 @@ classdef TurtleSim
             
             if get(handles.play, 'Value')
                 
-                if curIndx ~= simPres
-                    
-                    maxMinusMin = get(handles.aniSpeed,'Max') - get(handles.aniSpeed,'Min');
-                    set(handles.aniSpeed,'Value', maxMinusMin);
-                    aniSpeed = 0;
-                else
-                    set(handles.aniSpeed,'Value', 0.75);
-                end
+%                 if i_date ~= simDates(end)
+%                     
+%                     maxMinusMin = get(handles.aniSpeed,'Max') - get(handles.aniSpeed,'Min');
+%                     set(handles.aniSpeed,'Value', maxMinusMin);
+%                     aniSpeed = 0;
+%                 else
+%                     set(handles.aniSpeed,'Value', 0.75);
+%                 end
                 set(handles.aniLen, 'Value', get(handles.aniLen, 'Max'));
                 
             end
@@ -91,32 +103,24 @@ classdef TurtleSim
         end
         
         function [axisLen, axisParams] = setAxis(obj, handles, axisLen, axisParams, date)
-
-            if get(handles.updateAxis, 'Value')
             
+            if get(handles.updateAxis, 'Value')
+                
                 axisLen = floor(get(handles.axisLen, 'Value'));
                 
                 offset = floor(get(handles.offsetAxis, 'Value'));
-
-%                 if view > length(dAll(:,1))
-%                     view = length(dAll(:,1));
-%                 end
-%                 
-%                 if offset + 1 > length(dAll(:,1))
-%                     offset = length(dAll(:,1)) - 1;
-%                 end
-% %                 
-
-                x1 = date - offset;
-                x2 = date;
-                y1 = 0;
-                y2 = 30;
-
-%                 x1 = dAll(:,1)(view);
-%                 x2 = dAll(:,1)(1+offset)+7;
-%                 y1 = min(dAll.lo(1+offset:view))*.995;
-%                 y2 = max(dAll.hi(1+offset:view))*1.005;
-%                 
+                 
+                [M I1] = min(abs(obj.dAll(:,1) - (date - offset - axisLen)));
+                [M I2] = min(abs(obj.dAll(:,1) - (date - offset)));
+                
+                tf = TurtleFun;
+                [hi, lo, cl, op, da] = tf.returnOHLCDarray(obj.dAll);
+                
+                x1 = date - offset - axisLen;
+                x2 = date - offset + 15;
+                y1 = min(lo(I2:I1))*0.995;
+                y2 = max(hi(I2:I1))*1.005;
+               
                 axis([x1, x2, y1, y2]);
                 
                 axisParams = [x1, x2, y1, y2];
@@ -179,7 +183,7 @@ classdef TurtleSim
                 set(0,'CurrentFigure',fT)
                 [~,pTo] = tf.plotOp(tSim,tickSize);
             end
-   
+            
             [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date);
             
             pause(aniSpeed);
@@ -195,32 +199,32 @@ classdef TurtleSim
             dateIndx = td.getDateIndx(tCong, i_date);
             tSim = tCong(dateIndx,:);
             
-         
+            
             if isT
                 figure(fT)
             end
-                
-                if isNew & pTo ~= 0
-                    delete(pTo);
-                end
-                
-                if ~isNew & pT(1) ~= 0
-                    set(0,'CurrentFigure',fT)
-                    delete(pT);         
-                end
-                
+            
+            if isNew & pTo ~= 0
+                delete(pTo);
+            end
+            
+            if ~isNew & pT(1) ~= 0
                 set(0,'CurrentFigure',fT)
-                [~,pT] = tf.plotHiLoSolo(tSim, tickSize);
-   
+                delete(pT);
+            end
+            
+            set(0,'CurrentFigure',fT)
+            [~,pT] = tf.plotHiLoSolo(tSim, tickSize);
+            
             [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date);
             
             pause(aniSpeed);
             
         end
         
-        function [pMarket] = playTurtles(obj, handles, pMarket, curIndx, simPres, hlcoDs_lev)
+        function [pMarket] = playTurtles(obj, handles, pMarket, i_date, simDates, hlcoDs_lev)
             
-            if get(handles.play, 'Value') & curIndx == simPres
+            if get(handles.play, 'Value') % & i_date == simDates(end)
                 while ~get(handles.next, 'Value')
                     
                     pause(0.1);
@@ -256,7 +260,23 @@ classdef TurtleSim
                 end
             end
         end
- 
+        
+        function [levels] = plotLevel(obj, handles, levels, dAll)
+            
+            if get(handles.setLevel, 'Value')
+                levels = [levels; str2double(get(handles.enter,'String'))];
+                for i = 1:3
+                    figure(i)
+                    plot([dAll(end,1), dAll(1,1)], [1,1]*levels(end), 'k');
+                    set(handles.setLevel, 'Value', 0);
+                    
+                end
+                
+            end
+            
+        end 
+        
+        
     end
     
 end

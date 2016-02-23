@@ -59,7 +59,7 @@ classdef TurtleFun
             
         end
         
-        function [figHandle, pHandle, pT] = resetPlot(obj, figHandle, tPast, startDay)
+        function [figHandle, pHandle, pT] = resetPlot(obj, figHandle, tPast, startDay, levels, dAll)
             
             set(0,'CurrentFigure',figHandle)
             
@@ -68,6 +68,16 @@ classdef TurtleFun
             
             obj.plotStartDay(startDay);
             [figHandle,pHandle] = obj.plotHiLoMultiple(tPast);
+            
+            if ~isempty(levels)
+                for i = 1:3
+                    for j = 1:length(levels)
+                        set(0,'CurrentFigure',i)
+                        plot([dAll(end,1), dAll(1,1)], [1,1]*levels(j), 'k');
+                    end
+                end
+            end
+            
             
             pT = 0;
 
