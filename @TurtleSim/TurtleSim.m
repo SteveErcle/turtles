@@ -88,14 +88,14 @@ classdef TurtleSim
             
             if get(handles.play, 'Value')
                 
-%                 if i_date ~= simDates(end)
-%                     
-%                     maxMinusMin = get(handles.aniSpeed,'Max') - get(handles.aniSpeed,'Min');
-%                     set(handles.aniSpeed,'Value', maxMinusMin);
-%                     aniSpeed = 0;
-%                 else
-%                     set(handles.aniSpeed,'Value', 0.75);
-%                 end
+                %                 if i_date ~= simDates(end)
+                %
+                %                     maxMinusMin = get(handles.aniSpeed,'Max') - get(handles.aniSpeed,'Min');
+                %                     set(handles.aniSpeed,'Value', maxMinusMin);
+                %                     aniSpeed = 0;
+                %                 else
+                %                     set(handles.aniSpeed,'Value', 0.75);
+                %                 end
                 set(handles.aniLen, 'Value', get(handles.aniLen, 'Max'));
                 
             end
@@ -109,7 +109,7 @@ classdef TurtleSim
                 axisLen = floor(get(handles.axisLen, 'Value'));
                 
                 offset = floor(get(handles.offsetAxis, 'Value'));
-                 
+                
                 [M I1] = min(abs(obj.dAll(:,1) - (date - offset - axisLen)));
                 [M I2] = min(abs(obj.dAll(:,1) - (date - offset)));
                 
@@ -120,7 +120,7 @@ classdef TurtleSim
                 x2 = date - offset + 15;
                 y1 = min(lo(I2:I1))*0.995;
                 y2 = max(hi(I2:I1))*1.005;
-               
+                
                 axis([x1, x2, y1, y2]);
                 
                 axisParams = [x1, x2, y1, y2];
@@ -222,14 +222,16 @@ classdef TurtleSim
             
         end
         
-        function [pMarket] = playTurtles(obj, handles, pMarket, i_date, simDates, hlcoDs_lev)
+        function [pMarket, levels] = playTurtles(obj, handles, pMarket, levels, simDates, i_date, dAll)
             
             if get(handles.play, 'Value') % & i_date == simDates(end)
                 while ~get(handles.next, 'Value')
                     
                     pause(0.1);
                     
-                    pMarket = obj.plotTrade(handles, pMarket, hlcoDs_lev);
+                    pMarket = obj.plotTrade(handles, pMarket, i_date, dAll);
+                    
+                    levels = obj.plotLevel(handles, levels, dAll);
                     
                 end
                 
@@ -238,13 +240,13 @@ classdef TurtleSim
             set(handles.next, 'Value', 0);
         end
         
-        function [pMarket] = plotTrade(obj, handles, pMarket, hlcoDs_lev)
+        function [pMarket] = plotTrade(obj, handles, pMarket, i_date, dAll)
             
-            if get(handles.setLevel, 'Value')
+            if get(handles.setTrade, 'Value')
                 
                 ub = str2double(get(handles.ub,'String'));
                 enter = str2double(get(handles.enter,'String'));
-                lb = str2double(get(handles.lb,'String'));
+                lb = str2double(get(handles.lb,'String'));c
                 
                 if pMarket(1) ~= 0
                     delete(pMarket)
@@ -252,9 +254,9 @@ classdef TurtleSim
                 
                 for i = 1:3
                     figure(i)
-                    pMarket(i) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*ub, 'k');
-                    pMarket(i+1) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*enter, 'b');
-                    pMarket(i+2) = plot([hlcoDs_lev.da(end), hlcoDs_lev.da(1)], [1,1]*lb, 'k');
+                    pMarket(i) = plot([dAll(end,1), dAll(1,1)], [1,1]*ub, 'k');
+                    pMarket(i+1) = plot([dAll(end,1), dAll(1,1)], [1,1]*enter, 'b');
+                    pMarket(i+2) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'k');
                     set(handles.setLevel, 'Value', 0);
                     
                 end
@@ -264,18 +266,55 @@ classdef TurtleSim
         function [levels] = plotLevel(obj, handles, levels, dAll)
             
             if get(handles.setLevel, 'Value')
-                levels = [levels; str2double(get(handles.enter,'String'))];
-                for i = 1:3
-                    figure(i)
-                    plot([dAll(end,1), dAll(1,1)], [1,1]*levels(end), 'k');
+                
+                h = gcf;
+                axesObjs = get(h, 'Children');
+                axesObjs = findobj(axesObjs, 'type', 'axes');
+                
+                dataTips = findall(axesObjs, 'Type', 'hggroup', 'HandleVisibility', 'off');
+                
+                if length(dataTips) > 0
+                    cursor = datacursormode(gcf);
+                    dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
+                    value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
+                    levels = [levels; value];
+                    
+                    for i = 1:3
+                        set(0,'CurrentFigure',i)
+                        plot([dAll(end,1), dAll(1,1)], [1,1]*value, 'k');
+                    end
+                    
+                    delete(dataTips);
                     set(handles.setLevel, 'Value', 0);
                     
                 end
                 
             end
             
-        end 
+%             if get(handles.setLevel, 'Value')
+%                 
+%                 if exist('cursor_info', 'var')
+%                     
+%                     for j = 1:length(cursor_info)
+%                         
+%                         values = getfield(cursor_info, {j},'Position');
+%                         x_value = values(1);
+%                         y_value = values(2);
+%                         levels = [levels; y_value];
+%                         for i = 1:3
+%                             set(0,'CurrentFigure',i)
+%                             plot([dAll(end,1), dAll(1,1)], [1,1]*y_value, 'r');
+%                         end
+%                         
+%                     end
+%                     clear cursor_info
+%                 end
+%                 
+%             end
+            
+        end
         
+   
         
     end
     

@@ -107,7 +107,7 @@ while(true)
             [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
                 fM, 5, handles, axisLen, axisParams);
             
-            [pMarket] = ts.playTurtles(handles, pMarket, i_date, simDates, hlcoDs)
+            [pMarket] = ts.playTurtles(handles, pMarket, levels, simDates, i_date, dAll);
             
             
             [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
@@ -117,8 +117,8 @@ while(true)
             [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
                 fM, pM, pMo, 5, handles, axisLen, axisParams);
             
-            [pMarket] = ts.playTurtles(handles, pMarket, i_date, simDates, hlcoDs)
-  
+            [pMarket] = ts.playTurtles(handles, pMarket, levels, simDates, i_date, dAll);
+            
             [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);
             
         end
@@ -127,12 +127,12 @@ while(true)
         
         [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, simDates(end));
         
-        [levels] = ts.plotLevel(handles, levels, dAll)
+        [levels] = ts.plotLevel(handles, levels, dAll);
+
         
+        pause(0.01)
         
     end
-    
-    pause(0.01)
     
 end
 
