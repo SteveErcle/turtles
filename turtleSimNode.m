@@ -12,22 +12,26 @@ stock = 'CLDX'
 exchange = 'NYSE';
 
 
-past = '1/1/15';
-simulateFrom = '11/15/15';
-simulateTo = '1/1/16';
-
 %%
 
 ts = TurtleSim;
 tf = TurtleFun;
 td = TurtleData;
 delete(turtleSimGui)
-handles = guihandles(turtleSimGui);
 
-% [mPast, mCong, wPast, wCong, dPast, dCong] = td.getData(stock, past, simulateFrom, simulateTo)
+
+% [mAll, mCong, wAll, wCong, dAll, dCong] = td.getData(stock, past, simulateFrom, simulateTo);
+% td.saveData(stock, mAll, mCong, wAll, wCong, dAll,dCong);
 [mAll, mCong, wAll, wCong, dAll, dCong] = td.loadData(stock);
 
 startDay = dCong(end,1);
+
+simPres = td.getDateIndx(dAll(:,1), startDay)-20;
+aniLen = 20;
+
+handles = guihandles(turtleSimGui);
+
+
 
 dPast = td.resetPast(dCong, dAll, startDay);
 wPast = td.resetPast(wCong, wAll, startDay);
@@ -47,16 +51,19 @@ for init_Plots = 1:1
     [fD, pDp] = tf.resetPlot(1, dPast, startDay, [], []);
     title(strcat(stock,' Daily'));
     datetick('x',12, 'keeplimits');
+    set(gcf, 'Position', [1441,10,1080,542]);
     
     figure
     [fW, pWp] = tf.resetPlot(2, wPast, startDay, [], []);
     title(strcat(stock,' Weekly'));
     datetick('x',12, 'keeplimits');
+    set(gcf, 'Position', [1441,583,1080,542]);
     
     figure
     [fM, pMp] = tf.resetPlot(3, mPast, startDay, [], []);
     title(strcat(stock,' Monthly'));
     datetick('x',12, 'keeplimits');
+    set(gcf, 'Position', [1441,1238,1080,542]);
     
     axisParams = [1,1,1,1];
     pMarket = [0,0,0];
@@ -109,7 +116,6 @@ while(true)
             
             [pMarket] = ts.playTurtles(handles, pMarket, levels, simDates, i_date, dAll);
             
-            
             [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                 fD, pD, pDo, 0.5, handles, axisLen, axisParams);
             [pW, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
@@ -137,6 +143,9 @@ while(true)
 end
 
 
+
+% Build checker
+% Make sim watching easier and dont delete trade
 
 
 

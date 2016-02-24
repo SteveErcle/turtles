@@ -40,6 +40,18 @@ classdef TurtleData
             
         end
         
+        function [] = saveData(obj, stock, mAll, mCong, wAll, wCong, dAll,dCong)
+            
+            save(strcat(stock, 'data'), 'mAll', 'mCong', 'wAll', 'wCong', 'dAll', 'dCong');
+       
+        end
+        
+        function [mAll, mCong, wAll, wCong, dAll, dCong] = loadData(obj, stock)
+            
+            load(strcat(stock, 'data'));
+            
+        end
+
         function [tPast] = resetPast(obj, tCong, tAll, pastDate)
                 
             allDate = tCong(obj.getDateIndx(tCong(:,end), pastDate),1);
@@ -117,18 +129,7 @@ classdef TurtleData
             
         end
         
-        function [] = saveData(obj, stock, mAll, mCong, wAll, wCong, dAll,dCong)
-            
-            save(strcat(stock, 'data'), 'mAll', 'mCong', 'wAll', 'wCong', 'dAll', 'dCong');
-       
-        end
-        
-        function [mAll, mCong, wAll, wCong, dAll, dCong] = loadData(obj, stock)
-            
-            load(strcat(stock, 'data'));
-            
-        end
-
+   
     end
     
     

@@ -18,7 +18,7 @@ classdef TurtleSim
             
         end
         
-        function [] = setButtons(obj, handles, select)
+        function [] = setButtons(oxbj, handles, select)
             
             set(handles.M, 'Value', 0);
             set(handles.W, 'Value', 0);
@@ -64,6 +64,8 @@ classdef TurtleSim
             set(handles.offsetAxis, 'Max', lenOfTime, 'Min', 0);
             set(handles.offsetAxis, 'SliderStep', [1/lenOfTime, 10/lenOfTime]);
             set(handles.offsetAxis, 'Value', 0);
+            
+            set(handles.pr,'String', 0)
             
         end
         
@@ -117,12 +119,16 @@ classdef TurtleSim
                 [hi, lo, cl, op, da] = tf.returnOHLCDarray(obj.dAll);
                 
                 x1 = date - offset - axisLen;
-                x2 = date - offset + 15;
+                x2 = date - offset + 35;
                 y1 = min(lo(I2:I1))*0.995;
                 y2 = max(hi(I2:I1))*1.005;
-                
-                axis([x1, x2, y1, y2]);
-                
+               
+                for i = 1:3
+                    set(0,'CurrentFigure',i)
+                    axis([x1, x2, y1, y2]);
+                    
+                end
+
                 axisParams = [x1, x2, y1, y2];
                 
             end
@@ -246,7 +252,7 @@ classdef TurtleSim
                 
                 ub = str2double(get(handles.ub,'String'));
                 enter = str2double(get(handles.enter,'String'));
-                lb = str2double(get(handles.lb,'String'));c
+                lb = str2double(get(handles.lb,'String'));
                 
                 if pMarket(1) ~= 0
                     delete(pMarket)
@@ -261,60 +267,39 @@ classdef TurtleSim
                     
                 end
             end
+            set(handles.setTrade, 'Value', 0);
+             
         end
         
         function [levels] = plotLevel(obj, handles, levels, dAll)
             
             if get(handles.setLevel, 'Value')
-                
-                h = gcf;
-                axesObjs = get(h, 'Children');
-                axesObjs = findobj(axesObjs, 'type', 'axes');
-                
-                dataTips = findall(axesObjs, 'Type', 'hggroup', 'HandleVisibility', 'off');
-                
-                if length(dataTips) > 0
-                    cursor = datacursormode(gcf);
-                    dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
-                    value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
-                    levels = [levels; value];
+                for j = 1:3
+                    set(0,'CurrentFigure',j)
+                    h = gcf;
+                    axesObjs = get(h, 'Children');
+                    axesObjs = findobj(axesObjs, 'type', 'axes');
                     
-                    for i = 1:3
-                        set(0,'CurrentFigure',i)
-                        plot([dAll(end,1), dAll(1,1)], [1,1]*value, 'k');
-                    end
+                    dataTips = findall(axesObjs, 'Type', 'hggroup', 'HandleVisibility', 'off');
                     
-                    delete(dataTips);
-                    set(handles.setLevel, 'Value', 0);
-                    
+                    if length(dataTips) > 0
+                        cursor = datacursormode(gcf);
+                        dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
+                        value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
+                        levels = [levels; value];
+                        
+                        for i = 1:3
+                            set(0,'CurrentFigure',i)
+                            plot([dAll(end,1), dAll(1,1)], [1,1]*value, 'k');
+                        end
+                        
+                        delete(dataTips);
+                        set(handles.setLevel, 'Value', 0);
+                        
+                    end 
                 end
-                
             end
-            
-%             if get(handles.setLevel, 'Value')
-%                 
-%                 if exist('cursor_info', 'var')
-%                     
-%                     for j = 1:length(cursor_info)
-%                         
-%                         values = getfield(cursor_info, {j},'Position');
-%                         x_value = values(1);
-%                         y_value = values(2);
-%                         levels = [levels; y_value];
-%                         for i = 1:3
-%                             set(0,'CurrentFigure',i)
-%                             plot([dAll(end,1), dAll(1,1)], [1,1]*y_value, 'r');
-%                         end
-%                         
-%                     end
-%                     clear cursor_info
-%                 end
-%                 
-%             end
-            
         end
-        
-   
         
     end
     

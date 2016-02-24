@@ -22,16 +22,16 @@ function varargout = turtleSimGui(varargin)
 
 % Edit the above text to modify the response to help turtleSimGui
 
-% Last Modified by GUIDE v2.5 23-Feb-2016 18:56:40
+% Last Modified by GUIDE v2.5 23-Feb-2016 19:50:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @turtleSimGui_OpeningFcn, ...
-                   'gui_OutputFcn',  @turtleSimGui_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @turtleSimGui_OpeningFcn, ...
+    'gui_OutputFcn',  @turtleSimGui_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -63,7 +63,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = turtleSimGui_OutputFcn(hObject, eventdata, handles) 
+function varargout = turtleSimGui_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -405,3 +405,85 @@ function setTrade_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of setTrade
+
+
+
+function exit_Callback(hObject, eventdata, handles)
+% hObject    handle to exit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of exit as text
+%        str2double(get(hObject,'String')) returns contents of exit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function exit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to exit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in long.
+function long_Callback(hObject, eventdata, handles)
+% hObject    handle to long (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of long
+
+if get(handles.long,'Value') == 1
+    set(handles.short,'Value',0);
+    entered = str2double(get(handles.enter,'String'));
+    exit = str2double(get(handles.exit,'String'));
+    pr = ((exit-entered)/ entered)*100;
+    pr = num2str(pr + str2num(get(handles.pr,'String')));
+    set(handles.pr,'String', pr)
+end
+
+
+% --- Executes on button press in short.
+function short_Callback(hObject, eventdata, handles)
+% hObject    handle to short (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of short
+if get(handles.short,'Value') == 1
+    set(handles.long,'Value',0);
+    entered = str2double(get(handles.enter,'String'));
+    exit = str2double(get(handles.exit,'String'));
+    pr = ((entered-exit)/ entered)*100;
+    pr = num2str(pr + str2num(get(handles.pr,'String')));
+    set(handles.pr,'String', pr)
+    
+end
+
+
+
+function pr_Callback(hObject, eventdata, handles)
+% hObject    handle to pr (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of pr as text
+%        str2double(get(hObject,'String')) returns contents of pr as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function pr_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to pr (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
