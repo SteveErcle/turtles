@@ -125,13 +125,22 @@ classdef TurtleData
         
         function [dateIndx] = getDateIndx(obj, array, date)
             
+            if isa(date, 'char')
+                date = datenum(date,'mm/dd/yyyy');
+            end
+
             dateIndx = find(array(:,end) == date);
             
+            if isempty(dateIndx)
+                
+                disp('Finding Closest Date')
+                
+                [M dateIndx] = min( abs(array - date));
+    
+            end 
+            
         end
-        
-   
+    
     end
-    
-    
     
 end

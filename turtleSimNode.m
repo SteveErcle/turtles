@@ -12,13 +12,16 @@ stock = 'CLDX'
 exchange = 'NYSE';
 
 
+past = '1/1/08';
+simulateFrom = '1/1/12';
+simulateTo = '1/1/16';
+
 %%
 
 ts = TurtleSim;
 tf = TurtleFun;
 td = TurtleData;
 delete(turtleSimGui)
-
 
 % [mAll, mCong, wAll, wCong, dAll, dCong] = td.getData(stock, past, simulateFrom, simulateTo);
 % td.saveData(stock, mAll, mCong, wAll, wCong, dAll,dCong);
@@ -30,8 +33,6 @@ simPres = td.getDateIndx(dAll(:,1), startDay)-20;
 aniLen = 20;
 
 handles = guihandles(turtleSimGui);
-
-
 
 dPast = td.resetPast(dCong, dAll, startDay);
 wPast = td.resetPast(wCong, wAll, startDay);
@@ -67,14 +68,27 @@ for init_Plots = 1:1
     
     axisParams = [1,1,1,1];
     pMarket = [0,0,0];
-    levels = [];
-    
+    levels = [5.35000000000000;4.19000000000000;...
+        4.24000000000000;12.5900000000000;11.7500000000000;...
+        4.25000000000000;4.21000000000000;5.40000000000000;...
+        3.48000000000000;4.98000000000000;4.33000000000000;...
+        2.05000000000000;3.28000000000000;14.0900000000000;...
+        10.7300000000000;22.4000000000000;29.4300000000000;...
+        38.8400000000000;20.8500000000000;18.5700000000000];
 end
 
 
 while(true)
     
-    [simPres] = ts.getSimulationPresent(handles);
+
+    if ~isempty(get(handles.simPresEditBox,'String'))
+        simPres = td.getDateIndx(dAll(:,1), get(handles.simPresEditBox,'String'));
+    end
+    
+    if ~isempty(get(handles.aniLenEditBox,'String'))
+        aniLen = td.getDateIndx(dAll(:,1), get(handles.aniLenEditBox,'String')) - simPres;
+    end
+    
     simDatesIndxs = simPres:simPres + aniLen;
     
     if simDatesIndxs(end) > length(hlcoDs.da)
@@ -101,11 +115,11 @@ while(true)
         for i_date = simDates
             
             datestr(i_date)
-            set(handles.showDate,'String', datestr(i_date))
+            set(handles.showDate,'String', datestr(i_date));
             
-            isNewDay = ts.isNewTimePeriod(dCong, i_date)
-            isNewWeek = ts.isNewTimePeriod(wCong, i_date)
-            isNewMonth = ts.isNewTimePeriod(mCong, i_date)
+            isNewDay = ts.isNewTimePeriod(dCong, i_date);
+            isNewWeek = ts.isNewTimePeriod(wCong, i_date);
+            isNewMonth = ts.isNewTimePeriod(mCong, i_date);
             
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                 fD, 0.5, handles, axisLen, axisParams);
@@ -114,7 +128,7 @@ while(true)
             [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
                 fM, 5, handles, axisLen, axisParams);
             
-            [pMarket] = ts.playTurtles(handles, pMarket, levels, simDates, i_date, dAll);
+            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll);
             
             [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                 fD, pD, pDo, 0.5, handles, axisLen, axisParams);
@@ -123,7 +137,7 @@ while(true)
             [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
                 fM, pM, pMo, 5, handles, axisLen, axisParams);
             
-            [pMarket] = ts.playTurtles(handles, pMarket, levels, simDates, i_date, dAll);
+            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll);
             
             [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);
             
@@ -134,8 +148,7 @@ while(true)
         [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, simDates(end));
         
         [levels] = ts.plotLevel(handles, levels, dAll);
-
-        
+ 
         pause(0.01)
         
     end

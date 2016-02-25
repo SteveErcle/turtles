@@ -157,8 +157,7 @@ classdef TurtleSim
         end
         
         function [newTimePeriod] = isNewTimePeriod(obj, tCong, i_date)
-            
-            
+                   
             td = TurtleData;
             
             dateIndx = td.getDateIndx(tCong, i_date);
@@ -228,7 +227,7 @@ classdef TurtleSim
             
         end
         
-        function [pMarket, levels] = playTurtles(obj, handles, pMarket, levels, simDates, i_date, dAll)
+        function [pMarket, levels, axisLen, axisParams] = playTurtles(obj, handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll)
             
             if get(handles.play, 'Value') % & i_date == simDates(end)
                 while ~get(handles.next, 'Value')
@@ -238,6 +237,9 @@ classdef TurtleSim
                     pMarket = obj.plotTrade(handles, pMarket, i_date, dAll);
                     
                     levels = obj.plotLevel(handles, levels, dAll);
+                    
+                    [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date);
+           
                     
                 end
                 
@@ -259,10 +261,11 @@ classdef TurtleSim
                 end
                 
                 for i = 1:3
-                    figure(i)
-                    pMarket(i) = plot([dAll(end,1), dAll(1,1)], [1,1]*ub, 'k');
-                    pMarket(i+1) = plot([dAll(end,1), dAll(1,1)], [1,1]*enter, 'b');
-                    pMarket(i+2) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'k');
+                    set(0,'CurrentFigure',i)
+                    k = 3*i-2:i*3;
+                    pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*ub, 'k');
+                    pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enter, 'b');
+                    pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'k');
                     set(handles.setLevel, 'Value', 0);
                     
                 end
