@@ -4,7 +4,7 @@ clear all
 close all
 delete(giua)
 
-stock = 'R'
+stock = 'CFX'
 exchange = 'NYSE'
 
 c = yahoo;
@@ -22,35 +22,35 @@ handles = guihandles(giua);
 
 
 for volumeView = 1:1
-    hi = d(:,3); lo = d(:,4); cl = d(:,5); op = d(:,2); da = d(:,1);
-    figure(1)
-    
-    % vol = flipud(d(:,6));
-    % vol = [10;9;8;7;6;5;4;3;2;1];
-    % vol = flipud(vol);
-    
-    vol = d(:,6);
-    
-    vo = ones(length(vol),1);
-    for i = 1:length(vol)
-        meanVol = mean(vol(i:end));
-        %     meanVol = mean(vol);
-        vo(i) = (vol(i) - meanVol)/meanVol;
-    end
-    
-    
-    
-    % vo = flipud(vo)
-    % bar(da, vo)
-    bar(da, vo);
-    grip = gca;
-    title('Monthly Volume')
-    
-    %
-    % axis([grip grip],...
-    %     [d(end - (1+440),1)+0.4, ...
-    %     d(end - (700+25),1)+0.4,...
-    %     0,5]);
+%     hi = d(:,3); lo = d(:,4); cl = d(:,5); op = d(:,2); da = d(:,1);
+%     figure(1)
+%     
+%     % vol = flipud(d(:,6));
+%     % vol = [10;9;8;7;6;5;4;3;2;1];
+%     % vol = flipud(vol);
+%     
+%     vol = d(:,6);
+%     
+%     vo = ones(length(vol),1);
+%     for i = 1:length(vol)
+%         meanVol = mean(vol(i:end));
+%         %     meanVol = mean(vol);
+%         vo(i) = (vol(i) - meanVol)/meanVol;
+%     end
+%     
+%     
+%     
+%     % vo = flipud(vo)
+%     % bar(da, vo)
+%     bar(da, vo);
+%     grip = gca;
+%     title('Monthly Volume')
+%     
+%     %
+%     % axis([grip grip],...
+%     %     [d(end - (1+440),1)+0.4, ...
+%     %     d(end - (700+25),1)+0.4,...
+%     %     0,5]);
 end
 
 for initSubPlots = 1:1
@@ -61,7 +61,7 @@ for initSubPlots = 1:1
     highlow(hi, lo, hi, lo,'blue', da);
     hold on
     highlow(hi, lo, op, cl, 'blue', da);
-    title('Monthly')
+    title(strcat(stock,' Monthly'))
     
     subplot(3,1,2)
     hi = w(:,3); lo = w(:,4); cl = w(:,5); op = w(:,2); da = w(:,1);
@@ -333,12 +333,12 @@ while(true)
         datetick('x',12, 'keeplimits');
         
         
-        axis([grip grip],...
-            [d(end - (startIndx+440),1)+0.4, ...
-            d(end - (endIndx+25),1)+0.4,...
-            min(vo(end-(endIndx+25):end-(startIndx+440)))*0.98,...
-            max(vo(end-(endIndx+25):end-(startIndx+440)))*1.02]);
-        datetick(grip, 'x',12, 'keeplimits');
+%         axis([grip grip],...
+%             [d(end - (startIndx+440),1)+0.4, ...
+%             d(end - (endIndx+25),1)+0.4,...
+%             min(vo(end-(endIndx+25):end-(startIndx+440)))*0.98,...
+%             max(vo(end-(endIndx+25):end-(startIndx+440)))*1.02]);
+%         datetick(grip, 'x',12, 'keeplimits');
         
         
         
