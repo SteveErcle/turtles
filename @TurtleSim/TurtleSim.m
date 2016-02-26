@@ -250,11 +250,44 @@ classdef TurtleSim
         
         function [pMarket] = plotTrade(obj, handles, pMarket, i_date, dAll)
             
+            td = TurtleData;
+            tf = TurtleFun;
+            [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
+            dateIndx = td.getDateIndx(dAll(:,1), i_date);
+            
             if get(handles.setTrade, 'Value')
                 
-                ub = str2double(get(handles.ub,'String'));
-                enter = str2double(get(handles.enter,'String'));
-                lb = str2double(get(handles.lb,'String'));
+                if get(handles.cl, 'Value')
+                    enter = cl(dateIndx);
+                    set(handles.enter,'String', num2str(enter));
+                    set(handles.cl, 'Value', 0);
+                    
+                elseif get(handles.op, 'Value')
+                    enter = op(dateIndx);
+                    set(handles.enter,'String', num2str(enter));
+                    set(handles.op, 'Value', 0);
+                    
+                else
+                    enter = str2double(get(handles.enter,'String'));
+                end
+                
+                if get(handles.stopLoss, 'Value')
+                    slPercent = str2double(get(handles.stopLossPercent,'String'));
+                    if isempty(slPercent);
+                        slPercent = 0;
+                    end
+                    
+                    ub = enter*(1+(slPercent/100));
+                    lb = enter*(1-(slPercent/100));
+                    
+                    set(handles.ub,'String', num2str(ub));
+                    set(handles.lb,'String', num2str(lb));
+                    set(handles.stopLoss, 'Value', 0)
+                    
+                else
+                    lb = str2double(get(handles.lb,'String'));
+                    ub = str2double(get(handles.ub,'String'));
+                end
                 
                 if pMarket(1) ~= 0
                     delete(pMarket)
@@ -263,9 +296,9 @@ classdef TurtleSim
                 for i = 1:3
                     set(0,'CurrentFigure',i)
                     k = 3*i-2:i*3;
-                    pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*ub, 'k');
+                    pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*ub, 'r');
                     pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enter, 'b');
-                    pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'k');
+                    pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'r');
                     set(handles.setLevel, 'Value', 0);
                     
                 end
