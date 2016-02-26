@@ -4,7 +4,11 @@ clear all
 close all
 delete(giua)
 
+<<<<<<< HEAD
 stock = 'CFX'
+=======
+stock = 'CLDX'
+>>>>>>> d0ef817721ce5a372cb274b9874ef9b1dd48a38b
 exchange = 'NYSE'
 
 c = yahoo;

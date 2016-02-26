@@ -11,15 +11,78 @@ classdef TurtleFun
             hi = t(:,3); lo = t(:,4); cl = t(:,5); op = t(:,2); da = t(:,1);
         end
         
-        
-        function plotHiLo(obj, t)
-            [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
-            highlow(hi, lo, op, cl, 'black', da);
-            datetick('x',12, 'keeplimits');
+        function [figHandle, pHandle] = plotHiLoMultiple(obj, t)
+            
+            if (isa(t, 'TurtleVal'))
+                hi = t.hi;
+                lo = t.lo;
+                cl = t.cl;
+                op = t.op;
+                da = t.da;
+            else
+                [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
+            end
+            
+            pHandle = highlow(hi, lo, op, cl, 'blue', da);
             hold on
+            figHandle = gcf;
+            
+        end
+          
+        function [figHandle, pHandle] = plotHiLoSolo(obj, t, tickSize)
+           
+            [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
+            
+            pHandle(1) = plot([da,da], [lo,hi]);
+            pHandle(2) = plot([da-tickSize,da], [op,op]);
+            pHandle(3) = plot([da,da+tickSize], [cl,cl]);
+            hold on
+            figHandle = gcf;
+            
         end
         
+        function [figHandle, pHandle] = plotOp(obj, t, tickSize)
+            
+            if (isa(t, 'TurtleVal'))
+                hi = t.hi;
+                lo = t.lo;
+                cl = t.cl;
+                op = t.op;
+                da = t.da;
+            else
+                [hi, lo, cl, op, da] = obj.returnOHLCDarray(t);
+            end
+            
+            pHandle = plot([da(1)-tickSize,da(1)], [1,1]*op(1));
+            hold on
+            figHandle = gcf;
+            
+        end
         
+        function [figHandle, pHandle, pT] = resetPlot(obj, figHandle, tPast, startDay, levels, dAll)
+            
+            set(0,'CurrentFigure',figHandle)
+            
+            handle = gca;
+            cla(handle);
+            
+            obj.plotStartDay(startDay);
+            [figHandle,pHandle] = obj.plotHiLoMultiple(tPast);
+            
+            if ~isempty(levels)
+                for i = 1:3
+                    for j = 1:length(levels)
+                        set(0,'CurrentFigure',i)
+                        plot([dAll(end,1), dAll(1,1)], [1,1]*levels(j), 'k');
+                    end
+                end
+            end
+            
+            
+            pT = 0;
+
+        end 
+             
         function  [foundRes, foundSup, foundDates,...
                 closestRes, closestSup] = getContainerLevels(obj, maxNumDays, hi, lo, da)
             
@@ -77,7 +140,6 @@ classdef TurtleFun
             
         end
         
-        
         function plotContainer(obj, foundLevels)
             for i = 1:size(foundLevels,1)
                 plot([foundLevels(i,4); foundLevels(i,3)], ones(2,1)*foundLevels(i,1), 'b')
@@ -86,6 +148,12 @@ classdef TurtleFun
             
         end
         
+        function plotStartDay(obj, startDay)
+            
+            plot([startDay, startDay],  [0, 1000], 'c')
+            hold on;
+            
+        end
         
         function typeOfLevel = matchToResOrSup(obj, t, values)
             
@@ -103,10 +171,10 @@ classdef TurtleFun
             
         end
         
-        
     end
     
 end
+
 
 
 
