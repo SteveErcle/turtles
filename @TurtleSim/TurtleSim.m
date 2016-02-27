@@ -337,8 +337,70 @@ classdef TurtleSim
             end
         end
         
+        function [runnerUp, runnerDown] = trackTime(obj, isNew, tAll, i_date, runnerUp, runnerDown, fT)
+            
+            
+            if isNew
+                td = TurtleData;
+                tf = TurtleFun;
+                [hi, lo, cl, op, da] = tf.returnOHLCDarray(tAll);
+                dateIndx = td.getDateIndx(tAll(:,1), i_date)+1
+                
+                if lo(dateIndx) < lo(dateIndx+1)
+                    plotlo = 1;
+                elseif lo(dateIndx) >= lo(dateIndx+1) & hi(dateIndx) < hi(dateIndx+1)
+                    plotlo = 1;
+                else
+                    plotlo = 0;
+                end
+                
+                
+                if hi(dateIndx) > hi(dateIndx+1)
+                    plothi = 1;
+                elseif hi(dateIndx) <= hi(dateIndx+1) & lo(dateIndx) > lo(dateIndx+1)
+                    plothi = 1;
+                else
+                    plothi = 0;
+                end
+                
+                
+                if plotlo == 1
+                    runnerDown = runnerDown + 1;
+                else
+                    runnerDown = 1;
+                end
+                
+                if plothi == 1
+                    runnerUp = runnerUp + 1;
+                else
+                    runnerUp = 1;
+                end
+                
+                set(0,'CurrentFigure',fT)
+                
+                %             if runnerDown > runnerUp
+                %                 plot(da(dateIndx), lo(dateIndx), 'ro')
+                %                 plot(da(dateIndx+1), lo(dateIndx+1), 'ro')
+                %             else
+                %                 plot(da(dateIndx), hi(dateIndx), 'go')
+                %                 plot(da(dateIndx+1), hi(dateIndx+1), 'go')
+                %             end
+                
+                text(da(dateIndx)+0.5, op(dateIndx), strcat(num2str(runnerDown),',',num2str(runnerUp)))
+                
+                
+                %             disp('rDown,  rUp')
+                %             disp([runnerDown, runnerUp])
+                
+                %             store = [store; runnerDown, runnerUp];
+                
+                %             plot(da(i), hi(i)-0.25, 'kx')
+                
+            end
+        end
+        
     end
-    
+        
 end
 
 

@@ -39,86 +39,16 @@ wPast = td.resetPast(wCong, wAll, startDay);
 mPast = td.resetPast(mCong, mAll, startDay);
 
 
-[hi, lo, cl, op, da] = tf.returnOHLCDarray(wPast);
-tf.plotHiLoMultiple(wPast);
+% [hi, lo, cl, op, da] = tf.returnOHLCDarray(wPast);
+% tf.plotHiLoMultiple(wPast);
+% 
+% hi = flipud(hi);
+% da = flipud(da);
+% lo = flipud(lo);
+% runnerUp = 1;
+% runnerDown = 1;
+% store = [];
 
-hi = flipud(hi);
-da = flipud(da);
-lo = flipud(lo);
-runnerUp = 1;
-runnerDown = 1;
-
-for i = 3:length(hi)-1
-    
-%     if lower bottom
-        % keep it
-        
-%     if higher bottom but lower top
-%         keep it
-
-if lo(i+1) < lo(i)
-    plotlo = 1
-elseif lo(i+1) >= lo(i) & hi(i+1) < hi(i)
-    plotlo = 1
-else
-    plotlo = 0
-end
-
-
-if hi(i+1) > hi(i)
-    plothi = 1
-elseif hi(i+1) <= hi(i) & lo(i+1) > lo(i)
-    plothi = 1
-else
-    plothi = 0
-end
-
-
-    if plotlo == 1
-      plot(da(i+1), lo(i+1), 'ro')
-        plot(da(i), lo(i), 'ro')
-    end 
-    
-    if plothi == 1
-      plot(da(i+1), hi(i+1), 'go')
-        plot(da(i), hi(i), 'go')
-    end 
-    
-%     if hi(i+1) > hi(i) & lo(i+1) >= lo(i-2)
-%         plot(da(i+1), hi(i+1), 'go')
-%         plot(da(i), hi(i), 'go')
-%         runnerUp = runnerUp + 1
-%     else
-%         runnerUp = 1
-%     end 
-%     
-%      if lo(i+1) < lo(i) & hi(i+1) <= hi(i-2)
-%         plot(da(i+1), lo(i+1), 'ro')
-%         plot(da(i), lo(i), 'ro')
-%         runnerDown = runnerDown + 1
-%     else
-%         runnerDown = 1
-%     end
-    
-%     plot(da(i), lo(i), 'ko')
-    if i>50
-    pause
-    end 
-end
-
-
-% for i = 2:length(hi)-1
-%     if hi(i-1) < hi(i) & hi(i+1) < hi(i)
-%         plot(da(i), hi(i), 'ro')
-%     end 
-%     
-%      if lo(i-1) > lo(i) & lo(i+1) > lo(i)
-%         plot(da(i), lo(i), 'go')
-%     end 
-%     
-% end 
-
-return
 
 hlcoDs = TurtleVal(dCong);
 hlcoDp = TurtleVal(dAll);
@@ -160,9 +90,10 @@ for init_Plots = 1:1
 end
 
 
+
 while(true)
     
-
+    
     if ~isempty(get(handles.simPresEditBox,'String'))
         simPres = td.getDateIndx(dAll(:,1), get(handles.simPresEditBox,'String'));
     end
@@ -193,6 +124,8 @@ while(true)
         [~, pWp, pW] = tf.resetPlot(fW, wPast, startDay, levels, dAll);
         [~, pMp, pM] = tf.resetPlot(fM, mPast, startDay, levels, dAll);
         pMarket = [0,0,0];
+        runnerUp = 1;
+        runnerDown = 1;
         
         for i_date = simDates
             
@@ -202,6 +135,8 @@ while(true)
             isNewDay = ts.isNewTimePeriod(dCong, i_date);
             isNewWeek = ts.isNewTimePeriod(wCong, i_date);
             isNewMonth = ts.isNewTimePeriod(mCong, i_date);
+            
+            [runnerUp, runnerDown] = ts.trackTime(isNewWeek, wAll, i_date, runnerUp, runnerDown, fW)
             
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                 fD, 0.5, handles, axisLen, axisParams);
@@ -223,6 +158,7 @@ while(true)
             
             [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);
             
+           
         end
         
     else
@@ -230,7 +166,7 @@ while(true)
         [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, simDates(end));
         
         [levels] = ts.plotLevel(handles, levels, dAll);
- 
+        
         pause(0.01)
         
     end
