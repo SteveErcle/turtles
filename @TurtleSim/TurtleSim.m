@@ -122,13 +122,13 @@ classdef TurtleSim
                 x2 = date - offset + 35;
                 y1 = min(lo(I2:I1))*0.995;
                 y2 = max(hi(I2:I1))*1.005;
-               
+                
                 for i = 1:3
                     set(0,'CurrentFigure',i)
                     axis([x1, x2, y1, y2]);
                     
                 end
-
+                
                 axisParams = [x1, x2, y1, y2];
                 
             end
@@ -157,7 +157,7 @@ classdef TurtleSim
         end
         
         function [newTimePeriod] = isNewTimePeriod(obj, tCong, i_date)
-                   
+            
             td = TurtleData;
             
             dateIndx = td.getDateIndx(tCong, i_date);
@@ -227,19 +227,19 @@ classdef TurtleSim
             
         end
         
-        function [pMarket, levels, axisLen, axisParams] = playTurtles(obj, handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll)
+        function [pMarket, levels, axisLen, axisParams] = playTurtles(obj, handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a)
             
             if get(handles.play, 'Value') % & i_date == simDates(end)
                 while ~get(handles.next, 'Value')
                     
                     pause(0.1);
                     
-                    pMarket = obj.plotTrade(handles, pMarket, i_date, dAll);
+                    pMarket = obj.plotTrade(handles, pMarket, i_date, dAll, OpCl, a);
                     
                     levels = obj.plotLevel(handles, levels, dAll);
                     
                     [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date);
-           
+                    
                     
                 end
                 
@@ -248,7 +248,17 @@ classdef TurtleSim
             set(handles.next, 'Value', 0);
         end
         
-        function [pMarket] = plotTrade(obj, handles, pMarket, i_date, dAll)
+        function [pMarket] = plotTrade(obj, handles, pMarket, i_date, dAll, OpCl, a)
+            
+            if isempty(a) 
+                [pMarket] = obj.plotTradeGuiControl(handles, pMarket, i_date, dAll, OpCl);
+            else
+                [pMarket] = obj.plotTradeArudinoControl(handles, pMarket, i_date, dAll, OpCl, a);
+            end
+           
+        end 
+        
+        function [pMarket] = plotTradeGuiControl(obj, handles, pMarket, i_date, dAll, OpCl)
             
             td = TurtleData;
             tf = TurtleFun;
@@ -261,17 +271,16 @@ classdef TurtleSim
                     enter = cl(dateIndx);
                     set(handles.enter,'String', num2str(enter));
                     set(handles.cl, 'Value', 0);
-                    
                 elseif get(handles.op, 'Value')
                     enter = op(dateIndx);
                     set(handles.enter,'String', num2str(enter));
                     set(handles.op, 'Value', 0);
-                    
                 else
                     enter = str2double(get(handles.enter,'String'));
                 end
-                
+    
                 if get(handles.stopLoss, 'Value')
+                    
                     slPercent = str2double(get(handles.stopLossPercent,'String'));
                     if isempty(slPercent);
                         slPercent = 0;
@@ -291,7 +300,7 @@ classdef TurtleSim
                 
                 if pMarket(1) ~= 0
                     delete(pMarket)
-                end
+                end   
                 
                 for i = 1:3
                     set(0,'CurrentFigure',i)
@@ -300,12 +309,69 @@ classdef TurtleSim
                     pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enter, 'b');
                     pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'r');
                     set(handles.setLevel, 'Value', 0);
-                    
                 end
+                
+                set(handles.setTrade, 'Value', 0);
+                
             end
-            set(handles.setTrade, 'Value', 0);
-             
+            
         end
+
+        function [pMarket] = plotTradeArudinoControl(obj, handles, pMarket, i_date, dAll, OpCl, a)
+
+            td = TurtleData;
+            tf = TurtleFun;
+            [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
+            dateIndx = td.getDateIndx(dAll(:,1), i_date);
+            
+            voltTrade = readVoltage(a,1);
+            voltLoss =  readVoltage(a,0);
+            voltLimit = readVoltage(a,2);
+            
+            if OpCl == 1
+                enter = op(dateIndx);
+            else
+                enter = cl(dateIndx);
+            end
+ 
+            if voltTrade > 0.05                     
+                set(handles.enter,'String', num2str(enter));    
+            end
+            
+            if voltLimit > 0.05
+                slPercent = -15+voltLoss/5*30;
+                enter = enter*(1+(slPercent/100));
+                set(handles.enter,'String', num2str(enter));
+            end
+            
+            if ~isempty(str2num(get(handles.enter,'String')))
+                enter = str2num(get(handles.enter,'String'));
+                slPercent = -15+voltLoss/5*30;
+                ub = enter*(1+(slPercent/100));
+                lb = enter*(1-(slPercent/100));
+                ub = 0;
+                
+                set(handles.ub,'String', num2str(ub));
+                set(handles.lb,'String', num2str(lb));
+                set(handles.stopLoss, 'Value', 0)
+                
+                 if pMarket(1) ~= 0
+                    delete(pMarket)
+                end  
+                
+                for i = 1:3
+                    set(0,'CurrentFigure',i)
+                    k = 3*i-2:i*3;
+                    pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*ub, 'r');
+                    pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enter, 'b');
+                    pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'r');
+                    set(handles.setLevel, 'Value', 0);
+                end
+                
+            end
+            
+       
+        end 
         
         function [levels] = plotLevel(obj, handles, levels, dAll)
             
@@ -332,75 +398,66 @@ classdef TurtleSim
                         delete(dataTips);
                         set(handles.setLevel, 'Value', 0);
                         
-                    end 
+                    end
                 end
             end
         end
         
         function [runnerUp, runnerDown] = trackTime(obj, isNew, tAll, i_date, runnerUp, runnerDown, fT)
             
+            tRunnerUp = runnerUp(fT);
+            tRunnerDown = runnerDown(fT);
             
             if isNew
                 td = TurtleData;
                 tf = TurtleFun;
                 [hi, lo, cl, op, da] = tf.returnOHLCDarray(tAll);
-                dateIndx = td.getDateIndx(tAll(:,1), i_date)+1
+                dateIndx = td.getDateIndx(tAll(:,1), i_date)+1;
                 
                 if lo(dateIndx) < lo(dateIndx+1)
-                    plotlo = 1;
+                    runlo = 1;
                 elseif lo(dateIndx) >= lo(dateIndx+1) & hi(dateIndx) < hi(dateIndx+1)
-                    plotlo = 1;
+                    runlo = 1;
                 else
-                    plotlo = 0;
+                    runlo = 0;
                 end
                 
                 
                 if hi(dateIndx) > hi(dateIndx+1)
-                    plothi = 1;
+                    runhi = 1;
                 elseif hi(dateIndx) <= hi(dateIndx+1) & lo(dateIndx) > lo(dateIndx+1)
-                    plothi = 1;
+                    runhi = 1;
                 else
-                    plothi = 0;
+                    runhi = 0;
                 end
                 
                 
-                if plotlo == 1
-                    runnerDown = runnerDown + 1;
+                if runlo == 1
+                    tRunnerDown = tRunnerDown + 1;
                 else
-                    runnerDown = 1;
+                    tRunnerDown = 1;
                 end
                 
-                if plothi == 1
-                    runnerUp = runnerUp + 1;
+                if runhi == 1
+                    tRunnerUp = tRunnerUp + 1;
                 else
-                    runnerUp = 1;
+                    tRunnerUp = 1;
                 end
                 
                 set(0,'CurrentFigure',fT)
-                
-                %             if runnerDown > runnerUp
-                %                 plot(da(dateIndx), lo(dateIndx), 'ro')
-                %                 plot(da(dateIndx+1), lo(dateIndx+1), 'ro')
-                %             else
-                %                 plot(da(dateIndx), hi(dateIndx), 'go')
-                %                 plot(da(dateIndx+1), hi(dateIndx+1), 'go')
-                %             end
-                
-                text(da(dateIndx)+0.5, op(dateIndx), strcat(num2str(runnerDown),',',num2str(runnerUp)))
+                text(da(dateIndx)+0.5, op(dateIndx), strcat(num2str(tRunnerUp),',',num2str(tRunnerDown)));
                 
                 
-                %             disp('rDown,  rUp')
-                %             disp([runnerDown, runnerUp])
-                
-                %             store = [store; runnerDown, runnerUp];
-                
-                %             plot(da(i), hi(i)-0.25, 'kx')
                 
             end
+            
+            runnerUp(fT) = tRunnerUp;
+            runnerDown(fT) = tRunnerDown;
+            
         end
         
     end
-        
+    
 end
 
 

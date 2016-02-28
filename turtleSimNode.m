@@ -16,6 +16,8 @@ past = '1/1/08';
 simulateFrom = '1/1/12';
 simulateTo = '1/1/16';
 
+arduinoControl = 1;
+
 %%
 
 ts = TurtleSim;
@@ -38,24 +40,18 @@ dPast = td.resetPast(dCong, dAll, startDay);
 wPast = td.resetPast(wCong, wAll, startDay);
 mPast = td.resetPast(mCong, mAll, startDay);
 
-
-% [hi, lo, cl, op, da] = tf.returnOHLCDarray(wPast);
-% tf.plotHiLoMultiple(wPast);
-% 
-% hi = flipud(hi);
-% da = flipud(da);
-% lo = flipud(lo);
-% runnerUp = 1;
-% runnerDown = 1;
-% store = [];
-
-
 hlcoDs = TurtleVal(dCong);
 hlcoDp = TurtleVal(dAll);
 
 ts.dAll = dAll;
 ts.initHandles(handles, simPres, aniLen, axisLen, aniSpeed, dAll);
 ts.setButtons(handles, 'none');
+
+if arduinoControl == 1
+    a = arduino('/dev/tty.usbmodem1411','Uno')
+else
+    a = [];
+end 
 
 for init_Plots = 1:1
     
@@ -90,7 +86,6 @@ for init_Plots = 1:1
 end
 
 
-
 while(true)
     
     
@@ -123,11 +118,11 @@ while(true)
         [~, pDp, pD] = tf.resetPlot(fD, dPast, startDay, levels, dAll);
         [~, pWp, pW] = tf.resetPlot(fW, wPast, startDay, levels, dAll);
         [~, pMp, pM] = tf.resetPlot(fM, mPast, startDay, levels, dAll);
-        pMarket = [0,0,0];
-        runnerUp = 1;
-        runnerDown = 1;
+        pMarket     = [0,0,0];
+        runnerUp    = [1,1,1];
+        runnerDown  = [1,1,1];
         
-        for i_date = simDates
+         for i_date = simDates
             
             datestr(i_date)
             set(handles.showDate,'String', datestr(i_date));
@@ -136,7 +131,9 @@ while(true)
             isNewWeek = ts.isNewTimePeriod(wCong, i_date);
             isNewMonth = ts.isNewTimePeriod(mCong, i_date);
             
-            [runnerUp, runnerDown] = ts.trackTime(isNewWeek, wAll, i_date, runnerUp, runnerDown, fW)
+            [runnerUp, runnerDown] = ts.trackTime(isNewDay, dAll, i_date, runnerUp, runnerDown, fD);
+            [runnerUp, runnerDown] = ts.trackTime(isNewWeek, wAll, i_date, runnerUp, runnerDown, fW);
+            [runnerUp, runnerDown] = ts.trackTime(isNewMonth, mAll, i_date, runnerUp, runnerDown, fM);
             
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                 fD, 0.5, handles, axisLen, axisParams);
@@ -145,7 +142,7 @@ while(true)
             [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
                 fM, 5, handles, axisLen, axisParams);
             
-            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll);
+            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, 1, a);
             
             [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                 fD, pD, pDo, 0.5, handles, axisLen, axisParams);
@@ -154,11 +151,10 @@ while(true)
             [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
                 fM, pM, pMo, 5, handles, axisLen, axisParams);
             
-            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll);
+            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, 2, a);
             
             [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);
-            
-           
+              
         end
         
     else

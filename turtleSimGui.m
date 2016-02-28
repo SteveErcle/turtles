@@ -22,7 +22,7 @@ function varargout = turtleSimGui(varargin)
 
 % Edit the above text to modify the response to help turtleSimGui
 
-% Last Modified by GUIDE v2.5 25-Feb-2016 19:29:35
+% Last Modified by GUIDE v2.5 27-Feb-2016 16:36:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -583,3 +583,72 @@ function stopLoss_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of stopLoss
+
+
+
+function dRunner_Callback(hObject, eventdata, handles)
+% hObject    handle to dRunner (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of dRunner as text
+%        str2double(get(hObject,'String')) returns contents of dRunner as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function dRunner_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to dRunner (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function wRunner_Callback(hObject, eventdata, handles)
+% hObject    handle to wRunner (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of wRunner as text
+%        str2double(get(hObject,'String')) returns contents of wRunner as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function wRunner_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to wRunner (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function mRunner_Callback(hObject, eventdata, handles)
+% hObject    handle to mRunner (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of mRunner as text
+%        str2double(get(hObject,'String')) returns contents of mRunner as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function mRunner_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to mRunner (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
