@@ -4,7 +4,11 @@ clear all
 close all
 delete(giua)
 
+<<<<<<< HEAD
+stock = 'CFX'
+=======
 stock = 'CLDX'
+>>>>>>> d0ef817721ce5a372cb274b9874ef9b1dd48a38b
 exchange = 'NYSE'
 
 c = yahoo;
@@ -61,7 +65,7 @@ for initSubPlots = 1:1
     highlow(hi, lo, hi, lo,'blue', da);
     hold on
     highlow(hi, lo, op, cl, 'blue', da);
-    title('Monthly')
+    title(strcat(stock,' Monthly'))
     
     subplot(3,1,2)
     hi = w(:,3); lo = w(:,4); cl = w(:,5); op = w(:,2); da = w(:,1);
