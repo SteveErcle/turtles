@@ -104,9 +104,10 @@ classdef TurtleSim
             
         end
         
-        function [axisLen, axisParams] = setAxis(obj, handles, axisLen, axisParams, date)
+        function [axisLen, axisParams] = setAxis(obj, handles, axisLen, axisParams, date, OpCl)
             
             if get(handles.updateAxis, 'Value')
+               
                 
                 axisLen = floor(get(handles.axisLen, 'Value'));
                 
@@ -117,6 +118,11 @@ classdef TurtleSim
                 
                 tf = TurtleFun;
                 [hi, lo, cl, op, da] = tf.returnOHLCDarray(obj.dAll);
+                
+                if OpCl == 1
+                    hi(I2) = op(I2);
+                    lo(I2) = op(I2);
+                end 
                 
                 x1 = date - offset - axisLen;
                 x2 = date - offset + 35;
@@ -171,7 +177,7 @@ classdef TurtleSim
         end
         
         function [pTo, axisLen, axisParams] = animateOpen(obj, aniSpeed, isT, isNew, tCong, i_date,...
-                fT, tickSize, handles, axisLen, axisParams)
+                fT, tickSize, handles, axisLen, axisParams, OpCl)
             
             tf = TurtleFun;
             td = TurtleData;
@@ -189,14 +195,14 @@ classdef TurtleSim
                 [~,pTo] = tf.plotOp(tSim,tickSize);
             end
             
-            [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date);
+            [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date, OpCl);
             
             pause(aniSpeed);
             
         end
         
         function [pT, axisLen, axisParams] = animateClose(obj, aniSpeed, isT, isNew, tCong, i_date,...
-                fT, pT, pTo, tickSize, handles, axisLen, axisParams)
+                fT, pT, pTo, tickSize, handles, axisLen, axisParams, OpCl)
             
             tf = TurtleFun;
             td = TurtleData;
@@ -221,7 +227,7 @@ classdef TurtleSim
             set(0,'CurrentFigure',fT)
             [~,pT] = tf.plotHiLoSolo(tSim, tickSize);
             
-            [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date);
+            [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date, OpCl);
             
             pause(aniSpeed);
             
@@ -230,19 +236,25 @@ classdef TurtleSim
         function [pMarket, levels, axisLen, axisParams] = playTurtles(obj, handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a)
             
             if get(handles.play, 'Value') % & i_date == simDates(end)
+                
+                timeInterval = 5.9265e-06*2;
+                timeStart = now;
                 while ~get(handles.next, 'Value')
                     
-                    pause(0.1);
+                    %                     pause(0.050);
                     
                     pMarket = obj.plotTrade(handles, pMarket, i_date, dAll, OpCl, a);
                     
                     levels = obj.plotLevel(handles, levels, dAll);
                     
-                    [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date);
+                    [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date, OpCl);
                     
-                    
+                    if get(handles.timer, 'Value')
+                        if now - timeStart > timeInterval
+                            set(handles.next, 'Value',1);
+                        end
+                    end
                 end
-                
             end
             
             set(handles.next, 'Value', 0);
@@ -278,7 +290,7 @@ classdef TurtleSim
                 else
                     enter = str2double(get(handles.enter,'String'));
                 end
-    
+                
                 if get(handles.stopLoss, 'Value')
                     
                     slPercent = str2double(get(handles.stopLossPercent,'String'));
@@ -300,7 +312,7 @@ classdef TurtleSim
                 
                 if pMarket(1) ~= 0
                     delete(pMarket)
-                end   
+                end
                 
                 for i = 1:3
                     set(0,'CurrentFigure',i)
@@ -316,62 +328,158 @@ classdef TurtleSim
             end
             
         end
-
+        
         function [pMarket] = plotTradeArudinoControl(obj, handles, pMarket, i_date, dAll, OpCl, a)
-
+            
             td = TurtleData;
             tf = TurtleFun;
             [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
             dateIndx = td.getDateIndx(dAll(:,1), i_date);
             
-            voltTrade = readVoltage(a,1);
+            digitalMarket = 0;
+            digitalLimit = 0;
+            position = 0;
+            digitalResetStop = 0;
             voltLoss =  readVoltage(a,0);
-            voltLimit = readVoltage(a,2);
+            voltLimit = readVoltage(a,1);
             
+            digitals = [readDigitalPin(a,7), readDigitalPin(a,6),...
+                readDigitalPin(a,5), readDigitalPin(a,4)];
+  
+            disp(digitals)
+            
+            if  digitals == [1,0,0,0]
+                digitalMarket = 1;
+                position = 1;
+            elseif digitals == [0,1,0,0]
+                digitalMarket = 1;
+                position = -1;
+            elseif digitals == [0,0,1,0]
+                digitalResetStop = 1;
+            elseif digitals == [0,0,0,1]
+                set(handles.next, 'Value', 1);
+            elseif digitals == [0,0,0,1]
+              ;
+            elseif digitals == [0,0,1,1]
+%                 digitalResetStop = 1;
+            end 
+    
             if OpCl == 1
-                enter = op(dateIndx);
+                toBeEnter = op(dateIndx);
             else
-                enter = cl(dateIndx);
-            end
- 
-            if voltTrade > 0.05                     
-                set(handles.enter,'String', num2str(enter));    
+                toBeEnter = cl(dateIndx);
             end
             
-            if voltLimit > 0.05
-                slPercent = -15+voltLoss/5*30;
-                enter = enter*(1+(slPercent/100));
-                set(handles.enter,'String', num2str(enter));
+            if digitalMarket == 1
+                set(handles.setEnteredAt,'String', num2str(toBeEnter));
+                set(handles.setStopRef,'String', num2str(toBeEnter));
+                set(handles.setPosRef,'String', num2str(position));
+                set(handles.setDateRef,'String', strcat(num2str(dateIndx), '-', num2str(OpCl)));
             end
             
-            if ~isempty(str2num(get(handles.enter,'String')))
-                enter = str2num(get(handles.enter,'String'));
+            if ~strcmp(get(handles.setEnteredAt,'String'), '-') || ~strcmp(get(handles.setLimit,'String'), '-')
+                if digitalResetStop
+                    set(handles.setStopRef,'String', num2str(toBeEnter));
+                end
+                stopRef = str2double(get(handles.setStopRef,'String'));
                 slPercent = -15+voltLoss/5*30;
-                ub = enter*(1+(slPercent/100));
-                lb = enter*(1-(slPercent/100));
-                ub = 0;
+                stop = stopRef*(1+(slPercent/100));
+                set(handles.setStop,'String', num2str(stop));
+            end
+            
+            if digitalLimit == 1
+                slPercent = voltLimit/5*15;
+                limit = toBeEnter*(1+(slPercent/100));
+                set(handles.setLimit,'String', num2str(limit));
+                set(handles.setLimRef,'String', num2str(toBeEnter));
+                set(handles.setStopRef,'String', num2str(toBeEnter));
                 
-                set(handles.ub,'String', num2str(ub));
-                set(handles.lb,'String', num2str(lb));
-                set(handles.stopLoss, 'Value', 0)
+            elseif ~strcmp(get(handles.setLimit,'String'), '-')
+                limRef = str2double(get(handles.setLimRef,'String'));
+                slPercent = -15+voltLimit/5*30;
+                limit = limRef*(1+(slPercent/100));
+                set(handles.setLimit,'String', num2str(limit));    
+            end
+            
+            enteredAt   = str2double(get(handles.setEnteredAt,'String'));
+            stop        = str2double(get(handles.setStop,'String'));
+            limit       = str2double(get(handles.setLimit,'String'));
+            position    = str2double(get(handles.setPosRef,'String'));
+            
+            if isempty(enteredAt) || isnan(enteredAt)
+                enteredAt = 0;
+            end
+            if isempty(stop) || isnan(stop)
+                stop = 0;
+            end
+            if isempty(limit) || isnan(limit)
+                limit = 0;
+            end
+            
+            exitNow = 0;
+            if (enteredAt ~= 0 & stop ~= 0) &...
+                    ~strcmp(get(handles.setDateRef,'String'),strcat(num2str(dateIndx), '-', num2str(OpCl)))
                 
-                 if pMarket(1) ~= 0
-                    delete(pMarket)
-                end  
-                
-                for i = 1:3
-                    set(0,'CurrentFigure',i)
-                    k = 3*i-2:i*3;
-                    pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*ub, 'r');
-                    pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enter, 'b');
-                    pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'r');
-                    set(handles.setLevel, 'Value', 0);
+                if position == 1
+                    if OpCl == 1
+                        if stop > op(dateIndx)
+                            exitNow = 1;
+                        end
+                    else
+                        if stop > lo(dateIndx)
+                            exitNow = 1;
+                        end
+                    end
+                elseif position == -1
+                    if OpCl == 1
+                        if stop < op(dateIndx)
+                            exitNow = 1;
+                        end
+                    else
+                        if stop < hi(dateIndx)
+                            exitNow = 1;
+                        end
+                    end
                 end
                 
+                if exitNow == 1
+                    exitedAt = stop;
+                    if position == 1
+                        pr = ((exitedAt-enteredAt)/ enteredAt)*100;
+                    elseif position == -1
+                        pr = ((enteredAt-exitedAt)/ enteredAt)*100;
+                    end
+                    pr = num2str(pr + str2num(get(handles.pr,'String')));
+                    set(handles.pr,'String', pr)
+                    set(handles.setEnteredAt, 'String', '-');
+                end
             end
             
-       
-        end 
+        
+        
+        
+            %             if limit > stop
+            %                 if hi(dateIndx) > limit
+            %                     set(handles.setEnteredAt,'String', num2str(limit));
+            %                     set(handles.setLimit,'String', '-');
+            %                     entered = limit;
+            %                 end
+            %             end
+            
+            if pMarket(1) ~= 0
+                delete(pMarket)
+            end
+            
+            for i = 1:3
+                set(0,'CurrentFigure',i)
+                k = 3*i-2:i*3;
+                pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*limit, ':b');
+                pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enteredAt, 'b');
+                pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*stop, 'r');
+                set(handles.setLevel, 'Value', 0);
+            end
+            
+        end
         
         function [levels] = plotLevel(obj, handles, levels, dAll)
             

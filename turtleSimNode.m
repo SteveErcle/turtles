@@ -25,6 +25,7 @@ tf = TurtleFun;
 td = TurtleData;
 delete(turtleSimGui)
 
+
 % [mAll, mCong, wAll, wCong, dAll, dCong] = td.getData(stock, past, simulateFrom, simulateTo);
 % td.saveData(stock, mAll, mCong, wAll, wCong, dAll,dCong);
 [mAll, mCong, wAll, wCong, dAll, dCong] = td.loadData(stock);
@@ -48,7 +49,14 @@ ts.initHandles(handles, simPres, aniLen, axisLen, aniSpeed, dAll);
 ts.setButtons(handles, 'none');
 
 if arduinoControl == 1
+    try
     a = arduino('/dev/tty.usbmodem1411','Uno')
+    catch
+        disp('No Arduino detected');
+        disp('Switiching to GUI control');
+        arduinoControl = 0;
+        
+    end
 else
     a = [];
 end 
@@ -135,23 +143,25 @@ while(true)
             [runnerUp, runnerDown] = ts.trackTime(isNewWeek, wAll, i_date, runnerUp, runnerDown, fW);
             [runnerUp, runnerDown] = ts.trackTime(isNewMonth, mAll, i_date, runnerUp, runnerDown, fM);
             
+            OpCl = 1;
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, 0.5, handles, axisLen, axisParams);
+                fD, 0.5, handles, axisLen, axisParams, OpCl);
             [pWo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
-                fW, 3, handles, axisLen, axisParams);
+                fW, 3, handles, axisLen, axisParams, OpCl);
             [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
-                fM, 5, handles, axisLen, axisParams);
+                fM, 5, handles, axisLen, axisParams, OpCl);
             
-            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, 1, a);
+            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
             
+            OpCl = 2;
             [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, pD, pDo, 0.5, handles, axisLen, axisParams);
+                fD, pD, pDo, 0.5, handles, axisLen, axisParams, OpCl);
             [pW, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
-                fW, pW, pWo, 3, handles, axisLen, axisParams);
+                fW, pW, pWo, 3, handles, axisLen, axisParams, OpCl);
             [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
-                fM, pM, pMo, 5, handles, axisLen, axisParams);
+                fM, pM, pMo, 5, handles, axisLen, axisParams, OpCl);
             
-            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, 2, a);
+            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
             
             [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);
               
@@ -159,7 +169,7 @@ while(true)
         
     else
         
-        [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, simDates(end));
+        [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, simDates(end), 0);
         
         [levels] = ts.plotLevel(handles, levels, dAll);
         
@@ -172,7 +182,8 @@ end
 
 
 % Build checker
-% Make sim watching easier and dont delete trade
+% Make exit on button
+
 
 
 
