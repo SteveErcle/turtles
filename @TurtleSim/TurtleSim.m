@@ -1,10 +1,12 @@
 
-classdef TurtleSim
+classdef TurtleSim < handle
     
     properties
         
         dAll;
-        
+        runnerUpArr = [];
+        runnerDownArr = [];
+       
     end
     
     
@@ -340,6 +342,7 @@ classdef TurtleSim
             digitalLimit = 0;
             position = 0;
             digitalResetStop = 0;
+            digitalExit = 0;
             voltLoss =  readVoltage(a,0);
             voltLimit = readVoltage(a,1);
             
@@ -369,6 +372,13 @@ classdef TurtleSim
             else
                 toBeEnter = cl(dateIndx);
             end
+            
+            if (str2double(get(handles.setPosRef,'String')) == 1 ||...
+                    str2double(get(handles.setPosRef,'String')) == -1) & digitalMarket == 1
+                digitalExit = 1;
+                digitalMarket = 0;
+            end 
+                
             
             if digitalMarket == 1
                 set(handles.setEnteredAt,'String', num2str(toBeEnter));
@@ -422,28 +432,36 @@ classdef TurtleSim
                 
                 if position == 1
                     if OpCl == 1
-                        if stop > op(dateIndx)
+                        if stop > op(dateIndx) || digitalExit == 1
                             exitNow = 1;
                         end
                     else
-                        if stop > lo(dateIndx)
+                        if stop > lo(dateIndx) || digitalExit == 1
                             exitNow = 1;
                         end
                     end
                 elseif position == -1
                     if OpCl == 1
-                        if stop < op(dateIndx)
+                        if stop < op(dateIndx) || digitalExit == 1
                             exitNow = 1;
                         end
                     else
-                        if stop < hi(dateIndx)
+                        if stop < hi(dateIndx) || digitalExit == 1
                             exitNow = 1;
                         end
                     end
                 end
                 
                 if exitNow == 1
-                    exitedAt = stop;
+                    if digitalExit == 1
+                        if OpCl == 1
+                            exitedAt = op(dateIndx);
+                        else
+                            exitedAt = cl(dateIndx);
+                        end
+                    else
+                        exitedAt = stop;
+                    end
                     if position == 1
                         pr = ((exitedAt-enteredAt)/ enteredAt)*100;
                     elseif position == -1
@@ -452,20 +470,11 @@ classdef TurtleSim
                     pr = num2str(pr + str2num(get(handles.pr,'String')));
                     set(handles.pr,'String', pr)
                     set(handles.setEnteredAt, 'String', '-');
+                    set(handles.setPosRef,'String', num2str(0));
                 end
             end
             
         
-        
-        
-            %             if limit > stop
-            %                 if hi(dateIndx) > limit
-            %                     set(handles.setEnteredAt,'String', num2str(limit));
-            %                     set(handles.setLimit,'String', '-');
-            %                     entered = limit;
-            %                 end
-            %             end
-            
             if pMarket(1) ~= 0
                 delete(pMarket)
             end
@@ -511,7 +520,7 @@ classdef TurtleSim
             end
         end
         
-        function [runnerUp, runnerDown] = trackTime(obj, isNew, tAll, i_date, runnerUp, runnerDown, fT)
+        function [runnerUp, runnerDown] = trackTime(obj, handles, isNew, tAll, i_date, runnerUp, runnerDown, fT)
             
             tRunnerUp = runnerUp(fT);
             tRunnerDown = runnerDown(fT);
@@ -530,7 +539,6 @@ classdef TurtleSim
                     runlo = 0;
                 end
                 
-                
                 if hi(dateIndx) > hi(dateIndx+1)
                     runhi = 1;
                 elseif hi(dateIndx) <= hi(dateIndx+1) & lo(dateIndx) > lo(dateIndx+1)
@@ -539,7 +547,7 @@ classdef TurtleSim
                     runhi = 0;
                 end
                 
-                
+ 
                 if runlo == 1
                     tRunnerDown = tRunnerDown + 1;
                 else
@@ -555,12 +563,43 @@ classdef TurtleSim
                 set(0,'CurrentFigure',fT)
                 text(da(dateIndx)+0.5, op(dateIndx), strcat(num2str(tRunnerUp),',',num2str(tRunnerDown)));
                 
-                
-                
             end
             
             runnerUp(fT) = tRunnerUp;
             runnerDown(fT) = tRunnerDown;
+            
+            if fT == 1
+                obj.runnerUpArr = [obj.runnerUpArr; runnerUp];
+                obj.runnerDownArr = [obj.runnerDownArr; runnerDown];
+                ax = [handles.axes1, handles.axes2, handles.axes3];
+                
+                for j = 1:3
+                histoUp = [];
+                for i  = 1:max(obj.runnerUpArr(:,j))       
+                    foundLen = length(find(obj.runnerUpArr(:,j) == i));
+                    if ~isempty(foundLen)
+                    histoUp = [histoUp; foundLen];
+                    end 
+                end
+                
+                histoDown = [];
+                for i  = 1:max(obj.runnerDownArr(:,j))
+                    foundLen = length(find(obj.runnerDownArr(:,j) == i));
+                    if ~isempty(foundLen)
+                        histoDown = [histoDown; foundLen];
+                    end
+                end
+                histoDown = histoDown*-1;
+                
+                cla(ax(j))
+                
+                bar(ax(j), histoUp, 'g');
+                hold(ax(j), 'on');
+                bar(ax(j), histoDown, 'r');
+               
+                end 
+                
+            end
             
         end
         

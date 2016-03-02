@@ -1,4 +1,6 @@
-clc; clear all; close all;
+clc; 
+% clear all; 
+close all;
 
 simPres         = 1;
 aniLen          = 1;
@@ -129,6 +131,8 @@ while(true)
         pMarket     = [0,0,0];
         runnerUp    = [1,1,1];
         runnerDown  = [1,1,1];
+        ts.runnerUpArr = [];
+        ts.runnerDownArr = [];
         
          for i_date = simDates
             
@@ -139,9 +143,9 @@ while(true)
             isNewWeek = ts.isNewTimePeriod(wCong, i_date);
             isNewMonth = ts.isNewTimePeriod(mCong, i_date);
             
-            [runnerUp, runnerDown] = ts.trackTime(isNewDay, dAll, i_date, runnerUp, runnerDown, fD);
-            [runnerUp, runnerDown] = ts.trackTime(isNewWeek, wAll, i_date, runnerUp, runnerDown, fW);
-            [runnerUp, runnerDown] = ts.trackTime(isNewMonth, mAll, i_date, runnerUp, runnerDown, fM);
+            [runnerUp, runnerDown] = ts.trackTime(handles, isNewDay, dAll, i_date, runnerUp, runnerDown, fD);
+            [runnerUp, runnerDown] = ts.trackTime(handles, isNewWeek, wAll, i_date, runnerUp, runnerDown, fW);
+            [runnerUp, runnerDown] = ts.trackTime(handles, isNewMonth, mAll, i_date, runnerUp, runnerDown, fM);
             
             OpCl = 1;
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
