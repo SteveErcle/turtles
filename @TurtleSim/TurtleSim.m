@@ -6,6 +6,8 @@ classdef TurtleSim < handle
         dAll;
         runnerUpArr = [];
         runnerDownArr = [];
+        maxStop = [];
+        positionRef = 0;
        
     end
     
@@ -373,8 +375,7 @@ classdef TurtleSim < handle
                 toBeEnter = cl(dateIndx);
             end
             
-            if (str2double(get(handles.setPosRef,'String')) == 1 ||...
-                    str2double(get(handles.setPosRef,'String')) == -1) & digitalMarket == 1
+            if (obj.positionRef == 1 || obj.positionRef == -1) & digitalMarket == 1
                 digitalExit = 1;
                 digitalMarket = 0;
             end 
@@ -383,7 +384,7 @@ classdef TurtleSim < handle
             if digitalMarket == 1
                 set(handles.setEnteredAt,'String', num2str(toBeEnter));
                 set(handles.setStopRef,'String', num2str(toBeEnter));
-                set(handles.setPosRef,'String', num2str(position));
+                obj.positionRef = position;
                 set(handles.setDateRef,'String', strcat(num2str(dateIndx), '-', num2str(OpCl)));
             end
             
@@ -394,7 +395,28 @@ classdef TurtleSim < handle
                 stopRef = str2double(get(handles.setStopRef,'String'));
                 slPercent = -15+voltLoss/5*30;
                 stop = stopRef*(1+(slPercent/100));
+                
+                if obj.positionRef == 1 & stop < str2double(get(handles.setEnteredAt,'String'))*(1-(obj.maxStop/100))
+                  stop = str2double(get(handles.setEnteredAt,'String'))*(1-(obj.maxStop/100));
+                elseif obj.positionRef == -1 & stop > str2double(get(handles.setEnteredAt,'String'))*(1+(obj.maxStop/100))
+                    stop = str2double(get(handles.setEnteredAt,'String'))*(1+(obj.maxStop/100));
+                end 
+                
                 set(handles.setStop,'String', num2str(stop));
+                
+                enteredAt = str2double(get(handles.setEnteredAt,'String'));
+                exitedAt = toBeEnter;
+                
+                if obj.positionRef == 1
+                    ifExit = ((exitedAt-enteredAt)/ enteredAt)*100;
+                elseif obj.positionRef == -1
+                    ifExit = ((enteredAt-exitedAt)/ enteredAt)*100;
+                else
+                    ifExit = 0;
+                end 
+                
+                set(handles.ifExit,'String', num2str(ifExit));
+            
             end
             
             if digitalLimit == 1
@@ -414,7 +436,7 @@ classdef TurtleSim < handle
             enteredAt   = str2double(get(handles.setEnteredAt,'String'));
             stop        = str2double(get(handles.setStop,'String'));
             limit       = str2double(get(handles.setLimit,'String'));
-            position    = str2double(get(handles.setPosRef,'String'));
+            position    = obj.positionRef;
             
             if isempty(enteredAt) || isnan(enteredAt)
                 enteredAt = 0;
@@ -470,7 +492,9 @@ classdef TurtleSim < handle
                     pr = num2str(pr + str2num(get(handles.pr,'String')));
                     set(handles.pr,'String', pr)
                     set(handles.setEnteredAt, 'String', '-');
-                    set(handles.setPosRef,'String', num2str(0));
+                    enteredAt = 0;
+                    stop = 0;
+                    obj.positionRef = 0;
                 end
             end
             
@@ -485,7 +509,6 @@ classdef TurtleSim < handle
                 pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*limit, ':b');
                 pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enteredAt, 'b');
                 pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*stop, 'r');
-                set(handles.setLevel, 'Value', 0);
             end
             
         end

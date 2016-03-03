@@ -1,5 +1,5 @@
 clc; 
-% clear all; 
+clear all; 
 close all;
 
 simPres         = 1;
@@ -57,6 +57,7 @@ if arduinoControl == 1
         disp('No Arduino detected');
         disp('Switiching to GUI control');
         arduinoControl = 0;
+        a = [];
         
     end
 else
@@ -133,6 +134,7 @@ while(true)
         runnerDown  = [1,1,1];
         ts.runnerUpArr = [];
         ts.runnerDownArr = [];
+        ts.maxStop = 3.5;
         
          for i_date = simDates
             
