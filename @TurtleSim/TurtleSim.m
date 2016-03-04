@@ -360,11 +360,12 @@ classdef TurtleSim < handle
                 digitalMarket = 1;
                 position = -1;
             elseif digitals == [0,0,1,0]
+                digitalLimit = 1;
+            elseif digitals == [0,0,0,1]
                 digitalResetStop = 1;
+%                 set(handles.next, 'Value', 1);
             elseif digitals == [0,0,0,1]
-                set(handles.next, 'Value', 1);
-            elseif digitals == [0,0,0,1]
-              ;
+                ;
             elseif digitals == [0,0,1,1]
 %                 digitalResetStop = 1;
             end 
@@ -384,6 +385,7 @@ classdef TurtleSim < handle
             if digitalMarket == 1
                 set(handles.setEnteredAt,'String', num2str(toBeEnter));
                 set(handles.setStopRef,'String', num2str(toBeEnter));
+                set(handles.setLimit,'String', '-');
                 obj.positionRef = position;
                 set(handles.setDateRef,'String', strcat(num2str(dateIndx), '-', num2str(OpCl)));
             end
@@ -425,6 +427,7 @@ classdef TurtleSim < handle
                 set(handles.setLimit,'String', num2str(limit));
                 set(handles.setLimRef,'String', num2str(toBeEnter));
                 set(handles.setStopRef,'String', num2str(toBeEnter));
+                set(handles.setDateRef,'String', strcat(num2str(dateIndx), '-', num2str(OpCl)));
                 
             elseif ~strcmp(get(handles.setLimit,'String'), '-')
                 limRef = str2double(get(handles.setLimRef,'String'));
@@ -447,6 +450,36 @@ classdef TurtleSim < handle
             if isempty(limit) || isnan(limit)
                 limit = 0;
             end
+            
+            
+            if ~strcmp(get(handles.setLimit,'String'), '-') &...
+                    ~strcmp(get(handles.setDateRef,'String'),strcat(num2str(dateIndx), '-', num2str(OpCl)))
+              
+                if OpCl == 1
+                    hi(dateIndx) = op(dateIndx);
+                    lo(dateIndx) = op(dateIndx);
+                end 
+                
+                if limit > stop
+                    if hi(dateIndx) > limit
+                        set(handles.setEnteredAt,'String', num2str(limit));
+                        enteredAt = limit;
+                        set(handles.setLimit,'String', '-');
+                        obj.positionRef = 1;
+                        position = 1;
+                    end
+                else
+                    if lo(dateIndx) < limit
+                        set(handles.setEnteredAt,'String', num2str(limit));
+                        enteredAt = limit;
+                        set(handles.setLimit,'String', '-');
+                        obj.positionRef = -1;
+                        position = -1;
+                    end
+                    
+                end
+            end 
+            
             
             exitNow = 0;
             if (enteredAt ~= 0 & stop ~= 0) &...
@@ -495,6 +528,14 @@ classdef TurtleSim < handle
                     enteredAt = 0;
                     stop = 0;
                     obj.positionRef = 0;
+                    
+                    if str2num(pr) <= -obj.maxStop
+                        filename = strcat(datestr(now),'.fig')
+                        path = strcat('/Losing Trades/', filename)
+                        saveas(figure(1),[pwd path]);
+                    end
+                    
+                    
                 end
             end
             
