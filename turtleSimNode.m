@@ -64,6 +64,12 @@ else
     a = [];
 end 
 
+
+
+
+% %% change fig recorder to add maxStop
+% return
+
 for init_Plots = 1:1
     
     figure
@@ -71,19 +77,21 @@ for init_Plots = 1:1
     [fD, pDp] = tf.resetPlot(1, dPast, startDay, [], []);
     title(strcat(stock,' Daily'));
     datetick('x',12, 'keeplimits');
-    set(gcf, 'Position', [1441,10,1080,542]);
+    set(gcf, 'Position', [-1081,10,1080,542]);
+    
+%     1441 => Right Side
     
     figure
     [fW, pWp] = tf.resetPlot(2, wPast, startDay, [], []);
     title(strcat(stock,' Weekly'));
     datetick('x',12, 'keeplimits');
-    set(gcf, 'Position', [1441,583,1080,542]);
+    set(gcf, 'Position', [-1081,583,1080,542]);
     
     figure
     [fM, pMp] = tf.resetPlot(3, mPast, startDay, [], []);
     title(strcat(stock,' Monthly'));
     datetick('x',12, 'keeplimits');
-    set(gcf, 'Position', [1441,1238,1080,542]);
+    set(gcf, 'Position', [-1081,1238,1080,542]);
     
     axisParams = [1,1,1,1];
     pMarket = [0,0,0];
@@ -134,11 +142,13 @@ while(true)
         runnerDown  = [1,1,1];
         ts.runnerUpArr = [];
         ts.runnerDownArr = [];
-        ts.maxStop = 3.5;
+        ts.volumeArr = []; 
+        ts.maxStop = 2.5;
         
          for i_date = simDates
             
             datestr(i_date)
+            ts.i_dateH = i_date;
             set(handles.showDate,'String', datestr(i_date));
             
             isNewDay = ts.isNewTimePeriod(dCong, i_date);
@@ -148,6 +158,8 @@ while(true)
             [runnerUp, runnerDown] = ts.trackTime(handles, isNewDay, dAll, i_date, runnerUp, runnerDown, fD);
             [runnerUp, runnerDown] = ts.trackTime(handles, isNewWeek, wAll, i_date, runnerUp, runnerDown, fW);
             [runnerUp, runnerDown] = ts.trackTime(handles, isNewMonth, mAll, i_date, runnerUp, runnerDown, fM);
+            
+            ts.trackVolume(handles);
             
             OpCl = 1;
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...

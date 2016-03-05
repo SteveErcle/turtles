@@ -6,8 +6,10 @@ classdef TurtleSim < handle
         dAll;
         runnerUpArr = [];
         runnerDownArr = [];
+        volumeArr = [];
         maxStop = [];
         positionRef = 0;
+        i_dateH = 0;
        
     end
     
@@ -530,10 +532,14 @@ classdef TurtleSim < handle
                     obj.positionRef = 0;
                     
                     if str2num(pr) <= -obj.maxStop
-                        filename = strcat(datestr(now),'.fig')
-                        path = strcat('/Losing Trades/', filename)
+                        filename = strcat(datestr(now),'.fig');
+                        path = strcat('/Losing Trades/', filename);
                         saveas(figure(1),[pwd path]);
-                    end
+                    else
+                        filename = strcat(datestr(now),'.fig');
+                        path = strcat('/Winning Trades/', filename);
+                        saveas(figure(1),[pwd path]);
+                    end 
                     
                     
                 end
@@ -667,6 +673,24 @@ classdef TurtleSim < handle
             
         end
         
+        function [] = trackVolume(obj, handles)
+            
+            td = TurtleData;
+            
+            
+%             if isempty(obj.volumeArr)
+%                 cla(handles.axes4)
+%             end
+            
+            dateIndx = td.getDateIndx(obj.dAll(:,1), obj.i_dateH);
+            
+            obj.volumeArr = [obj.volumeArr; obj.i_dateH, obj.dAll(dateIndx,6)];
+            
+            bar(handles.axes4, obj.volumeArr(:,1), obj.volumeArr(:,2));
+            hold(handles.axes4, 'on');
+            
+        end 
+            
     end
     
 end
