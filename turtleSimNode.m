@@ -1,5 +1,5 @@
 clc; 
-clear all; 
+% clear all; 
 close all;
 
 simPres         = 1;
@@ -65,10 +65,6 @@ else
 end 
 
 
-
-
-% %% change fig recorder to add maxStop
-% return
 
 for init_Plots = 1:1
     
@@ -159,8 +155,6 @@ while(true)
             [runnerUp, runnerDown] = ts.trackTime(handles, isNewWeek, wAll, i_date, runnerUp, runnerDown, fW);
             [runnerUp, runnerDown] = ts.trackTime(handles, isNewMonth, mAll, i_date, runnerUp, runnerDown, fM);
             
-            ts.trackVolume(handles);
-            
             OpCl = 1;
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                 fD, 0.5, handles, axisLen, axisParams, OpCl);
@@ -178,6 +172,8 @@ while(true)
                 fW, pW, pWo, 3, handles, axisLen, axisParams, OpCl);
             [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
                 fM, pM, pMo, 5, handles, axisLen, axisParams, OpCl);
+            
+            ts.trackVolume(handles, OpCl);
             
             [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
             
@@ -200,7 +196,6 @@ end
 
 
 % Build checker
-% Make exit on button
 
 
 

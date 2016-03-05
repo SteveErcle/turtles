@@ -462,8 +462,8 @@ classdef TurtleSim < handle
                     lo(dateIndx) = op(dateIndx);
                 end 
                 
-                if limit > stop
-                    if hi(dateIndx) > limit
+                if limit > stop 
+                    if hi(dateIndx) > limit & lo(dateIndx) <= limit
                         set(handles.setEnteredAt,'String', num2str(limit));
                         enteredAt = limit;
                         set(handles.setLimit,'String', '-');
@@ -471,7 +471,7 @@ classdef TurtleSim < handle
                         position = 1;
                     end
                 else
-                    if lo(dateIndx) < limit
+                    if lo(dateIndx) < limit & hi(dateIndx) >= limit
                         set(handles.setEnteredAt,'String', num2str(limit));
                         enteredAt = limit;
                         set(handles.setLimit,'String', '-');
@@ -533,19 +533,18 @@ classdef TurtleSim < handle
                     
                     if str2num(pr) <= -obj.maxStop
                         filename = strcat(datestr(now),'.fig');
-                        path = strcat('/Losing Trades/', filename);
+                        path = strcat('/Losing Trades/', filename, '-', num2str(obj.maxStop), '.fig');
                         saveas(figure(1),[pwd path]);
                     else
-                        filename = strcat(datestr(now),'.fig');
-                        path = strcat('/Winning Trades/', filename);
+                        filename = strcat(datestr(now));
+                        path = strcat('/Winning Trades/', filename, '-', num2str(obj.maxStop), '.fig');
                         saveas(figure(1),[pwd path]);
                     end 
                     
                     
                 end
             end
-            
-        
+       
             if pMarket(1) ~= 0
                 delete(pMarket)
             end
@@ -673,21 +672,28 @@ classdef TurtleSim < handle
             
         end
         
-        function [] = trackVolume(obj, handles)
+        function [] = trackVolume(obj, handles, OpCl)
             
             td = TurtleData;
             
             
-%             if isempty(obj.volumeArr)
-%                 cla(handles.axes4)
-%             end
+            if isempty(obj.volumeArr)
+                cla(handles.axes4)
+            end
             
-            dateIndx = td.getDateIndx(obj.dAll(:,1), obj.i_dateH);
-            
-            obj.volumeArr = [obj.volumeArr; obj.i_dateH, obj.dAll(dateIndx,6)];
-            
-            bar(handles.axes4, obj.volumeArr(:,1), obj.volumeArr(:,2));
-            hold(handles.axes4, 'on');
+            if OpCl == 2
+                
+                dateIndx = td.getDateIndx(obj.dAll(:,1), obj.i_dateH);
+                
+                disp(strcat('Volume Date: ', datestr(obj.dAll(dateIndx,1))));
+                disp(strcat('Volume Amount: ', num2str(obj.dAll(dateIndx,6))));
+                
+                obj.volumeArr = [obj.volumeArr; obj.i_dateH, obj.dAll(dateIndx,6)];
+                
+                bar(handles.axes4, obj.volumeArr(:,1), obj.volumeArr(:,2));
+                hold(handles.axes4, 'on');
+                
+            end
             
         end 
             
