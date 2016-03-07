@@ -1,5 +1,5 @@
 clc; 
-% clear all; 
+clear all; 
 close all;
 
 simPres         = 1;
@@ -47,6 +47,7 @@ hlcoDs = TurtleVal(dCong);
 hlcoDp = TurtleVal(dAll);
 
 ts.dAll = dAll;
+ts.dCong = dCong; ts.wCong = wCong; ts.mCong = mCong;
 ts.initHandles(handles, simPres, aniLen, axisLen, aniSpeed, dAll);
 ts.setButtons(handles, 'none');
 
@@ -64,8 +65,6 @@ else
     a = [];
 end 
 
-
-
 for init_Plots = 1:1
     
     figure
@@ -73,7 +72,8 @@ for init_Plots = 1:1
     [fD, pDp] = tf.resetPlot(1, dPast, startDay, [], []);
     title(strcat(stock,' Daily'));
     datetick('x',12, 'keeplimits');
-    set(gcf, 'Position', [-1081,10,1080,542]);
+    set(gcf, 'Position', [-1081,1238,1080,542]);
+    
     
 %     1441 => Right Side
     
@@ -87,7 +87,7 @@ for init_Plots = 1:1
     [fM, pMp] = tf.resetPlot(3, mPast, startDay, [], []);
     title(strcat(stock,' Monthly'));
     datetick('x',12, 'keeplimits');
-    set(gcf, 'Position', [-1081,1238,1080,542]);
+    set(gcf, 'Position', [-1081,10,1080,542]);
     
     axisParams = [1,1,1,1];
     pMarket = [0,0,0];
@@ -151,10 +151,7 @@ while(true)
             isNewWeek = ts.isNewTimePeriod(wCong, i_date);
             isNewMonth = ts.isNewTimePeriod(mCong, i_date);
             
-            [runnerUp, runnerDown] = ts.trackTime(handles, isNewDay, dAll, i_date, runnerUp, runnerDown, fD);
-            [runnerUp, runnerDown] = ts.trackTime(handles, isNewWeek, wAll, i_date, runnerUp, runnerDown, fW);
-            [runnerUp, runnerDown] = ts.trackTime(handles, isNewMonth, mAll, i_date, runnerUp, runnerDown, fM);
-            
+         
             OpCl = 1;
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                 fD, 0.5, handles, axisLen, axisParams, OpCl);
@@ -174,6 +171,11 @@ while(true)
                 fM, pM, pMo, 5, handles, axisLen, axisParams, OpCl);
             
             ts.trackVolume(handles, OpCl);
+            [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);
+            [runnerUp, runnerDown] = ts.trackTime(handles, wAll, runnerUp, runnerDown, OpCl, fW);
+            [runnerUp, runnerDown] = ts.trackTime(handles, mAll, runnerUp, runnerDown, OpCl, fM);
+                                                  
+            
             
             [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
             

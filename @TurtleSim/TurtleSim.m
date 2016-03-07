@@ -10,6 +10,9 @@ classdef TurtleSim < handle
         maxStop = [];
         positionRef = 0;
         i_dateH = 0;
+        dCong;
+        wCong;
+        mCong;
        
     end
     
@@ -132,8 +135,8 @@ classdef TurtleSim < handle
                 
                 x1 = date - offset - axisLen;
                 x2 = date - offset + 35;
-                y1 = min(lo(I2:I1))*0.995;
-                y2 = max(hi(I2:I1))*1.005;
+                y1 = min(lo(I2:I1))*0.99;
+                y2 = max(hi(I2:I1))*1.01;
                 
                 for i = 1:3
                     set(0,'CurrentFigure',i)
@@ -589,16 +592,34 @@ classdef TurtleSim < handle
             end
         end
         
-        function [runnerUp, runnerDown] = trackTime(obj, handles, isNew, tAll, i_date, runnerUp, runnerDown, fT)
+        function [runnerUp, runnerDown] = trackTime(obj, handles, tAll, runnerUp, runnerDown, OpCl, fT)
             
             tRunnerUp = runnerUp(fT);
             tRunnerDown = runnerDown(fT);
             
-            if isNew
-                td = TurtleData;
+            td = TurtleData;
+            dateIndx_tomorrow = td.getDateIndx(obj.dAll(:,1), obj.i_dateH) - 1;
+            i_date_tomorrow = obj.dAll(dateIndx_tomorrow);
+            
+            if fT == 1
+                isNew =  obj.isNewTimePeriod(obj.dCong, i_date_tomorrow);
+                tCong = obj.dCong;
+            elseif fT == 2
+                isNew = obj.isNewTimePeriod(obj.wCong, i_date_tomorrow);
+                tCong = obj.wCong;
+            elseif fT == 3
+                isNew = obj.isNewTimePeriod(obj.mCong, i_date_tomorrow);
+                tCong = obj.mCong;
+            end
+                
+            
+            if isNew & OpCl == 2
                 tf = TurtleFun;
                 [hi, lo, cl, op, da] = tf.returnOHLCDarray(tAll);
-                dateIndx = td.getDateIndx(tAll(:,1), i_date)+1;
+                
+                dateIndx = td.getDateIndx(tCong(:,8), obj.i_dateH);
+                timePeriod_today = tCong(dateIndx,1);
+                dateIndx = td.getDateIndx(tAll(:,1), timePeriod_today);
                 
                 if lo(dateIndx) < lo(dateIndx+1)
                     runlo = 1;
@@ -630,7 +651,8 @@ classdef TurtleSim < handle
                 end
                 
                 set(0,'CurrentFigure',fT)
-                text(da(dateIndx)+0.5, op(dateIndx), strcat(num2str(tRunnerUp),',',num2str(tRunnerDown)));
+                text(da(dateIndx), hi(dateIndx)*1.01, strcat(num2str(tRunnerUp)));
+                text(da(dateIndx), lo(dateIndx)*0.99, strcat(num2str(tRunnerDown)));
                 
             end
             

@@ -15,7 +15,7 @@ classdef TurtleData
             mAll = fetch(c,stock,past, simulateTo, 'm');
             
             dCong = fetch(c,stock,simulateFrom, simulateTo, 'd');
-            dCong(:,end) = dCong(:,1);
+            dCong(:,end+1) = dCong(:,1);
        
             hlcoDs = TurtleVal(dCong);
 
