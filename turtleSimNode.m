@@ -139,7 +139,7 @@ while(true)
         ts.runnerUpArr = [];
         ts.runnerDownArr = [];
         ts.volumeArr = []; 
-        ts.maxStop = 2.5;
+        ts.maxStop = 10;
         
          for i_date = simDates
             
