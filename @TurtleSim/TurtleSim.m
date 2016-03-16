@@ -13,7 +13,7 @@ classdef TurtleSim < handle
         dCong;
         wCong;
         mCong;
-       
+        dayAnnotation = 0;
     end
     
     
@@ -119,7 +119,7 @@ classdef TurtleSim < handle
                
                 
                 axisLen = floor(get(handles.axisLen, 'Value'));
-                
+              
                 offset = floor(get(handles.offsetAxis, 'Value'));
                 
                 [M I1] = min(abs(obj.dAll(:,1) - (date - offset - axisLen)));
@@ -138,9 +138,29 @@ classdef TurtleSim < handle
                 y1 = min(lo(I2:I1))*0.99;
                 y2 = max(hi(I2:I1))*1.01;
                 
+                [Md Id1] = min(abs(obj.dAll(:,1) - (date - offset - axisLen/3)));
+                [Md Id2] = min(abs(obj.dAll(:,1) - (date - offset)));
+                
+             
+                if OpCl == 1
+                    hi(Id2) = op(Id2);
+                    lo(Id2) = op(Id2);
+                end
+                
+                xd1 = date - offset - axisLen/3;
+                xd2 = date - offset + 35;
+                yd1 = min(lo(Id2:Id1))*0.99;
+                yd2 = max(hi(Id2:Id1))*1.01;
+                
+
                 for i = 1:3
+                    
                     set(0,'CurrentFigure',i)
-                    axis([x1, x2, y1, y2]);
+                    if i == 1
+                        axis([xd1, xd2, yd1, yd2]);
+                    else
+                        axis([x1, x2, y1, y2]);
+                    end
                     
                 end
                 
@@ -153,7 +173,7 @@ classdef TurtleSim < handle
             y1 = axisParams(3);
             y2 = axisParams(4);
             
-            axis([x1, x2, y1, y2]);
+%             axis([x1, x2, y1, y2]);
             
         end
         
@@ -719,6 +739,33 @@ classdef TurtleSim < handle
             
         end 
             
+        function[] = plotAnnotation(obj, OpCl)
+            
+            tf = TurtleFun;
+            td = TurtleData;
+            [hi, lo, cl, op, da] = tf.returnOHLCDarray(obj.dAll);
+            
+            dateIndx = td.getDateIndx(obj.dAll(:,1), obj.i_dateH);
+            
+            if OpCl == 1
+                dayStatus = strcat('op: ', num2str(op(dateIndx)));
+            elseif OpCl == 2
+                dayStatus = strcat('op: ', num2str(op(dateIndx)), ' hi: ', num2str(hi(dateIndx)),...
+                    ' lo: ', num2str(lo(dateIndx)), ' cl: ', num2str(cl(dateIndx)));
+            end
+          
+            dim = [.80 .12 .05 .11];
+            
+            if obj.dayAnnotation ~= 0
+                delete(obj.dayAnnotation);
+            end 
+            
+            set(0,'CurrentFigure',1)
+            obj.dayAnnotation = annotation('textbox',dim,'String', dayStatus);
+
+        end 
+            
+        
     end
     
 end

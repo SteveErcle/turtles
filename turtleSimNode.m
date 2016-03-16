@@ -10,13 +10,13 @@ aniSpeed        = 0.1;
 daysForCrossVal = 10;
 daysIntoPast    = 400;
 
-stock = 'CLDX'
+stock = 'MENT'
 exchange = 'NYSE';
 
 
-past = '1/1/08';
+past = '1/1/06';
 simulateFrom = '1/1/12';
-simulateTo = '1/1/16';
+simulateTo = '3/1/16';
 
 arduinoControl = 1;
 
@@ -91,13 +91,7 @@ for init_Plots = 1:1
     
     axisParams = [1,1,1,1];
     pMarket = [0,0,0];
-    levels = [5.35000000000000;4.19000000000000;...
-        4.24000000000000;12.5900000000000;11.7500000000000;...
-        4.25000000000000;4.21000000000000;5.40000000000000;...
-        3.48000000000000;4.98000000000000;4.33000000000000;...
-        2.05000000000000;3.28000000000000;14.0900000000000;...
-        10.7300000000000;22.4000000000000;29.4300000000000;...
-        38.8400000000000;20.8500000000000;18.5700000000000];
+    levels = [];
 end
 
 
@@ -150,28 +144,29 @@ while(true)
             isNewDay = ts.isNewTimePeriod(dCong, i_date);
             isNewWeek = ts.isNewTimePeriod(wCong, i_date);
             isNewMonth = ts.isNewTimePeriod(mCong, i_date);
-            
-         
+       
             OpCl = 1;
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, 0.5, handles, axisLen, axisParams, OpCl);
+                fD, 0.5, handles, floor(axisLen/2), axisParams, OpCl);
             [pWo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
                 fW, 3, handles, axisLen, axisParams, OpCl);
             [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
                 fM, 5, handles, axisLen, axisParams, OpCl);
+            ts.plotAnnotation(OpCl);
             
             [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
             
             OpCl = 2;
             [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, pD, pDo, 0.5, handles, axisLen, axisParams, OpCl);
+                fD, pD, pDo, 0.5, handles, floor(axisLen/2), axisParams, OpCl);
             [pW, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
                 fW, pW, pWo, 3, handles, axisLen, axisParams, OpCl);
             [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
                 fM, pM, pMo, 5, handles, axisLen, axisParams, OpCl);
+            ts.plotAnnotation(OpCl);
             
             ts.trackVolume(handles, OpCl);
-            [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);
+%             [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);
             [runnerUp, runnerDown] = ts.trackTime(handles, wAll, runnerUp, runnerDown, OpCl, fW);
             [runnerUp, runnerDown] = ts.trackTime(handles, mAll, runnerUp, runnerDown, OpCl, fM);
                                                   
