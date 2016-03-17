@@ -147,7 +147,7 @@ while(true)
        
             OpCl = 1;
             [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, 0.5, handles, floor(axisLen/2), axisParams, OpCl);
+                fD, 0.5, handles, axisLen, axisParams, OpCl);
             [pWo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
                 fW, 3, handles, axisLen, axisParams, OpCl);
             [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
@@ -158,7 +158,7 @@ while(true)
             
             OpCl = 2;
             [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, pD, pDo, 0.5, handles, floor(axisLen/2), axisParams, OpCl);
+                fD, pD, pDo, 0.5, handles, axisLen, axisParams, OpCl);
             [pW, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
                 fW, pW, pWo, 3, handles, axisLen, axisParams, OpCl);
             [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
@@ -166,7 +166,7 @@ while(true)
             ts.plotAnnotation(OpCl);
             
             ts.trackVolume(handles, OpCl);
-%             [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);
+            [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);
             [runnerUp, runnerDown] = ts.trackTime(handles, wAll, runnerUp, runnerDown, OpCl, fW);
             [runnerUp, runnerDown] = ts.trackTime(handles, mAll, runnerUp, runnerDown, OpCl, fM);
                                                   
