@@ -1,5 +1,5 @@
-clc; 
-clear all; 
+clc;
+clear all;
 close all;
 
 simPres         = 1;
@@ -10,7 +10,7 @@ aniSpeed        = 0.1;
 daysForCrossVal = 10;
 daysIntoPast    = 400;
 
-stock = 'MENT'
+stock = 'PBR'
 exchange = 'NYSE';
 
 
@@ -27,6 +27,12 @@ tf = TurtleFun;
 td = TurtleData;
 delete(turtleSimGui)
 
+c = yahoo;
+averages = '^GSPC';
+dAvg = fetch(c,averages,past, simulateTo, 'd');
+
+%
+% return;
 
 % [mAll, mCong, wAll, wCong, dAll, dCong] = td.getData(stock, past, simulateFrom, simulateTo);
 % td.saveData(stock, mAll, mCong, wAll, wCong, dAll,dCong);
@@ -53,7 +59,7 @@ ts.setButtons(handles, 'none');
 
 if arduinoControl == 1
     try
-    a = arduino('/dev/tty.usbmodem1411','Uno')
+        a = arduino('/dev/tty.usbmodem1411','Uno')
     catch
         disp('No Arduino detected');
         disp('Switiching to GUI control');
@@ -63,7 +69,7 @@ if arduinoControl == 1
     end
 else
     a = [];
-end 
+end
 
 for init_Plots = 1:1
     
@@ -75,7 +81,7 @@ for init_Plots = 1:1
     set(gcf, 'Position', [-1081,1238,1080,542]);
     
     
-%     1441 => Right Side
+    %     1441 => Right Side
     
     figure
     [fW, pWp] = tf.resetPlot(2, wPast, startDay, [], []);
@@ -94,6 +100,8 @@ for init_Plots = 1:1
     levels = [];
 end
 
+figure
+[fAvg, pAvg]= tf.plotHiLoMultiple(dAvg);
 
 while(true)
     
@@ -132,52 +140,90 @@ while(true)
         runnerDown  = [1,1,1];
         ts.runnerUpArr = [];
         ts.runnerDownArr = [];
-        ts.volumeArr = []; 
+        ts.volumeArr = [];
         ts.maxStop = 10;
         
-         for i_date = simDates
+        for i_date = simDates
             
-            datestr(i_date)
-            ts.i_dateH = i_date;
-            set(handles.showDate,'String', datestr(i_date));
-            
-            isNewDay = ts.isNewTimePeriod(dCong, i_date);
-            isNewWeek = ts.isNewTimePeriod(wCong, i_date);
-            isNewMonth = ts.isNewTimePeriod(mCong, i_date);
-       
-            OpCl = 1;
-            [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, 0.5, handles, axisLen, axisParams, OpCl);
-            [pWo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
-                fW, 3, handles, axisLen, axisParams, OpCl);
-            [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
-                fM, 5, handles, axisLen, axisParams, OpCl);
-            ts.plotAnnotation(OpCl);
-            
-            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
-            
-            OpCl = 2;
-            [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
-                fD, pD, pDo, 0.5, handles, axisLen, axisParams, OpCl);
-            [pW, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
-                fW, pW, pWo, 3, handles, axisLen, axisParams, OpCl);
-            [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
-                fM, pM, pMo, 5, handles, axisLen, axisParams, OpCl);
-            ts.plotAnnotation(OpCl);
-            
-            ts.trackVolume(handles, OpCl);
-            [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);
-            [runnerUp, runnerDown] = ts.trackTime(handles, wAll, runnerUp, runnerDown, OpCl, fW);
-            [runnerUp, runnerDown] = ts.trackTime(handles, mAll, runnerUp, runnerDown, OpCl, fM);
-                                                  
-            
-            
-            [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
-            
-            [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);
-              
+            if get(handles.runAnimation, 'Value')
+                
+                datestr(i_date)
+                ts.i_dateH = i_date;
+                set(handles.showDate,'String', datestr(i_date));
+                
+                isNewDay = ts.isNewTimePeriod(dCong, i_date);
+                isNewWeek = ts.isNewTimePeriod(wCong, i_date);
+                isNewMonth = ts.isNewTimePeriod(mCong, i_date);
+                
+                OpCl = 1;
+                [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
+                    fD, 0.5, handles, axisLen, axisParams, OpCl);
+                [pWo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
+                    fW, 3, handles, axisLen, axisParams, OpCl);
+                [pMo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
+                    fM, 5, handles, axisLen, axisParams, OpCl);
+                ts.plotAnnotation(OpCl);
+                
+                [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
+                
+                OpCl = 2;
+                [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
+                    fD, pD, pDo, 0.5, handles, axisLen, axisParams, OpCl);
+                [pW, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
+                    fW, pW, pWo, 3, handles, axisLen, axisParams, OpCl);
+                [pM, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.M, 'Value'), isNewMonth, mCong, i_date,...
+                    fM, pM, pMo, 5, handles, axisLen, axisParams, OpCl);
+                ts.plotAnnotation(OpCl);
+                
+                
+                avgIndx = td.getDateIndx(dAvg(:,1), i_date)
+                dateIndx = td.getDateIndx(dAll(:,1), i_date)
+                [hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(dAvg);
+                [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
+                
+                
+                disp('Average');
+                disp([opA(avgIndx), clA(avgIndx)]);
+                disp('Stock');
+                disp([op(avgIndx), cl(avgIndx)]);
+                
+                pointA = clA(avgIndx) - opA(avgIndx);
+                pointS = cl(avgIndx) - op(avgIndx);
+                
+                set(0,'CurrentFigure',fD)
+                if pointS > 0
+                    plot(da(dateIndx), hi(avgIndx), 'go')
+                else
+                    plot(da(avgIndx), hi(avgIndx), 'ro')
+                end
+                
+                if pointA > 0
+                    plot(da(dateIndx), lo(avgIndx), 'go')
+                else
+                    plot(da(avgIndx), lo(avgIndx), 'ro')
+                end
+                
+                
+                set(0,'CurrentFigure',fAvg)
+                cla(fAvg)
+                ax = gca
+                pAvg = tf.plotHiLoMultiple(dAvg(avgIndx:end,:));
+                axis(gca, [da(avgIndx+150), da(avgIndx)+35,...
+                    min(loA(avgIndx:avgIndx+150)),...
+                    max(hiA(avgIndx:avgIndx+150))])
+                
+                
+                ts.trackVolume(handles, OpCl);
+                [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);
+                [runnerUp, runnerDown] = ts.trackTime(handles, wAll, runnerUp, runnerDown, OpCl, fW);
+                [runnerUp, runnerDown] = ts.trackTime(handles, mAll, runnerUp, runnerDown, OpCl, fM);
+
+                [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
+                
+                [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);
+                
+            end
         end
-        
     else
         
         [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, simDates(end), 0);

@@ -733,6 +733,7 @@ classdef TurtleSim < handle
                 obj.volumeArr = [obj.volumeArr; obj.i_dateH, obj.dAll(dateIndx,6)];
                 
                 bar(handles.axes4, obj.volumeArr(:,1), obj.volumeArr(:,2));
+%                 axis(handles.axes4, 'equal')
                 hold(handles.axes4, 'on');
                 
             end
