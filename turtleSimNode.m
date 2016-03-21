@@ -10,13 +10,13 @@ aniSpeed        = 0.1;
 daysForCrossVal = 10;
 daysIntoPast    = 400;
 
-stock = 'PBR'
+stock = 'WLL'
 exchange = 'NYSE';
-
+FETCH = 1;
 
 past = '1/1/06';
-simulateFrom = '1/1/12';
-simulateTo = '3/1/16';
+simulateFrom = '1/1/16';
+simulateTo = now;
 
 arduinoControl = 1;
 
@@ -31,12 +31,13 @@ c = yahoo;
 averages = '^GSPC';
 dAvg = fetch(c,averages,past, simulateTo, 'd');
 
-%
-% return;
 
-% [mAll, mCong, wAll, wCong, dAll, dCong] = td.getData(stock, past, simulateFrom, simulateTo);
-% td.saveData(stock, mAll, mCong, wAll, wCong, dAll,dCong);
-[mAll, mCong, wAll, wCong, dAll, dCong] = td.loadData(stock);
+if FETCH == 1
+    [mAll, mCong, wAll, wCong, dAll, dCong] = td.getData(stock, past, simulateFrom, simulateTo);
+    td.saveData(stock, mAll, mCong, wAll, wCong, dAll,dCong);
+else
+    [mAll, mCong, wAll, wCong, dAll, dCong] = td.loadData(stock);
+end
 
 startDay = dCong(end,1);
 
@@ -100,8 +101,8 @@ for init_Plots = 1:1
     levels = [];
 end
 
-figure
-[fAvg, pAvg]= tf.plotHiLoMultiple(dAvg);
+fAvg = figure
+
 
 while(true)
     
@@ -178,9 +179,13 @@ while(true)
                 
                 avgIndx = td.getDateIndx(dAvg(:,1), i_date)
                 dateIndx = td.getDateIndx(dAll(:,1), i_date)
-                [hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(dAvg);
-                [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
                 
+                [hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(dAvg);
+                daA(avgIndx,1)
+               
+                [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
+                da(dateIndx,1)
+               
                 
                 disp('Average');
                 disp([opA(avgIndx), clA(avgIndx)]);
@@ -188,26 +193,26 @@ while(true)
                 disp([op(avgIndx), cl(avgIndx)]);
                 
                 pointA = clA(avgIndx) - opA(avgIndx);
-                pointS = cl(avgIndx) - op(avgIndx);
+                pointS = cl(dateIndx) - op(dateIndx);
                 
                 set(0,'CurrentFigure',fD)
                 if pointS > 0
-                    plot(da(dateIndx), hi(avgIndx), 'go')
+                    plot(da(dateIndx), hi(dateIndx), 'go')
                 else
-                    plot(da(avgIndx), hi(avgIndx), 'ro')
+                    plot(da(dateIndx), hi(dateIndx), 'ro')
                 end
                 
                 if pointA > 0
-                    plot(da(dateIndx), lo(avgIndx), 'go')
+                    plot(da(dateIndx), lo(dateIndx), 'go')
                 else
-                    plot(da(avgIndx), lo(avgIndx), 'ro')
+                    plot(da(dateIndx), lo(dateIndx), 'ro')
                 end
                 
                 
                 set(0,'CurrentFigure',fAvg)
                 cla(fAvg)
                 ax = gca
-                pAvg = tf.plotHiLoMultiple(dAvg(avgIndx:end,:));
+                tf.plotHiLoMultiple(dAvg(avgIndx:end,:));
                 axis(gca, [da(avgIndx+150), da(avgIndx)+35,...
                     min(loA(avgIndx:avgIndx+150)),...
                     max(hiA(avgIndx:avgIndx+150))])

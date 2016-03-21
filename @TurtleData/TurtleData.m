@@ -37,7 +37,7 @@ classdef TurtleData
             end
   
             close(c)
-            
+           
         end
         
         function [] = saveData(obj, stock, mAll, mCong, wAll, wCong, dAll,dCong)
