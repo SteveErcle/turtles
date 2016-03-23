@@ -8,8 +8,8 @@ selection = [8 27 36] %[3, 9, 37, 6, 19, 30] %[23, 24, 30, 31, 37, 42, 47, 48, 5
 
 for i = 12:length(allStocks)
 % i = selection
-    stock = 'DV'%allStocks(i)
-EAD = 1;
+    stock = '^GSPC'%allStocks(i)
+EAD = 0;
 
 
     
@@ -41,7 +41,7 @@ EAD = 1;
     
     exchange = 'NYSE';
 
-    d = getTodaysOHLC(stock, exchange, d);
+%     d = getTodaysOHLC(stock, exchange, d);
 
     
     datestr(d(1))

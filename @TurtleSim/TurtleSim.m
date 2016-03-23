@@ -4,6 +4,7 @@ classdef TurtleSim < handle
     properties
         
         dAll;
+        iAll;
         runnerUpArr = [];
         runnerDownArr = [];
         volumeArr = [];
@@ -766,6 +767,57 @@ classdef TurtleSim < handle
 
         end 
             
+        
+        function [] = intraDayViewer(obj, handles, fInt)
+            
+            if get(handles.I, 'Value')
+                
+                tf = TurtleFun;
+                
+                simDate = datestr(obj.i_dateH,2);
+                intraIndx = strmatch(simDate, obj.iAll.dateDay);
+                
+                if isempty(intraIndx)
+                    disp('** Intraday data not available **')
+                else
+                    
+                    
+                    hi = obj.iAll.high(intraIndx);
+                    lo = obj.iAll.low(intraIndx);
+                    op = obj.iAll.close([intraIndx(1);intraIndx(1:end-1)]);
+                    cl = obj.iAll.close(intraIndx);
+                    da = obj.iAll.date(intraIndx);
+                    
+                    intraDay = [da, op, hi, lo, cl];
+                    
+                    datestr(da(1))
+                    
+                    
+                    cla(fInt);
+                    
+                    for i = 1:size(intraDay,1)
+                        set(0,'CurrentFigure',fInt)
+                        tf.plotHiLoSolo(intraDay(i,:), 0.0003*5);
+                        datetick('x',15, 'keeplimits');
+                        
+                        maxHi = max(hi(1:i))
+                        minLo = min(lo(1:i))
+                        
+                        if get(handles.play, 'Value')
+                            while ~get(handles.next, 'Value')
+                                pause(0.1);
+                            end
+                            set(handles.next, 'Value', 0);
+                        else
+                            aniSpeed = get(handles.aniSpeed, 'Max') - (get(handles.aniSpeed, 'Value'));
+                            pause(aniSpeed);
+                        end
+                    end
+                    
+                end
+            end
+            
+        end
         
     end
     

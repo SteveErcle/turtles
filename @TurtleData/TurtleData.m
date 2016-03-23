@@ -6,7 +6,7 @@ classdef TurtleData
     
     methods
         
-        function [mAll, mCong, wAll, wCong, dAll, dCong] = getData(obj, stock, past, simulateFrom, simulateTo)
+        function [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = getData(obj, stock, past, simulateFrom, simulateTo)
             
             c = yahoo;
             
@@ -37,16 +37,23 @@ classdef TurtleData
             end
   
             close(c)
-           
+            
+            minutes = 5;
+            interval = num2str(60*minutes);
+            prevdays = '100d';
+            stockexchange = 'NYSE';
+            iAll = IntraDayStockData(stock,stockexchange,interval,prevdays);
+            iAll.dateDay = datestr(iAll.date,2);
+            
         end
         
-        function [] = saveData(obj, stock, mAll, mCong, wAll, wCong, dAll,dCong)
+        function [] = saveData(obj, stock, mAll, mCong, wAll, wCong, dAll, dCong, iAll)
             
-            save(strcat(stock, 'data'), 'mAll', 'mCong', 'wAll', 'wCong', 'dAll', 'dCong');
+            save(strcat(stock, 'data'), 'mAll', 'mCong', 'wAll', 'wCong', 'dAll', 'dCong', 'iAll');
        
         end
         
-        function [mAll, mCong, wAll, wCong, dAll, dCong] = loadData(obj, stock)
+        function [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = loadData(obj, stock)
             
             load(strcat(stock, 'data'));
             

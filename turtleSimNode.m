@@ -10,12 +10,12 @@ aniSpeed        = 0.1;
 daysForCrossVal = 10;
 daysIntoPast    = 400;
 
-stock = 'WLL'
+stock = 'FCX'
 exchange = 'NYSE';
-FETCH = 1;
+FETCH = 0;
 
 past = '1/1/06';
-simulateFrom = '1/1/16';
+simulateFrom = '2/21/16';
 simulateTo = now;
 
 arduinoControl = 1;
@@ -30,13 +30,13 @@ delete(turtleSimGui)
 c = yahoo;
 averages = '^GSPC';
 dAvg = fetch(c,averages,past, simulateTo, 'd');
-
+close(c);
 
 if FETCH == 1
-    [mAll, mCong, wAll, wCong, dAll, dCong] = td.getData(stock, past, simulateFrom, simulateTo);
-    td.saveData(stock, mAll, mCong, wAll, wCong, dAll,dCong);
+    [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.getData(stock, past, simulateFrom, simulateTo);
+    td.saveData(stock, mAll, mCong, wAll, wCong, dAll, dCong, iAll);
 else
-    [mAll, mCong, wAll, wCong, dAll, dCong] = td.loadData(stock);
+    [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.loadData(stock);
 end
 
 startDay = dCong(end,1);
@@ -54,6 +54,7 @@ hlcoDs = TurtleVal(dCong);
 hlcoDp = TurtleVal(dAll);
 
 ts.dAll = dAll;
+ts.iAll = iAll;
 ts.dCong = dCong; ts.wCong = wCong; ts.mCong = mCong;
 ts.initHandles(handles, simPres, aniLen, axisLen, aniSpeed, dAll);
 ts.setButtons(handles, 'none');
@@ -101,8 +102,8 @@ for init_Plots = 1:1
     levels = [];
 end
 
-fAvg = figure
-
+fAvg = figure;
+fInt = figure;
 
 while(true)
     
@@ -167,6 +168,8 @@ while(true)
                 
                 [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
                 
+                ts.intraDayViewer(handles, fInt);
+                
                 OpCl = 2;
                 [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                     fD, pD, pDo, 0.5, handles, axisLen, axisParams, OpCl);
@@ -218,6 +221,8 @@ while(true)
                     max(hiA(avgIndx:avgIndx+150))])
                 
                 
+              
+                
                 ts.trackVolume(handles, OpCl);
                 [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);
                 [runnerUp, runnerDown] = ts.trackTime(handles, wAll, runnerUp, runnerDown, OpCl, fW);
@@ -226,6 +231,7 @@ while(true)
                 [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
                 
                 [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);
+                
                 
             end
         end

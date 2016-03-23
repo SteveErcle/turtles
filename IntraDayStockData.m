@@ -1,4 +1,4 @@
-function data = IntraDayStockData(symbol,stockexchange,interval,prevdays)
+function data = IntraDayStockData(symbol, stockexchange, interval, prevdays)
 %% IntraDayStockData pulls intraday stock price from Google.
 %
 % Input:
@@ -33,7 +33,9 @@ function data = IntraDayStockData(symbol,stockexchange,interval,prevdays)
 %       datetick('x',16);
 %
 
+
 %initialize elements of the call url
+stockexchange = 'NYSE';
 data.symbol = upper(symbol);
 data.stockexchange = upper(stockexchange);
 if nargin < 3,
