@@ -1,6 +1,4 @@
-clc;
-clear all;
-close all;
+clc; clear all; close all;
 
 simPres         = 1;
 aniLen          = 1;
@@ -10,7 +8,7 @@ aniSpeed        = 0.1;
 daysForCrossVal = 10;
 daysIntoPast    = 400;
 
-stock = 'FCX'
+stock = 'CECE'
 exchange = 'NYSE';
 FETCH = 0;
 
@@ -45,6 +43,7 @@ simPres = td.getDateIndx(dAll(:,1), startDay)-20;
 aniLen = 20;
 
 handles = guihandles(turtleSimGui);
+ts.handles = handles;
 
 dPast = td.resetPast(dCong, dAll, startDay);
 wPast = td.resetPast(wCong, wAll, startDay);
@@ -61,16 +60,16 @@ ts.setButtons(handles, 'none');
 
 if arduinoControl == 1
     try
-        a = arduino('/dev/tty.usbmodem1411','Uno')
+        ts.a = arduino('/dev/tty.usbmodem1411','Uno')
     catch
         disp('No Arduino detected');
         disp('Switiching to GUI control');
         arduinoControl = 0;
-        a = [];
+        ts.a = [];
         
     end
 else
-    a = [];
+    ts.a = [];
 end
 
 for init_Plots = 1:1
@@ -99,7 +98,7 @@ for init_Plots = 1:1
     
     axisParams = [1,1,1,1];
     pMarket = [0,0,0];
-    levels = [];
+    ts.levels = [];
 end
 
 fInt = figure(4);
@@ -135,9 +134,9 @@ while(true)
         wPast = td.resetPast(wCong, wAll, simDates(1));
         mPast = td.resetPast(mCong, mAll, simDates(1));
         
-        [~, pDp, pD] = tf.resetPlot(fD, dPast, startDay, levels, dAll);
-        [~, pWp, pW] = tf.resetPlot(fW, wPast, startDay, levels, dAll);
-        [~, pMp, pM] = tf.resetPlot(fM, mPast, startDay, levels, dAll);
+        [~, pDp, pD] = tf.resetPlot(fD, dPast, startDay, ts.levels, dAll);
+        [~, pWp, pW] = tf.resetPlot(fW, wPast, startDay, ts.levels, dAll);
+        [~, pMp, pM] = tf.resetPlot(fM, mPast, startDay, ts.levels, dAll);
         pMarket     = [0,0,0];
         runnerUp    = [1,1,1];
         runnerDown  = [1,1,1];
@@ -167,9 +166,9 @@ while(true)
                     fM, 5, handles, axisLen, axisParams, OpCl);
                 ts.plotAnnotation(OpCl);
                 
-                [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
+                [axisLen, axisParams] = ts.playTurtles(handles, axisLen, axisParams, simDates, i_date, dAll, OpCl);
                 
-                ts.intraDayViewer(handles, fInt);
+                ts.intraDayViewer(fInt);
                 
                 OpCl = 2;
                 [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
@@ -227,7 +226,7 @@ while(true)
                 [runnerUp, runnerDown] = ts.trackTime(handles, wAll, runnerUp, runnerDown, OpCl, fW);
                 [runnerUp, runnerDown] = ts.trackTime(handles, mAll, runnerUp, runnerDown, OpCl, fM);
 
-                [pMarket, levels, axisLen, axisParams] = ts.playTurtles(handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a);
+                [axisLen, axisParams] = ts.playTurtles(handles, axisLen, axisParams, simDates, i_date, dAll, OpCl);
                 
                 [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);
                 
@@ -238,7 +237,7 @@ while(true)
         
         [axisLen, axisParams] = ts.setAxis(handles, axisLen, axisParams, simDates(end), 0);
         
-        [levels] = ts.plotLevel(handles, levels, dAll);
+        ts.plotLevel();
         
         pause(0.01)
         

@@ -16,6 +16,11 @@ classdef TurtleSim < handle
         wCong;
         mCong;
         dayAnnotation = 0;
+        
+        pMarket = 0;
+        levels = [];
+        handles;
+        a;
     end
     
     
@@ -264,7 +269,7 @@ classdef TurtleSim < handle
             
         end
         
-        function [pMarket, levels, axisLen, axisParams] = playTurtles(obj, handles, pMarket, levels, axisLen, axisParams, simDates, i_date, dAll, OpCl, a)
+        function [axisLen, axisParams] = playTurtles(obj, handles, axisLen, axisParams, simDates, i_date, dAll, OpCl, a)
             
             if get(handles.play, 'Value') % & i_date == simDates(end)
                 
@@ -273,9 +278,9 @@ classdef TurtleSim < handle
                 while ~get(handles.next, 'Value')
                     
 
-                    pMarket = obj.plotTrade(handles, pMarket, i_date, dAll, OpCl, a);
+                    obj.plotTrade(OpCl);
                     
-                    levels = obj.plotLevel(handles, levels, dAll);
+                    obj.plotLevel();
                     
                     [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date, OpCl);
                     
@@ -290,17 +295,17 @@ classdef TurtleSim < handle
             set(handles.next, 'Value', 0);
         end
         
-        function [pMarket] = plotTrade(obj, handles, pMarket, i_date, dAll, OpCl, a)
+        function plotTrade(obj, OpCl)
             
-            if isempty(a) 
-                [pMarket] = obj.plotTradeGuiControl(handles, pMarket, i_date, dAll, OpCl);
+            if isempty(obj.a) 
+%                 obj.plotTradeGuiControl(handles, i_date, dAll, OpCl);
             else
-                [pMarket] = obj.plotTradeArudinoControl(handles, pMarket, i_date, dAll, OpCl, a);
+                obj.plotTradeArudinoControl(OpCl);
             end
            
         end 
         
-        function [pMarket] = plotTradeGuiControl(obj, handles, pMarket, i_date, dAll, OpCl)
+        function plotTradeGuiControl(obj, handles, i_date, dAll, OpCl)
             
             td = TurtleData;
             tf = TurtleFun;
@@ -340,16 +345,16 @@ classdef TurtleSim < handle
                     ub = str2double(get(handles.ub,'String'));
                 end
                 
-                if pMarket(1) ~= 0
-                    delete(pMarket)
+                if obj.pMarket(1) ~= 0
+                    delete(obj.pMarket)
                 end
                 
                 for i = 1:3
                     set(0,'CurrentFigure',i)
                     k = 3*i-2:i*3;
-                    pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*ub, 'r');
-                    pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enter, 'b');
-                    pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'r');
+                    obj.pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*ub, 'r');
+                    obj.pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enter, 'b');
+                    obj.pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*lb, 'r');
                     set(handles.setLevel, 'Value', 0);
                 end
                 
@@ -359,24 +364,24 @@ classdef TurtleSim < handle
             
         end
         
-        function [pMarket] = plotTradeArudinoControl(obj, handles, pMarket, i_date, dAll, OpCl, a)
+        function plotTradeArudinoControl(obj, OpCl)
             
             td = TurtleData;
             tf = TurtleFun;
-            [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
+            [hi, lo, cl, op, da] = tf.returnOHLCDarray(obj.dAll);
             
-            dateIndx = td.getDateIndx(dAll(:,1), i_date);
+            dateIndx = td.getDateIndx(obj.dAll(:,1), obj.i_dateH);
             
             digitalMarket = 0;
             digitalLimit = 0;
             position = 0;
             digitalResetStop = 0;
             digitalExit = 0;
-            voltLoss =  readVoltage(a,0);
-            voltLimit = readVoltage(a,1);
+            voltLoss =  readVoltage(obj.a,0);
+            voltLimit = readVoltage(obj.a,1);
             
-            digitals = [readDigitalPin(a,7), readDigitalPin(a,6),...
-                readDigitalPin(a,5), readDigitalPin(a,4)];
+            digitals = [readDigitalPin(obj.a,7), readDigitalPin(obj.a,6),...
+                readDigitalPin(obj.a,5), readDigitalPin(obj.a,4)];
   
             disp(digitals)
             
@@ -401,8 +406,8 @@ classdef TurtleSim < handle
                 toBeEnter = op(dateIndx);
             elseif OpCl == 2
                 toBeEnter = cl(dateIndx);
-            elseif OpCl == 0;
-                toBeEnter = obj.iAll.close(obj.i_intraH);
+            elseif OpCl == 3;
+                toBeEnter = obj.iAll.close(obj.i_intraH)
             end 
             
             if (obj.positionRef == 1 || obj.positionRef == -1) & digitalMarket == 1
@@ -412,30 +417,30 @@ classdef TurtleSim < handle
                 
             
             if digitalMarket == 1
-                set(handles.setEnteredAt,'String', num2str(toBeEnter));
-                set(handles.setStopRef,'String', num2str(toBeEnter));
-                set(handles.setLimit,'String', '-');
+                set(obj.handles.setEnteredAt,'String', num2str(toBeEnter));
+                set(obj.handles.setStopRef,'String', num2str(toBeEnter));
+                set(obj.handles.setLimit,'String', '-');
                 obj.positionRef = position;
-                set(handles.setDateRef,'String', strcat(num2str(dateIndx), '-', num2str(OpCl)));
+                set(obj.handles.setDateRef,'String', strcat(num2str(dateIndx), '-', num2str(OpCl)));
             end
             
-            if ~strcmp(get(handles.setEnteredAt,'String'), '-') || ~strcmp(get(handles.setLimit,'String'), '-')
+            if ~strcmp(get(obj.handles.setEnteredAt,'String'), '-') || ~strcmp(get(obj.handles.setLimit,'String'), '-')
                 if digitalResetStop
-                    set(handles.setStopRef,'String', num2str(toBeEnter));
+                    set(obj.handles.setStopRef,'String', num2str(toBeEnter));
                 end
-                stopRef = str2double(get(handles.setStopRef,'String'));
+                stopRef = str2double(get(obj.handles.setStopRef,'String'));
                 slPercent = -15+voltLoss/5*30;
                 stop = stopRef*(1+(slPercent/100));
                 
-                if obj.positionRef == 1 & stop < str2double(get(handles.setEnteredAt,'String'))*(1-(obj.maxStop/100))
-                  stop = str2double(get(handles.setEnteredAt,'String'))*(1-(obj.maxStop/100));
-                elseif obj.positionRef == -1 & stop > str2double(get(handles.setEnteredAt,'String'))*(1+(obj.maxStop/100))
-                    stop = str2double(get(handles.setEnteredAt,'String'))*(1+(obj.maxStop/100));
+                if obj.positionRef == 1 & stop < str2double(get(obj.handles.setEnteredAt,'String'))*(1-(obj.maxStop/100))
+                  stop = str2double(get(obj.handles.setEnteredAt,'String'))*(1-(obj.maxStop/100));
+                elseif obj.positionRef == -1 & stop > str2double(get(obj.handles.setEnteredAt,'String'))*(1+(obj.maxStop/100))
+                    stop = str2double(get(obj.handles.setEnteredAt,'String'))*(1+(obj.maxStop/100));
                 end 
                 
-                set(handles.setStop,'String', num2str(stop));
+                set(obj.handles.setStop,'String', num2str(stop));
                 
-                enteredAt = str2double(get(handles.setEnteredAt,'String'));
+                enteredAt = str2double(get(obj.handles.setEnteredAt,'String'));
                 exitedAt = toBeEnter;
                 
                 if obj.positionRef == 1
@@ -446,28 +451,28 @@ classdef TurtleSim < handle
                     ifExit = 0;
                 end 
                 
-                set(handles.ifExit,'String', num2str(ifExit));
+                set(obj.handles.ifExit,'String', num2str(ifExit));
             
             end
             
             if digitalLimit == 1
                 slPercent = voltLimit/5*15;
                 limit = toBeEnter*(1+(slPercent/100));
-                set(handles.setLimit,'String', num2str(limit));
-                set(handles.setLimRef,'String', num2str(toBeEnter));
-                set(handles.setStopRef,'String', num2str(toBeEnter));
-                set(handles.setDateRef,'String', strcat(num2str(dateIndx), '-', num2str(OpCl)));
+                set(obj.handles.setLimit,'String', num2str(limit));
+                set(obj.handles.setLimRef,'String', num2str(toBeEnter));
+                set(obj.handles.setStopRef,'String', num2str(toBeEnter));
+                set(obj.handles.setDateRef,'String', strcat(num2str(dateIndx), '-', num2str(OpCl)));
                 
-            elseif ~strcmp(get(handles.setLimit,'String'), '-')
-                limRef = str2double(get(handles.setLimRef,'String'));
+            elseif ~strcmp(get(obj.handles.setLimit,'String'), '-')
+                limRef = str2double(get(obj.handles.setLimRef,'String'));
                 slPercent = -15+voltLimit/5*30;
                 limit = limRef*(1+(slPercent/100));
-                set(handles.setLimit,'String', num2str(limit));    
+                set(obj.handles.setLimit,'String', num2str(limit));    
             end
             
-            enteredAt   = str2double(get(handles.setEnteredAt,'String'));
-            stop        = str2double(get(handles.setStop,'String'));
-            limit       = str2double(get(handles.setLimit,'String'));
+            enteredAt   = str2double(get(obj.handles.setEnteredAt,'String'));
+            stop        = str2double(get(obj.handles.setStop,'String'));
+            limit       = str2double(get(obj.handles.setLimit,'String'));
             position    = obj.positionRef;
             
             if isempty(enteredAt) || isnan(enteredAt)
@@ -481,8 +486,8 @@ classdef TurtleSim < handle
             end
             
             
-            if ~strcmp(get(handles.setLimit,'String'), '-') &...
-                    ~strcmp(get(handles.setDateRef,'String'),strcat(num2str(dateIndx), '-', num2str(OpCl)))
+            if ~strcmp(get(obj.handles.setLimit,'String'), '-') &...
+                    ~strcmp(get(obj.handles.setDateRef,'String'),strcat(num2str(dateIndx), '-', num2str(OpCl)))
               
                 if OpCl == 1
                     hi(dateIndx) = op(dateIndx);
@@ -491,17 +496,17 @@ classdef TurtleSim < handle
                 
                 if limit > stop 
                     if hi(dateIndx) > limit & lo(dateIndx) <= limit
-                        set(handles.setEnteredAt,'String', num2str(limit));
+                        set(obj.handles.setEnteredAt,'String', num2str(limit));
                         enteredAt = limit;
-                        set(handles.setLimit,'String', '-');
+                        set(obj.handles.setLimit,'String', '-');
                         obj.positionRef = 1;
                         position = 1;
                     end
                 else
                     if lo(dateIndx) < limit & hi(dateIndx) >= limit
-                        set(handles.setEnteredAt,'String', num2str(limit));
+                        set(obj.handles.setEnteredAt,'String', num2str(limit));
                         enteredAt = limit;
-                        set(handles.setLimit,'String', '-');
+                        set(obj.handles.setLimit,'String', '-');
                         obj.positionRef = -1;
                         position = -1;
                     end
@@ -512,7 +517,7 @@ classdef TurtleSim < handle
             
             exitNow = 0;
             if (enteredAt ~= 0 & stop ~= 0) &...
-                    ~strcmp(get(handles.setDateRef,'String'),strcat(num2str(dateIndx), '-', num2str(OpCl)))
+                    ~strcmp(get(obj.handles.setDateRef,'String'),strcat(num2str(dateIndx), '-', num2str(OpCl)))
                 
                 if position == 1
                     if OpCl == 1
@@ -551,9 +556,9 @@ classdef TurtleSim < handle
                     elseif position == -1
                         pr = ((enteredAt-exitedAt)/ enteredAt)*100;
                     end
-                    pr = num2str(pr + str2num(get(handles.pr,'String')));
-                    set(handles.pr,'String', pr)
-                    set(handles.setEnteredAt, 'String', '-');
+                    pr = num2str(pr + str2num(get(obj.handles.pr,'String')));
+                    set(obj.handles.pr,'String', pr)
+                    set(obj.handles.setEnteredAt, 'String', '-');
                     enteredAt = 0;
                     stop = 0;
                     obj.positionRef = 0;
@@ -572,28 +577,28 @@ classdef TurtleSim < handle
                 end
             end
             
-            if pMarket(1) ~= 0
-                if ishandle(pMarket(10))
-                    delete(pMarket)
+            if obj.pMarket(1) ~= 0
+                if ishandle(obj.pMarket(10))
+                    delete(obj.pMarket)
                 else
-                    delete(pMarket(1:9))
+                    delete(obj.pMarket(1:9))
                 end
             end
             
             for i = 1:4
                 set(0,'CurrentFigure',i)
                 k = 3*i-2:i*3;
-                pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*limit, ':b');
-                pMarket(k(2)) = plot([dAll(end,1), dAll(1,1)], [1,1]*enteredAt, 'b');
-                pMarket(k(3)) = plot([dAll(end,1), dAll(1,1)], [1,1]*stop, 'r');
+                obj.pMarket(k(1)) = plot([obj.dAll(end,1), obj.dAll(1,1)], [1,1]*limit, ':b');
+                obj.pMarket(k(2)) = plot([obj.dAll(end,1), obj.dAll(1,1)], [1,1]*enteredAt, 'b');
+                obj.pMarket(k(3)) = plot([obj.dAll(end,1), obj.dAll(1,1)], [1,1]*stop, 'r');
             end
             
         end
         
-        function [levels] = plotLevel(obj, handles, levels, dAll)
+        function plotLevel(obj)
             
-            if get(handles.setLevel, 'Value')
-                for j = 1:3
+            if get(obj.handles.setLevel, 'Value')
+                for j = 1:4
                     set(0,'CurrentFigure',j)
                     h = gcf;
                     axesObjs = get(h, 'Children');
@@ -605,16 +610,15 @@ classdef TurtleSim < handle
                         cursor = datacursormode(gcf);
                         dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
                         value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
-                        levels = [levels; value];
+                        obj.levels = [obj.levels; value];
                         
-                        for i = 1:3
+                        for i = 1:4
                             set(0,'CurrentFigure',i)
-                            plot([dAll(end,1), dAll(1,1)], [1,1]*value, 'k');
+                            plot([obj.dAll(end,1), obj.dAll(1,1)], [1,1]*value, 'k');
                         end
                         
                         delete(dataTips);
-                        set(handles.setLevel, 'Value', 0);
-                        
+                        set(obj.handles.setLevel, 'Value', 0);        
                     end
                 end
             end
@@ -774,11 +778,13 @@ classdef TurtleSim < handle
 
         end 
                   
-        function [] = intraDayViewer(obj, handles, fInt)
+        function [] = intraDayViewer(obj, fInt)
             
-            if get(handles.I, 'Value')
+            if get(obj.handles.I, 'Value')
                 
                 tf = TurtleFun;
+                
+                OpCl = 3;
                 
                 simDate = datestr(obj.i_dateH,2);
                 intraIndx = strmatch(simDate, obj.iAll.dateDay);
@@ -801,23 +807,39 @@ classdef TurtleSim < handle
                     set(0,'CurrentFigure',fInt)
                     cla;
                     
+                    for j = 1:length(obj.levels)
+                        plot([obj.dAll(end,1), obj.dAll(1,1)], [1,1]*obj.levels(j), 'k');
+                        hold on;
+                    end
+                    
+                    
                     for i = 1:size(intraDay,1)
                         
+                        if i == size(intraDay,1)
+                            set(obj.handles.play, 'Value', 1);
+                        end
+                        
                         obj.i_intraH = intraIndx(i);
-                        obj.iAll.close(obj.i_intraH)
                         tf.plotHiLoSolo(intraDay(i,:), 0.0003*5);
+                        xlim([da(1)-0.0003*10, da(end)+0.0003*10]);
+                        ylim([min(lo(1:i))*0.99, max(hi(1:i))*1.01])
                         datetick('x',15, 'keeplimits');
                         
                         maxHi = max(hi(1:i))
                         minLo = min(lo(1:i))
                         
-                        if get(handles.play, 'Value')
-                            while ~get(handles.next, 'Value')
+                        if get(obj.handles.play, 'Value')
+                            while ~get(obj.handles.next, 'Value')
                                 pause(0.1);
+                                
+                                obj.plotTrade(OpCl);
+                                
+                                obj.plotLevel();
+
                             end
-                            set(handles.next, 'Value', 0);
+                            set(obj.handles.next, 'Value', 0);
                         else
-                            aniSpeed = get(handles.aniSpeed, 'Max') - (get(handles.aniSpeed, 'Value'));
+                            aniSpeed = get(obj.handles.aniSpeed, 'Max') - (get(obj.handles.aniSpeed, 'Value'));
                             pause(aniSpeed);
                         end
                     end
@@ -826,6 +848,8 @@ classdef TurtleSim < handle
             end
             
         end
+        
+        
         
     end
     
