@@ -11,6 +11,7 @@ classdef TurtleSim < handle
         maxStop = [];
         positionRef = 0;
         i_dateH = 0;
+        i_intraH;
         dCong;
         wCong;
         mCong;
@@ -271,8 +272,7 @@ classdef TurtleSim < handle
                 timeStart = now;
                 while ~get(handles.next, 'Value')
                     
-                    %                     pause(0.050);
-                    
+
                     pMarket = obj.plotTrade(handles, pMarket, i_date, dAll, OpCl, a);
                     
                     levels = obj.plotLevel(handles, levels, dAll);
@@ -364,6 +364,7 @@ classdef TurtleSim < handle
             td = TurtleData;
             tf = TurtleFun;
             [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
+            
             dateIndx = td.getDateIndx(dAll(:,1), i_date);
             
             digitalMarket = 0;
@@ -398,9 +399,11 @@ classdef TurtleSim < handle
     
             if OpCl == 1
                 toBeEnter = op(dateIndx);
-            else
+            elseif OpCl == 2
                 toBeEnter = cl(dateIndx);
-            end
+            elseif OpCl == 0;
+                toBeEnter = obj.iAll.close(obj.i_intraH);
+            end 
             
             if (obj.positionRef == 1 || obj.positionRef == -1) & digitalMarket == 1
                 digitalExit = 1;
@@ -568,12 +571,16 @@ classdef TurtleSim < handle
                     
                 end
             end
-       
+            
             if pMarket(1) ~= 0
-                delete(pMarket)
+                if ishandle(pMarket(10))
+                    delete(pMarket)
+                else
+                    delete(pMarket(1:9))
+                end
             end
             
-            for i = 1:3
+            for i = 1:4
                 set(0,'CurrentFigure',i)
                 k = 3*i-2:i*3;
                 pMarket(k(1)) = plot([dAll(end,1), dAll(1,1)], [1,1]*limit, ':b');
@@ -766,8 +773,7 @@ classdef TurtleSim < handle
             obj.dayAnnotation = annotation('textbox',dim,'String', dayStatus);
 
         end 
-            
-        
+                  
         function [] = intraDayViewer(obj, handles, fInt)
             
             if get(handles.I, 'Value')
@@ -792,11 +798,13 @@ classdef TurtleSim < handle
                     
                     datestr(da(1))
                     
-                    
-                    cla(fInt);
+                    set(0,'CurrentFigure',fInt)
+                    cla;
                     
                     for i = 1:size(intraDay,1)
-                        set(0,'CurrentFigure',fInt)
+                        
+                        obj.i_intraH = intraIndx(i);
+                        obj.iAll.close(obj.i_intraH)
                         tf.plotHiLoSolo(intraDay(i,:), 0.0003*5);
                         datetick('x',15, 'keeplimits');
                         

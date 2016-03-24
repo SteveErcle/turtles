@@ -15,7 +15,7 @@ exchange = 'NYSE';
 FETCH = 0;
 
 past = '1/1/06';
-simulateFrom = '2/21/16';
+simulateFrom = '1/1/16';
 simulateTo = now;
 
 arduinoControl = 1;
@@ -102,8 +102,9 @@ for init_Plots = 1:1
     levels = [];
 end
 
-fAvg = figure;
-fInt = figure;
+fInt = figure(4);
+fAvg = figure(5);
+
 
 while(true)
     
@@ -220,8 +221,6 @@ while(true)
                     min(loA(avgIndx:avgIndx+150)),...
                     max(hiA(avgIndx:avgIndx+150))])
                 
-                
-              
                 
                 ts.trackVolume(handles, OpCl);
                 [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);

@@ -41,7 +41,7 @@ EAD = 0;
     
     exchange = 'NYSE';
 
-%     d = getTodaysOHLC(stock, exchange, d);
+    d = getTodaysOHLC(stock, exchange, d);
 
     
     datestr(d(1))
