@@ -431,6 +431,7 @@ classdef TurtleSim < handle
                     obj.isEnteredIntra = 1;
                 else
                     obj.isEnteredIntra = 0;
+                    obj.dateRef = 0;       
                 end 
                 
             end
@@ -535,34 +536,37 @@ classdef TurtleSim < handle
                     (~strcmp(get(obj.handles.setDateRef,'String'),strcat(num2str(dateIndx), '-', num2str(OpCl))) ||...
                     (obj.iAll.date(obj.i_intraH) ~= obj.dateRef & obj.dateRef ~= 0))
                 
-                disp('INSIDE EXIT NOW')
+                disp('INSIDE EXIT NOW');
                 
+                if digitalExit == 1
+                    exitNow = 1;
+                end 
                 
                 if position == 1
                     if OpCl == 1
-                        if stop > op(dateIndx) || digitalExit == 1
+                        if stop > op(dateIndx)
                             exitNow = 1;
                         end
                     elseif OpCl == 2 & obj.isEnteredIntra == 0;
-                        if stop > lo(dateIndx) || digitalExit == 1
+                        if stop > lo(dateIndx)
                             exitNow = 1;
                         end
                     elseif OpCl == 3
-                        if stop > obj.iAll.low(obj.i_intraH) || digitalExit == 1
+                        if stop > obj.iAll.low(obj.i_intraH)
                             exitNow = 1
                         end
                     end
                 elseif position == -1
                     if OpCl == 1
-                        if stop < op(dateIndx) || digitalExit == 1
+                        if stop < op(dateIndx)
                             exitNow = 1;
                         end
                     elseif OpCl == 2 & obj.isEnteredIntra == 0;
-                        if stop < hi(dateIndx) || digitalExit == 1
+                        if stop < hi(dateIndx)
                             exitNow = 1;
                         end
                     elseif OpCl == 3
-                        if stop < obj.iAll.high(obj.i_intraH) || digitalExit == 1
+                        if stop < obj.iAll.high(obj.i_intraH)
                             exitNow = 1
                         end
                     end
@@ -609,7 +613,7 @@ classdef TurtleSim < handle
             if obj.pMarket(1) ~= 0
                 if ishandle(obj.pMarket(10))
                     delete(obj.pMarket)
-                else
+                elseif ishandle(obj.pMarket(9))
                     delete(obj.pMarket(1:9))
                 end
             end
