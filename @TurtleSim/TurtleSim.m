@@ -4,20 +4,23 @@ classdef TurtleSim < handle
     properties
         
         dAll;
-        iAll;
+        iAll = 0;
         runnerUpArr = [];
         runnerDownArr = [];
         volumeArr = [];
         maxStop = [];
         positionRef = 0;
+        dateRef = 0;
         i_dateH = 0;
-        i_intraH;
+        i_intraH = 1;
         dCong;
         wCong;
         mCong;
         dayAnnotation = 0;
+        isEnteredIntra = 0;
         
         pMarket = 0;
+        pdInt;
         levels = [];
         handles;
         a;
@@ -407,7 +410,7 @@ classdef TurtleSim < handle
             elseif OpCl == 2
                 toBeEnter = cl(dateIndx);
             elseif OpCl == 3;
-                toBeEnter = obj.iAll.close(obj.i_intraH)
+                toBeEnter = obj.iAll.close(obj.i_intraH);
             end 
             
             if (obj.positionRef == 1 || obj.positionRef == -1) & digitalMarket == 1
@@ -422,6 +425,14 @@ classdef TurtleSim < handle
                 set(obj.handles.setLimit,'String', '-');
                 obj.positionRef = position;
                 set(obj.handles.setDateRef,'String', strcat(num2str(dateIndx), '-', num2str(OpCl)));
+                
+                if OpCl == 3
+                    obj.dateRef = obj.iAll.date(obj.i_intraH);
+                    obj.isEnteredIntra = 1;
+                else
+                    obj.isEnteredIntra = 0;
+                end 
+                
             end
             
             if ~strcmp(get(obj.handles.setEnteredAt,'String'), '-') || ~strcmp(get(obj.handles.setLimit,'String'), '-')
@@ -445,13 +456,17 @@ classdef TurtleSim < handle
                 
                 if obj.positionRef == 1
                     ifExit = ((exitedAt-enteredAt)/ enteredAt)*100;
+                    ifStop = ((stop-enteredAt)/ enteredAt)*100;
                 elseif obj.positionRef == -1
                     ifExit = ((enteredAt-exitedAt)/ enteredAt)*100;
+                    ifStop = ((enteredAt-stop)/ enteredAt)*100;
                 else
                     ifExit = 0;
+                    ifStop = 0;
                 end 
                 
                 set(obj.handles.ifExit,'String', num2str(ifExit));
+                set(obj.handles.ifStop,'String', num2str(ifStop));
             
             end
             
@@ -517,16 +532,24 @@ classdef TurtleSim < handle
             
             exitNow = 0;
             if (enteredAt ~= 0 & stop ~= 0) &...
-                    ~strcmp(get(obj.handles.setDateRef,'String'),strcat(num2str(dateIndx), '-', num2str(OpCl)))
+                    (~strcmp(get(obj.handles.setDateRef,'String'),strcat(num2str(dateIndx), '-', num2str(OpCl))) ||...
+                    (obj.iAll.date(obj.i_intraH) ~= obj.dateRef & obj.dateRef ~= 0))
+                
+                disp('INSIDE EXIT NOW')
+                
                 
                 if position == 1
                     if OpCl == 1
                         if stop > op(dateIndx) || digitalExit == 1
                             exitNow = 1;
                         end
-                    else
+                    elseif OpCl == 2 & obj.isEnteredIntra == 0;
                         if stop > lo(dateIndx) || digitalExit == 1
                             exitNow = 1;
+                        end
+                    elseif OpCl == 3
+                        if stop > obj.iAll.low(obj.i_intraH) || digitalExit == 1
+                            exitNow = 1
                         end
                     end
                 elseif position == -1
@@ -534,9 +557,13 @@ classdef TurtleSim < handle
                         if stop < op(dateIndx) || digitalExit == 1
                             exitNow = 1;
                         end
-                    else
+                    elseif OpCl == 2 & obj.isEnteredIntra == 0;
                         if stop < hi(dateIndx) || digitalExit == 1
                             exitNow = 1;
+                        end
+                    elseif OpCl == 3
+                        if stop < obj.iAll.high(obj.i_intraH) || digitalExit == 1
+                            exitNow = 1
                         end
                     end
                 end
@@ -545,8 +572,10 @@ classdef TurtleSim < handle
                     if digitalExit == 1
                         if OpCl == 1
                             exitedAt = op(dateIndx);
-                        else
+                        elseif OpCl == 2
                             exitedAt = cl(dateIndx);
+                        elseif OpCl == 3
+                            exitedAt = obj.iAll.close(obj.i_intraH)
                         end
                     else
                         exitedAt = stop;
@@ -563,18 +592,18 @@ classdef TurtleSim < handle
                     stop = 0;
                     obj.positionRef = 0;
                     
-                    if str2num(pr) <= -obj.maxStop
-                        filename = strcat(datestr(now),'.fig');
-                        path = strcat('/Losing Trades/', filename, '-', num2str(obj.maxStop), '.fig');
-                        saveas(figure(1),[pwd path]);
-                    else
-                        filename = strcat(datestr(now));
-                        path = strcat('/Winning Trades/', filename, '-', num2str(obj.maxStop), '.fig');
-                        saveas(figure(1),[pwd path]);
-                    end 
-                    
+                    %                     if str2num(pr) <= -obj.maxStop
+                    %                         filename = strcat(datestr(now),'.fig');
+                    %                         path = strcat('/Losing Trades/', filename, '-', num2str(obj.maxStop), '.fig');
+                    %                         saveas(figure(1),[pwd path]);
+                    %                     else
+                    %                         filename = strcat(datestr(now));
+                    %                         path = strcat('/Winning Trades/', filename, '-', num2str(obj.maxStop), '.fig');
+                    %                         saveas(figure(1),[pwd path]);
+                    %                     end
                     
                 end
+                
             end
             
             if obj.pMarket(1) ~= 0
@@ -820,13 +849,21 @@ classdef TurtleSim < handle
                         end
                         
                         obj.i_intraH = intraIndx(i);
+                        set(0,'CurrentFigure',fInt)
                         tf.plotHiLoSolo(intraDay(i,:), 0.0003*5);
                         xlim([da(1)-0.0003*10, da(end)+0.0003*10]);
                         ylim([min(lo(1:i))*0.99, max(hi(1:i))*1.01])
                         datetick('x',15, 'keeplimits');
                         
-                        maxHi = max(hi(1:i))
-                        minLo = min(lo(1:i))
+                        maxHi = max(hi(1:i));
+                        minLo = min(lo(1:i));
+                        set(0,'CurrentFigure',1)
+                        if ishandle(obj.pdInt)
+                            delete(obj.pdInt);
+                        end 
+                        dNow = [obj.i_dateH, op(1), maxHi, minLo, cl(i)]; 
+                        [~, obj.pdInt] = tf.plotHiLoSolo(dNow, 0.5);
+                        
                         
                         if get(obj.handles.play, 'Value')
                             while ~get(obj.handles.next, 'Value')

@@ -1,4 +1,4 @@
-clc; clear all; close all;
+clc; close all; clear all; 
 
 simPres         = 1;
 aniLen          = 1;
@@ -60,7 +60,7 @@ ts.setButtons(handles, 'none');
 
 if arduinoControl == 1
     try
-        ts.a = arduino('/dev/tty.usbmodem1411','Uno')
+        ts.a = arduino('/dev/tty.usbmodem1411','Uno');
     catch
         disp('No Arduino detected');
         disp('Switiching to GUI control');
