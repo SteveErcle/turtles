@@ -22,7 +22,7 @@ function varargout = turtleSimGui(varargin)
 
 % Edit the above text to modify the response to help turtleSimGui
 
-% Last Modified by GUIDE v2.5 28-Feb-2016 18:32:52
+% Last Modified by GUIDE v2.5 26-Mar-2016 10:28:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -661,3 +661,58 @@ function timer_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of timer
+
+
+% --- Executes on button press in setTrend.
+function setTrend_Callback(hObject, eventdata, handles)
+% hObject    handle to setTrend (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of setTrend
+
+
+% --- Executes on selection change in Colors.
+function Colors_Callback(hObject, eventdata, handles)
+% hObject    handle to Colors (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns Colors contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from Colors
+
+
+% --- Executes during object creation, after setting all properties.
+function Colors_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Colors (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in timeLen.
+function timeLen_Callback(hObject, eventdata, handles)
+% hObject    handle to timeLen (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns timeLen contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from timeLen
+
+
+% --- Executes during object creation, after setting all properties.
+function timeLen_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to timeLen (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

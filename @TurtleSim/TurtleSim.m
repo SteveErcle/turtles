@@ -22,6 +22,7 @@ classdef TurtleSim < handle
         pMarket = 0;
         pdInt;
         levels = [];
+        trends = [];
         handles;
         a;
     end
@@ -630,7 +631,29 @@ classdef TurtleSim < handle
         
         function plotLevel(obj)
             
-            if get(obj.handles.setLevel, 'Value')
+            if get(obj.handles.setLevel, 'Value') ||  get(obj.handles.setTrend, 'Value')
+                
+                
+                numColor = get(obj.handles.Colors, 'Value');
+                timeLen = get(obj.handles.timeLen, 'String');
+                timeIndx = get(obj.handles.timeLen, 'Value');
+                
+                timeExtend = str2double(timeLen(timeIndx));
+             
+                
+                switch numColor
+                    case 1
+                        color = 'k';
+                    case 2
+                        color = 'c';
+                    case 3
+                        color = 'b';
+                    case 4
+                        color = 'm';
+                    case 5
+                        color = 'r';
+                end 
+                
                 for j = 1:4
                     set(0,'CurrentFigure',j)
                     h = gcf;
@@ -640,18 +663,54 @@ classdef TurtleSim < handle
                     dataTips = findall(axesObjs, 'Type', 'hggroup', 'HandleVisibility', 'off');
                     
                     if length(dataTips) > 0
-                        cursor = datacursormode(gcf);
-                        dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
-                        value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
-                        obj.levels = [obj.levels; value];
                         
-                        for i = 1:4
-                            set(0,'CurrentFigure',i)
-                            plot([obj.dAll(end,1), obj.dAll(1,1)], [1,1]*value, 'k');
+                        
+                        if get(obj.handles.setTrend, 'Value')
+                            cursor = datacursormode(gcf);
+                            values = cursor.getCursorInfo;
+                            if size(values,2) > 1
+                                [t1, t2] = values.Position;
+                            end
+                            obj.trends = [obj.trends; t1(1), t2(1), t1(2), t2(2)];
+                            
+                            temp = t1;
+                            if t1(1) > t2(1)
+                                t1 = t2;
+                                t2 = temp;
+                            end 
+             
+                            x1 = t1(1);
+                            x2 = t2(1);
+                            y1 = t1(2);
+                            y2 = t2(2);
+                      
+                            p = polyfit([x1,x2], [y1,y2], 1);
+                            
+                            y3 = p(1)*(x2+timeExtend) + p(2);
+                            
+                             for i = 1:4
+                                set(0,'CurrentFigure',i)
+                                plot([x1,x2+timeExtend] , [y1, y3], color);
+                            end
+                            
                         end
                         
+                        if get(obj.handles.setLevel, 'Value')
+                            cursor = datacursormode(gcf);
+                            dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
+                            value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
+                            obj.levels = [obj.levels; value];
+                            
+                            for i = 1:4
+                                set(0,'CurrentFigure',i)
+                                plot([obj.dAll(end,1), obj.dAll(1,1)], [1,1]*value, color);
+                            end
+                        end
+                        
+                        
                         delete(dataTips);
-                        set(obj.handles.setLevel, 'Value', 0);        
+                        set(obj.handles.setLevel, 'Value', 0);   
+                        set(obj.handles.setTrend, 'Value', 0);
                     end
                 end
             end

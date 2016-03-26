@@ -8,13 +8,13 @@ aniSpeed        = 0.1;
 daysForCrossVal = 10;
 daysIntoPast    = 400;
 
-stock = 'CECE'
+stock = 'HTZ'
 exchange = 'NYSE';
 FETCH = 0;
 
 past = '1/1/06';
-simulateFrom = '1/1/16';
-simulateTo = now;
+simulateFrom = '1/1/12';
+simulateTo = '1/1/13';
 
 arduinoControl = 1;
 

@@ -37,13 +37,20 @@ classdef TurtleData
             end
   
             close(c)
+     
+            iAll = [];
+            iAll.date = [];
             
             minutes = 5;
             interval = num2str(60*minutes);
             prevdays = '100d';
             stockexchange = 'NYSE';
+            try
             iAll = IntraDayStockData(stock,stockexchange,interval,prevdays);
             iAll.dateDay = datestr(iAll.date,2);
+            catch
+                disp('Failed to fetch intraday data')
+            end 
             
         end
         
