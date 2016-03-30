@@ -8,13 +8,13 @@ aniSpeed        = 0.1;
 daysForCrossVal = 10;
 daysIntoPast    = 400;
 
-stock = 'HTZ'
+stock = 'TSLA'
 exchange = 'NYSE';
-FETCH = 0;
+FETCH = 1;
 
-past = '1/1/06';
-simulateFrom = '1/1/12';
-simulateTo = '1/1/13';
+past = '1/1/2006';
+simulateFrom = '10/1/14';
+simulateTo = '10/1/15';
 
 arduinoControl = 1;
 
