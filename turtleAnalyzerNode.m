@@ -5,7 +5,7 @@ clear all; clc; close all;
 
 
 
-past = now-17000;
+past = 734318;
 simulateTo = now;
 
 stock = 'TSLA';
@@ -21,13 +21,19 @@ dAvg = fetch(c,averages,past, simulateTo, 'd');
 
 close(c);
 
+
+
+
+
+
 tf = TurtleFun;
 % [hi, lo, cl, op, da] = tf.returnOHLCDarray(wAll);
 % vo = dAll(:,6);
 
-subplot(2,1,1)
-[hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll(1:101,:));
+subplot(3,1,1)
+[hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
 highlow(hi, lo, op, cl, 'blue', da);
+hold on;
 % subplot(3,1,2)
 % [hi, lo, cl, op, da] = tf.returnOHLCDarray(wAll);
 % highlow(hi, lo, op, cl, 'blue', da);
@@ -39,23 +45,44 @@ set(gcf, 'Position', [-1079,5,1077,1820]);
 
 
 [hiD, loD, clD, opD, daD] = tf.returnOHLCDarray(dAvg);
-ad = [];
-adD = [];
+subplot(3,1,2)
+highlow(hiD, loD, opD, clD, 'blue', daD);
+
+
+perCl = [];
+perClD = [];
+
+for i = 1:size(da)-1
+    perCl = [perCl; (cl(i) - cl(i+1)) / cl(i+1)*100];
+    perClD = [perClD; (clD(i) - clD(i+1)) / clD(i+1)*100];
+end
+
+beta = cov(perCl, perClD) / var(perClD)
+beta = beta(1,2)
+
+return;
+
+
+ad = [0];
+adD = [0];
 figure(1)
 hold on;
-for i = 2:100
-    ad = [ad; (cl(i) - cl(i+1))/ cl(i+1)];
-    adD = [adD; (clD(i) - clD(i+1))/ clD(i+1)];
+
+for i = size(dAvg,1)-1:-1:1
+    adD = [adD; (clD(i) - clD(i+1)) / clD(i+1)*100];
+    
+    disp([clD(i), clD(i+1)])
+  
+    subplot(3,1,3)
+    plot(adD, 'bo')
+    
+    subplot(3,1,1)
+    plot(da(i), hi(i) , 'ro')
     
 end
 
-subplot(2,1,2)
-plot(ad)
-hold on;
-plot(adD*2, 'r')
-plot(ad-adD*2, 'g')
 
-
+return
 
 
 tStore = [];
