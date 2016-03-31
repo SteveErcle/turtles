@@ -22,27 +22,48 @@ dAvg = fetch(c,averages,past, simulateTo, 'd');
 close(c);
 
 tf = TurtleFun;
-[hi, lo, cl, op, da] = tf.returnOHLCDarray(wAll);
-vo = dAll(:,6);
+% [hi, lo, cl, op, da] = tf.returnOHLCDarray(wAll);
+% vo = dAll(:,6);
 
-subplot(3,1,1)
-[hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
+subplot(2,1,1)
+[hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll(1:101,:));
 highlow(hi, lo, op, cl, 'blue', da);
-subplot(3,1,2)
-[hi, lo, cl, op, da] = tf.returnOHLCDarray(wAll);
-highlow(hi, lo, op, cl, 'blue', da);
-subplot(3,1,3)
-[hi, lo, cl, op, da] = tf.returnOHLCDarray(mAll);
-highlow(hi, lo, op, cl, 'blue', da);
+% subplot(3,1,2)
+% [hi, lo, cl, op, da] = tf.returnOHLCDarray(wAll);
+% highlow(hi, lo, op, cl, 'blue', da);
+% subplot(3,1,3)
+% [hi, lo, cl, op, da] = tf.returnOHLCDarray(mAll);
+% highlow(hi, lo, op, cl, 'blue', da);
 
 set(gcf, 'Position', [-1079,5,1077,1820]);
+
+
+[hiD, loD, clD, opD, daD] = tf.returnOHLCDarray(dAvg);
+ad = [];
+adD = [];
+figure(1)
+hold on;
+for i = 2:100
+    ad = [ad; (cl(i) - cl(i+1))/ cl(i+1)];
+    adD = [adD; (clD(i) - clD(i+1))/ clD(i+1)];
+    
+end
+
+subplot(2,1,2)
+plot(ad)
+hold on;
+plot(adD*2, 'r')
+plot(ad-adD*2, 'g')
+
+
+
 
 tStore = [];
 
 while(true)
     
     pause
- 
+    
     h = gcf;
     axesObjs = get(h, 'Children');
     axesObjs = findobj(axesObjs, 'type', 'axes');
@@ -52,7 +73,7 @@ while(true)
         
         cursor = datacursormode(gcf);
         values = cursor.getCursorInfo;
-       
+        
         tDate = values.Position;
         tStore = [tStore; tDate(1)];
         datestr(tStore,12)
