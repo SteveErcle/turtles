@@ -3,9 +3,9 @@
 clear all; clc; close all;
 
 
+beta = 1.29;
 
-
-past = 734318;
+past = '2/1/16';
 simulateTo = now;
 
 stock = 'TSLA';
@@ -20,11 +20,6 @@ averages = '^GSPC';
 dAvg = fetch(c,averages,past, simulateTo, 'd');
 
 close(c);
-
-
-
-
-
 
 tf = TurtleFun;
 % [hi, lo, cl, op, da] = tf.returnOHLCDarray(wAll);
@@ -48,17 +43,39 @@ set(gcf, 'Position', [-1079,5,1077,1820]);
 subplot(3,1,2)
 highlow(hiD, loD, opD, clD, 'blue', daD);
 
+ta = TurtleAnalyzer;
 
-perCl = [];
-perClD = [];
-
-for i = 1:size(da)-1
-    perCl = [perCl; (cl(i) - cl(i+1)) / cl(i+1)*100];
-    perClD = [perClD; (clD(i) - clD(i+1)) / clD(i+1)*100];
+perStock = ta.percentChange(dAll);
+% perStock = [0.1,0.1,0.1,0.1;
+%     0.1,0.1,0.1,0.1;
+%     0.1,0.1,0.1,0.1;
+%     0.1,0.1,0.1,0.1];
+base = dAll(end,2:5)
+newStock = [da(1),base];
+for i = 1:size(perStock,1)-1
+    i
+    newStock = [newStock; da(i+1), newStock(i,2:end)./(1+perStock(i,:))];
 end
 
-beta = cov(perCl, perClD) / var(perClD)
-beta = beta(1,2)
+
+subplot(3,1,3)
+[hi, lo, cl, op, da] = tf.returnOHLCDarray(newStock);
+highlow(hi, lo, op, cl, 'blue', da);
+
+
+% perStock = [];
+% perIndx = [];
+%
+% for i = 1:size(da)-1
+%     perStock = [perStock; (op(i) - op(i+1)) / op(i+1),...
+%         (hi(i) - hi(i+1)) / hi(i+1),...
+%         (lo(i) - lo(i+1)) / lo(i+1),...
+%         (cl(i) - cl(i+1)) / cl(i+1)]
+%     perIndx = [perClD; beta*(clD(i) - clD(i+1)) / clD(i+1)*100];
+% end
+% %
+% beta = cov(perCl, perClD) / var(perClD)
+% beta = beta(1,2)
 
 return;
 
@@ -72,7 +89,7 @@ for i = size(dAvg,1)-1:-1:1
     adD = [adD; (clD(i) - clD(i+1)) / clD(i+1)*100];
     
     disp([clD(i), clD(i+1)])
-  
+    
     subplot(3,1,3)
     plot(adD, 'bo')
     
