@@ -5,7 +5,7 @@ clear all; clc; close all;
 
 beta = 1.29;
 
-past = '2/1/16';
+past = '1/1/16';
 simulateTo = now;
 
 stock = 'TSLA';
@@ -22,92 +22,69 @@ dAvg = fetch(c,averages,past, simulateTo, 'd');
 close(c);
 
 tf = TurtleFun;
-% [hi, lo, cl, op, da] = tf.returnOHLCDarray(wAll);
-% vo = dAll(:,6);
 
-subplot(3,1,1)
+
+
 [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
-highlow(hi, lo, op, cl, 'blue', da);
-hold on;
-% subplot(3,1,2)
-% [hi, lo, cl, op, da] = tf.returnOHLCDarray(wAll);
-% highlow(hi, lo, op, cl, 'blue', da);
-% subplot(3,1,3)
-% [hi, lo, cl, op, da] = tf.returnOHLCDarray(mAll);
-% highlow(hi, lo, op, cl, 'blue', da);
-
-set(gcf, 'Position', [-1079,5,1077,1820]);
 
 
-[hiD, loD, clD, opD, daD] = tf.returnOHLCDarray(dAvg);
-subplot(3,1,2)
-highlow(hiD, loD, opD, clD, 'blue', daD);
+% Idx = cos(2*pi*1/33*(1:100))' + 10;
+% Scb = cos(2*pi*1/17*(1:100) + pi/2)' + 10;
 
-ta = TurtleAnalyzer;
+Idx = dAvg(:,5:5);
+Scb = dAll(:,5:5);
 
-perStock = ta.percentChange(dAll);
-% perStock = [0.1,0.1,0.1,0.1;
-%     0.1,0.1,0.1,0.1;
-%     0.1,0.1,0.1,0.1;
-%     0.1,0.1,0.1,0.1];
-base = dAll(end,2:5)
-newStock = [da(1),base];
-for i = 1:size(perStock,1)-1
-    i
-    newStock = [newStock; da(i+1), newStock(i,2:end)./(1+perStock(i,:))];
-end
+per = [];
 
 
-subplot(3,1,3)
-[hi, lo, cl, op, da] = tf.returnOHLCDarray(newStock);
-highlow(hi, lo, op, cl, 'blue', da);
+for i = 1 : size(Idx,1) - 1
+    per = [per; beta* ((Idx(i,:) - Idx(i+1,:)) ./ Idx(i+1,:))];
+end 
+
+Sio = Scb(1,:);
+
+for i = 1 : size(Idx,1) - 1
+  Sio(i+1,:) = Sio(i,:) ./ (1+per(i,:));
+end 
 
 
-% perStock = [];
-% perIndx = [];
-%
-% for i = 1:size(da)-1
-%     perStock = [perStock; (op(i) - op(i+1)) / op(i+1),...
-%         (hi(i) - hi(i+1)) / hi(i+1),...
-%         (lo(i) - lo(i+1)) / lo(i+1),...
-%         (cl(i) - cl(i+1)) / cl(i+1)]
-%     perIndx = [perClD; beta*(clD(i) - clD(i+1)) / clD(i+1)*100];
-% end
-% %
-% beta = cov(perCl, perClD) / var(perClD)
-% beta = beta(1,2)
+Sro = Scb(1) + (Scb - Sio);
 
-return;
+ScbF = diff(getFiltered(Scb,0.1,'low'));
+SioF = diff(getFiltered(Sio,0.1,'low'));
+SroF = diff(getFiltered(Sro,0.1,'low'));
 
 
-ad = [0];
-adD = [0];
-figure(1)
-hold on;
-
-for i = size(dAvg,1)-1:-1:1
-    adD = [adD; (clD(i) - clD(i+1)) / clD(i+1)*100];
-    
-    disp([clD(i), clD(i+1)])
-    
-    subplot(3,1,3)
-    plot(adD, 'bo')
-    
-    subplot(3,1,1)
-    plot(da(i), hi(i) , 'ro')
-    
-end
+wSize = 10;
+ScbS = (tsmovavg(flipud(Scb),'s',wSize,1));
+SioS = (tsmovavg(flipud(Sio),'s',wSize,1));
+SroS = (tsmovavg(flipud(Sro),'s',wSize,1));
 
 
-return
+ScbS(end:end-wSize) = ScbS(end-wSize);
+
+% subplot(2,1,1)
+hold on
+% [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
+% highlow(hi, lo, op, cl, 'red', da);
+plot(da,Sio)
+plot(da,Scb,'r')
+plot(da,Sro, 'g')
 
 
-tStore = [];
+% subplot(2,1,2)
+hold on
+plot(da(1:end),SioS)
+plot(da(1:end),ScbS,'r')
+plot(da(1:end),SroS, 'g')
 
+
+return 
+
+p = 0;
 while(true)
     
-    pause
-    
+pause(0.2)
     h = gcf;
     axesObjs = get(h, 'Children');
     axesObjs = findobj(axesObjs, 'type', 'axes');
@@ -118,132 +95,32 @@ while(true)
         cursor = datacursormode(gcf);
         values = cursor.getCursorInfo;
         
-        tDate = values.Position;
-        tStore = [tStore; tDate(1)];
-        datestr(tStore,12)
-        delete(dataTips);
-        
+        tData = values.Position;
+        if ishandle(p) & p(1) ~= 0
+            delete(p)
+        end 
+        subplot(2,1,1)
+        p(1) = plot(tData(1), tData(2), 'bo');
+        subplot(2,1,2)
+        p(2) = plot(tData(1), tData(2), 'bo');
     end
+    delete(dataTips);
     
 end
 
 
 
-
-return
-
-
-
-
-
-
-
-
-
-
-tRunnerDown = 0;
-tRunnerUp = 0;
-tStore = [];
-
-range = 2:10
-
-for dateIndx = range
-    
-    if lo(dateIndx) < lo(dateIndx-1)
-        runlo = 1;
-    elseif lo(dateIndx) >= lo(dateIndx-1) & hi(dateIndx) < hi(dateIndx-1)
-        runlo = 1;
-    else
-        runlo = 0;
-    end
-    
-    if hi(dateIndx) > hi(dateIndx-1)
-        runhi = 1;
-    elseif hi(dateIndx) <= hi(dateIndx-1) & lo(dateIndx) > lo(dateIndx-1)
-        runhi = 1;
-    else
-        runhi = 0;
-    end
-    
-    
-    if runlo == 1
-        tRunnerDown = tRunnerDown + 1;
-    else
-        tRunnerDown = 1;
-    end
-    
-    if runhi == 1
-        tRunnerUp = tRunnerUp + 1;
-    else
-        tRunnerUp = 1;
-    end
-    
-    disp([tRunnerUp, tRunnerDown])
-    
-    tStore = [tStore; tRunnerUp, tRunnerDown];
-    
-end
-
-subplot(3,1,1)
-pHandle = highlow(hi, lo, op, cl, 'blue', da);
-hold on
-
-text(da(range), hi(range)*1.01, strcat(num2str(tStore(:,1))));
-text(da(range), lo(range)*0.99, strcat(num2str(tStore(:,2))));
-
-
-
-[hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(dAvg);
-daA(avgIndx,1)
-
-[hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
-da(dateIndx,1)
-
-
-disp('Average');
-disp([opA(avgIndx), clA(avgIndx)]);
-disp('Stock');
-disp([op(avgIndx), cl(avgIndx)]);
-
-pointA = clA(avgIndx) - opA(avgIndx);
-pointS = cl(dateIndx) - op(dateIndx);
-
-set(0,'CurrentFigure',fD)
-if pointS > 0
-    plot(da(dateIndx), hi(dateIndx), 'go')
-else
-    plot(da(dateIndx), hi(dateIndx), 'ro')
-end
-
-if pointA > 0
-    plot(da(dateIndx), lo(dateIndx), 'go')
-else
-    plot(da(dateIndx), lo(dateIndx), 'ro')
-end
-
-
-
-
-
-
-
-
-
-
-
-% text(da(dateIndx), hi(dateIndx)*1.01, strcat(num2str(tRunnerUp)));
-% text(da(dateIndx), lo(dateIndx)*0.99, strcat(num2str(tRunnerDown)));
-
-% ax1 = gca;
+% subplot(2,1,1)
+% [hi, lo, cl, op, da] = tf.returnOHLCDarray([da,Idx]);
+% highlow(hi, lo, op, cl, 'blue', da);
+% 
+% subplot(2,1,2)
 % hold on
-%
-% ax2 = axes('Position',get(ax1,'Position'),...
-%     'XAxisLocation','top',...
-%     'YAxisLocation','right',...
-%     'Color','none',...
-%     'XColor','k','YColor','k');
-% set(ax2, 'YLim', [0 180000000])
-% linkaxes([ax1 ax2],'x');
-% hold on
-% bar(dAll(:,1),dAll(:,6),'Parent',ax2);
-% hold off
+% [hi, lo, cl, op, da] = tf.returnOHLCDarray([da,Sio]);
+% highlow(hi, lo, op, cl, 'blue', da);
+% [hi, lo, cl, op, da] = tf.returnOHLCDarray([da,Scb]);
+% highlow(hi, lo, op, cl, 'red', da);
+% [hi, lo, cl, op, da] = tf.returnOHLCDarray([da,Sro]);
+% highlow(hi, lo, op, cl, 'green', da);
+
+
