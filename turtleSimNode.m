@@ -10,11 +10,11 @@ daysIntoPast    = 400;
 
 stock = 'TSLA'
 exchange = 'NYSE';
-FETCH = 1;
+FETCH = 0;
 
 past = '1/1/2006';
-simulateFrom = '10/1/14';
-simulateTo = '10/1/15';
+simulateFrom = '1/1/16';
+simulateTo = '4/1/16';
 
 arduinoControl = 1;
 
