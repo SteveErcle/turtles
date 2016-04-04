@@ -6,8 +6,8 @@ delete(slider);
 handles = guihandles(slider);
 
 
-simFrom = 1;
-simTo = 100;
+simFrom = 80;
+simTo = 200;
 len = simTo - simFrom;
 axisView = 50;
 setOff = 50;
@@ -16,29 +16,29 @@ set(handles.axisView, 'Max', len, 'Min', setOff);
 set(handles.axisView, 'SliderStep', [1/len, 10/len]);
 set(handles.axisView, 'Value', axisView);
 
-% past = '1/1/13';
-% simulateTo = now;
-%
-% stock = 'TSLA';
-%
-% c = yahoo;
-%
-% dAll = (fetch(c,stock,past, simulateTo, 'd'));
-% wAll = fetch(c,stock,past, simulateTo, 'w');
-% mAll = fetch(c,stock,past, simulateTo, 'm');
-%
-% averages = '^GSPC';
-% dAvg = fetch(c,averages,past, simulateTo, 'd');
-%
-% close(c);
+past = '1/1/13';
+simulateTo = now;
+
+stock = '^GSPC';
+
+c = yahoo;
+
+dAll = (fetch(c,stock,past, simulateTo, 'd'));
+wAll = fetch(c,stock,past, simulateTo, 'w');
+mAll = fetch(c,stock,past, simulateTo, 'm');
+
+averages = '^GSPC';
+dAvg = fetch(c,averages,past, simulateTo, 'd');
+
+close(c);
 
 
-load('tslaOffline');
+% load('tslaOffline');
 dAll = dAll(simFrom:simTo,:);
 dAvg = dAvg(simFrom:simTo,:);
 
 
-beta = 1.29;
+beta = 1.0;
 
 
 tf = TurtleFun;
@@ -76,7 +76,7 @@ end
 Sro = Scb(end) + (Scb - Sio);
 
 
-wSize = 10;
+wSize = 20;
 ScbS = flipud(tsmovavg(flipud(Scb(:,4)),'e',wSize,1));
 SioS = flipud(tsmovavg(flipud(Sio(:,4)),'e',wSize,1));
 SroS = flipud(tsmovavg(flipud(Sro(:,4)),'e',wSize,1));

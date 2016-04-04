@@ -3,66 +3,68 @@ clc; close all; clear all;
 
 tf = TurtleFun;
 
+
+%%
 load('tslaOffline');
 
 simFrom = 300;
-simTo = 400; %length(dAll);
-
+simTo = 400; 
 dAll = dAll(simFrom:simTo,:);
 dAvg = dAvg(simFrom:simTo,:);
 [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
-
-wSize = 10;
+starter = da(1);
+wSize = 20;
 signal = flipud(tsmovavg(flipud(cl),'e',wSize,1));
 signal(end-(wSize-2):end) = [];
-
 t = 0:length(signal)-1;
 
 
-% A = 1;
-% P = 100;
-% theta = 0;
-% y = A(1)*cos(2*pi*(1/P(1)) * t + theta(1));
+%%
+fun = @(x)(fliplr(signal') - (x(1)*cos(2*pi*(1/x(2)) * t + x(3))));
 
-fun = @(x)(signal' - (x(1)*cos(2*pi*(1/x(2)) * t + x(3))));
-
-x0 = [16, 100, 0];
-lb = [5, 30, -pi];
-ub = [20, 200, pi];
+x0 = [16, 67, 0];
+lb = [5, 10, -pi];
+ub = [20, 150, pi];
 options = optimset('Display', 'off');
 
 [x, resnorm] = lsqnonlin(fun, x0, lb, ub, options);
 
-model = (x(1)*cos(2*pi*(1/x(2)) * t + x(3)))+mean(signal)
+%%
 
-subplot(2,1,1)
+sigAvg = mean(signal);
+
+model = fliplr((x(1)*cos(2*pi*(1/x(2)) * t + x(3))) + sigAvg);
+
+% subplot(2,1,1)
 hold on
-plot(da(1:end-9),signal,'k.');
-plot(da(1:end-9),model,'b');
+plot(da(1:end-(wSize-1)),signal,'k.');
+plot(da(1:end-(wSize-1)),model,'b');
 
 
+%%
 load('tslaOffline');
 
 simFrom = 275;
-simTo = 400; %length(dAll);
-
-
+simTo = 400; 
 dAll = dAll(simFrom:simTo,:);
+dAvg = dAvg(simFrom:simTo,:);
 [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
 
-wSize = 10;
+wSize = 20;
 signal = flipud(tsmovavg(flipud(cl),'e',wSize,1));
 signal(end-(wSize-2):end) = [];
-
 t = 0:length(signal)-1;
 
 
-model = (x(1)*cos(2*pi*(1/x(2)) * t + x(3)))+mean(signal)
+%%
 
-subplot(2,1,2)
+model = fliplr((x(1)*cos(2*pi*(1/x(2)) * t + x(3))) + sigAvg);
+
+% subplot(2,1,2)
 hold on
-plot(da(1:end-9),signal,'k.');
-plot(da(1:end-9),model,'b');
+plot([starter,starter], [min(signal), max(signal)]);
+plot(da(1:end-(wSize-1)),signal,'k.');
+plot(da(1:end-(wSize-1)),model,'b');
 
 
 
