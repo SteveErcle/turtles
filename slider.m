@@ -22,7 +22,7 @@ function varargout = slider(varargin)
 
 % Edit the above text to modify the response to help slider
 
-% Last Modified by GUIDE v2.5 02-Apr-2016 09:07:12
+% Last Modified by GUIDE v2.5 04-Apr-2016 21:44:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -86,6 +86,28 @@ function axisView_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function axisView_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to axisView (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function wSize_Callback(hObject, eventdata, handles)
+% hObject    handle to wSize (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function wSize_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to wSize (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
