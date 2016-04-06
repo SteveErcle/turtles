@@ -4,10 +4,11 @@ clear all; clc; close all;
 
 delete(slider);
 handles = guihandles(slider);
+tf = TurtleFun;
+ta = TurtleAnalyzer;
 
-
-simFrom = 230;
-simTo = 330;
+simFrom = 1;
+simTo = 100;
 len = simTo - simFrom;
 axisView = 50;
 setOff = 50;
@@ -20,32 +21,40 @@ set(handles.wSize, 'Max', 30 , 'Min', 1);
 set(handles.wSize, 'SliderStep', [1/30, 10/30]);
 set(handles.wSize, 'Value', 10);
 
-% past = '1/1/13';
-% simulateTo = now;
-%
-% stock = '^GSPC';
-%
-% c = yahoo;
-%
-% dAll = (fetch(c,stock,past, simulateTo, 'd'));
-% wAll = fetch(c,stock,past, simulateTo, 'w');
-% mAll = fetch(c,stock,past, simulateTo, 'm');
-%
-% averages = '^GSPC';
-% dAvg = fetch(c,averages,past, simulateTo, 'd');
-%
-% close(c);
 
 
-load('tslaOffline');
+past = '1/1/01';
+simulateTo = now;
+
+stock = 'AXL';
+
+c = yahoo;
+
+dAll = (fetch(c,stock,past, simulateTo, 'd'));
+wAll = fetch(c,stock,past, simulateTo, 'w');
+mAll = fetch(c,stock,past, simulateTo, 'm');
+
+averages = '^GSPC';
+dAvg = fetch(c,averages,past, simulateTo, 'd');
+
+close(c);
+
+
+
+
+[~,~,cl,~,da] = tf.returnOHLCDarray(dAll);
+[~,~,clD,~,~] = tf.returnOHLCDarray(dAvg);
+disp('Beta: ')
+beta = ta.calcBeta(cl, clD)
+
+datestr(da(1,1))
+
+
+% load('tslaOffline');
 dAll = dAll(simFrom:simTo,:);
 dAvg = dAvg(simFrom:simTo,:);
 
 
-beta = 1.29;
-
-
-tf = TurtleFun;
 
 p = 0;
 
@@ -54,42 +63,11 @@ while(true)
     [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
     
     
+    wSize = floor(get(handles.wSize, 'Value'));
+    set(handles.printSize, 'String', num2str(wSize));
     
-    Idx = dAvg(:,2:5);
-    Scb = dAll(:,2:5);
-    
-    
-    % Scb = ([8 8 7 6 5 4 3 2 2])';
-    % Idx = ([9 8 7 6 5 4 3 2 1])';
-    % Idx = [Idx, Idx*2];
-    % Scb = Idx;
-    % Scb(end,:) = [4,3];
-    
-    per = [];
-    
-    for i = size(Idx,1) - 1 : -1 : 1
-        per = [per; beta * ((Idx(i,:) - Idx(i+1,:)) ./ Idx(i+1,:))];
-    end
-    per = flipud(per);
-    
-    Sio = zeros(size(Scb));
-    Sio(end,:) = Scb(end,:);
-    
-    for i = size(Idx,1) - 1 : -1 : 1
-        Sio(i,:) = Sio(i+1,:).*(per(i,:)+1);
-    end
-    
-    
-    
-    Sro = Scb(end) + (Scb - Sio);
-    
-    
-    wSize = floor(get(handles.wSize, 'Value'))
-    ScbS = flipud(tsmovavg(flipud(Scb(:,4)),'e',wSize,1));
-    SioS = flipud(tsmovavg(flipud(Sio(:,4)),'e',wSize,1));
-    SroS = flipud(tsmovavg(flipud(Sro(:,4)),'e',wSize,1));
-    
-    
+    [ScbS, SioS, SroS] = ta.getMovingAvgs(dAll, dAvg, wSize, beta);
+
     numSub = 2;
     
     
@@ -115,7 +93,7 @@ while(true)
     
     
     subplot(numSub,1,1)
-    [hi, lo, cl, op, da] = tf.returnOHLCDarray([da,Scb]);
+    [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
     highlow(hi, lo, op, cl, 'red', da);
     hold on;
     
@@ -137,9 +115,9 @@ while(true)
     offSet = xLen - setOff;
     subplot(numSub,1,1)
     xlim([da(end-offSet), da(end-xLen)]);
-    %     subplot(numSub,1,2)
-    %     xlim([da(end-offSet), da(end-xLen)]+0.25);
-    %
+    subplot(numSub,1,2)
+    xlim([da(end-offSet), da(end-xLen)]+0.25);
+    
     
     pause(0.2)
     h = gcf;

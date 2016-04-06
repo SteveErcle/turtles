@@ -8,57 +8,50 @@ classdef TurtleAnalyzer < handle
     
     methods
         
-        function beta = calcBeta(obj)
+        function beta = calcBeta(obj, cl ,clD)
             
+            perCl = [];
+            perClD = [];
             
-            for i = 1:size(da)-1
+            for i = 1:size(cl)-1
                 perCl = [perCl; (cl(i) - cl(i+1)) / cl(i+1)*100];
-                perClD = [perClD; beta*(clD(i) - clD(i+1)) / clD(i+1)*100];
+                perClD = [perClD; (clD(i) - clD(i+1)) / clD(i+1)*100];
             end
             
-            beta = cov(perCl, perClD) / var(perClD)
-            beta = beta(1,2)
-            
-        end
-       
-        function perSecurity = percentChange(obj, varargin)
-            
-            if nargin == 2
-                tAll = varargin{1};
-                beta = 1;
-            elseif nargin == 3
-                    tAll = varargin{1};
-                    beta = varargin{2};
-            end 
-                
-            
-            [hi, lo, cl, op, da] = obj.tf.returnOHLCDarray(tAll);
-            
-            perSecurity = [];
-            % add beta;
-            for i = 1:size(da)-1
-                perSecurity = [perSecurity; beta*((op(i) - op(i+1)) / op(i+1)),...
-                    beta*((hi(i) - hi(i+1)) / hi(i+1)),...
-                    beta*((lo(i) - lo(i+1)) / lo(i+1)),...
-                    beta*((cl(i) - cl(i+1)) / cl(i+1))];
-            end
+            beta = cov(perCl, perClD) / var(perClD);
+            beta = beta(1,2);
             
         end
         
-        function adjustedStock = adjustPrice(obj, perStock, dAll)
+        function [ScbS, SioS, SroS] = getMovingAvgs(obj, stockData, avgData, window_size, beta)
             
-            adjustedStock = dAll(end,2:5);
-            for i = 1:size(perStock,1)-1
-                adjustedStock = [adjustedStock; adjustedStock(i,:)./(1+perStock(i,:))];
+            Idx = avgData(:,2:5);
+            Scb = stockData(:,2:5);
+            
+            per = [];
+            
+            for i = size(Idx,1) - 1 : -1 : 1
+                per = [per; beta * ((Idx(i,:) - Idx(i+1,:)) ./ Idx(i+1,:))];
+            end
+            per = flipud(per);
+            
+            Sio = zeros(size(Scb));
+            Sio(end,:) = Scb(end,:);
+            
+            for i = size(Idx,1) - 1 : -1 : 1
+                Sio(i,:) = Sio(i+1,:).*(per(i,:)+1);
             end
             
+            Sro = Scb(end) + (Scb - Sio);
+            
+            ScbS = flipud(tsmovavg(flipud(Scb(:,4)),'e',window_size,1));
+            SioS = flipud(tsmovavg(flipud(Sio(:,4)),'e',window_size,1));
+            SroS = flipud(tsmovavg(flipud(Sro(:,4)),'e',window_size,1));
+            
+            
         end
-        
         
     end
-    
-    
-    
     
     
 end

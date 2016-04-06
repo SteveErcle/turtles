@@ -8,13 +8,13 @@ aniSpeed        = 0.1;
 daysForCrossVal = 10;
 daysIntoPast    = 400;
 
-stock = 'TSLA'
+stock = 'AXL'
 exchange = 'NYSE';
 FETCH = 0;
 
 past = '1/1/2006';
 simulateFrom = '1/1/16';
-simulateTo = '4/1/16';
+simulateTo = now;
 
 arduinoControl = 1;
 
@@ -54,6 +54,7 @@ hlcoDp = TurtleVal(dAll);
 
 ts.dAll = dAll;
 ts.iAll = iAll;
+ts.dAvg = dAvg;
 ts.dCong = dCong; ts.wCong = wCong; ts.mCong = mCong;
 ts.initHandles(handles, simPres, aniLen, axisLen, aniSpeed, dAll);
 ts.setButtons(handles, 'none');
@@ -158,6 +159,7 @@ while(true)
                 isNewMonth = ts.isNewTimePeriod(mCong, i_date);
                 
                 OpCl = 1;
+                ts.OpCl = 1;
                 [pDo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                     fD, 0.5, handles, axisLen, axisParams, OpCl);
                 [pWo, axisLen, axisParams] = ts.animateOpen(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
@@ -171,6 +173,7 @@ while(true)
                 ts.intraDayViewer(fInt);
                 
                 OpCl = 2;
+                ts.OpCl = 2;
                 [pD, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.D, 'Value'), isNewDay, dCong, i_date,...
                     fD, pD, pDo, 0.5, handles, axisLen, axisParams, OpCl);
                 [pW, axisLen, axisParams] = ts.animateClose(aniSpeed, get(handles.W, 'Value'), isNewWeek, wCong, i_date,...
@@ -180,52 +183,53 @@ while(true)
                 ts.plotAnnotation(OpCl);
                 
                 
-                avgIndx = td.getDateIndx(dAvg(:,1), i_date)
-                dateIndx = td.getDateIndx(dAll(:,1), i_date)
+%                 avgIndx = td.getDateIndx(dAvg(:,1), i_date)
+%                 dateIndx = td.getDateIndx(dAll(:,1), i_date)
+%                 
+%                 [hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(dAvg);
+%                 daA(avgIndx,1)
+%                
+%                 [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
+%                 da(dateIndx,1)
+%                
+%                 
+%                 disp('Average');
+%                 disp([opA(avgIndx), clA(avgIndx)]);
+%                 disp('Stock');
+%                 disp([op(avgIndx), cl(avgIndx)]);
+%                 
+%                 pointA = clA(avgIndx) - opA(avgIndx);
+%                 pointS = cl(dateIndx) - op(dateIndx);
+%                 
+%                 set(0,'CurrentFigure',fD)
+%                 if pointS > 0
+%                     plot(da(dateIndx), hi(dateIndx), 'go')
+%                 else
+%                     plot(da(dateIndx), hi(dateIndx), 'ro')
+%                 end
+%                 
+%                 if pointA > 0
+%                     plot(da(dateIndx), lo(dateIndx), 'go')
+%                 else
+%                     plot(da(dateIndx), lo(dateIndx), 'ro')
+%                 end
+%                 
+%                 
+%                 set(0,'CurrentFigure',fAvg)
+%                 cla(fAvg)
+%                 ax = gca
+%                 tf.plotHiLoMultiple(dAvg(avgIndx:end,:));
+%                 axis(gca, [da(avgIndx+150), da(avgIndx)+35,...
+%                     min(loA(avgIndx:avgIndx+150)),...
+%                     max(hiA(avgIndx:avgIndx+150))])
                 
-                [hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(dAvg);
-                daA(avgIndx,1)
-               
-                [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
-                da(dateIndx,1)
-               
-                
-                disp('Average');
-                disp([opA(avgIndx), clA(avgIndx)]);
-                disp('Stock');
-                disp([op(avgIndx), cl(avgIndx)]);
-                
-                pointA = clA(avgIndx) - opA(avgIndx);
-                pointS = cl(dateIndx) - op(dateIndx);
-                
-                set(0,'CurrentFigure',fD)
-                if pointS > 0
-                    plot(da(dateIndx), hi(dateIndx), 'go')
-                else
-                    plot(da(dateIndx), hi(dateIndx), 'ro')
-                end
-                
-                if pointA > 0
-                    plot(da(dateIndx), lo(dateIndx), 'go')
-                else
-                    plot(da(dateIndx), lo(dateIndx), 'ro')
-                end
-                
-                
-                set(0,'CurrentFigure',fAvg)
-                cla(fAvg)
-                ax = gca
-                tf.plotHiLoMultiple(dAvg(avgIndx:end,:));
-                axis(gca, [da(avgIndx+150), da(avgIndx)+35,...
-                    min(loA(avgIndx:avgIndx+150)),...
-                    max(hiA(avgIndx:avgIndx+150))])
-                
-                
+                ts.plotMovingAvg();
                 ts.trackVolume(handles, OpCl);
                 [runnerUp, runnerDown] = ts.trackTime(handles, dAll, runnerUp, runnerDown, OpCl, fD);
                 [runnerUp, runnerDown] = ts.trackTime(handles, wAll, runnerUp, runnerDown, OpCl, fW);
                 [runnerUp, runnerDown] = ts.trackTime(handles, mAll, runnerUp, runnerDown, OpCl, fM);
 
+                
                 [axisLen, axisParams] = ts.playTurtles(handles, axisLen, axisParams, simDates, i_date, dAll, OpCl);
                 
                 [aniSpeed, aniLen] = ts.setAnimation(handles, i_date, simDates);

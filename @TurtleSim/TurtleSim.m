@@ -5,6 +5,7 @@ classdef TurtleSim < handle
         
         dAll;
         iAll = 0;
+        dAvg;
         runnerUpArr = [];
         runnerDownArr = [];
         volumeArr = [];
@@ -13,6 +14,7 @@ classdef TurtleSim < handle
         dateRef = 0;
         i_dateH = 0;
         i_intraH = 1;
+        OpCl = 0;
         dCong;
         wCong;
         mCong;
@@ -20,11 +22,15 @@ classdef TurtleSim < handle
         isEnteredIntra = 0;
         
         pMarket = 0;
+        pMoving = 0;
         pdInt;
         levels = [];
         trends = [];
         handles;
         a;
+        
+        ta = TurtleAnalyzer;
+        td = TurtleData;
     end
     
     
@@ -84,6 +90,10 @@ classdef TurtleSim < handle
             set(handles.offsetAxis, 'Max', lenOfTime, 'Min', 0);
             set(handles.offsetAxis, 'SliderStep', [1/lenOfTime, 10/lenOfTime]);
             set(handles.offsetAxis, 'Value', 0);
+            
+            set(handles.windSize, 'Max', 30 , 'Min', 1);
+            set(handles.windSize, 'SliderStep', [1/30, 10/30]);
+            set(handles.windSize, 'Value', 10);
             
             set(handles.pr,'String', 0)
             
@@ -285,6 +295,10 @@ classdef TurtleSim < handle
                     obj.plotTrade(OpCl);
                     
                     obj.plotLevel();
+                    
+                    if obj.OpCl == 2
+                        obj.plotMovingAvg();
+                    end
                     
                     [axisLen, axisParams] = obj.setAxis(handles, axisLen, axisParams, i_date, OpCl);
                     
@@ -688,7 +702,7 @@ classdef TurtleSim < handle
                             
                             y3 = p(1)*(x2+timeExtend) + p(2);
                             
-                             for i = 1:4
+                            for i = 1:4
                                 set(0,'CurrentFigure',i)
                                 plot([x1,x2+timeExtend] , [y1, y3], color);
                             end
@@ -949,11 +963,58 @@ classdef TurtleSim < handle
             
         end
         
+        function [] = plotMovingAvg(obj)
+            
+            if get(obj.handles.movingAvg, 'Value')
+                
+                lenAvg = 50;
+                
+                [stockIndx] = obj.td.getDateIndx(obj.dAll(:,1), obj.i_dateH);
+                stockData = obj.dAll(stockIndx:stockIndx+lenAvg,:);
+                
+                [avgIndx] = obj.td.getDateIndx(obj.dAll(:,1), obj.i_dateH);
+                avgData = obj.dAvg(avgIndx:avgIndx+lenAvg,:);
+                
+                daRange = stockData(:,1);
+                
+                windSize = floor(get(obj.handles.windSize, 'Value'));
+                set(obj.handles.printWindSize, 'String', num2str(windSize));
+                
+                beta = 1.72;
+                
+                [ScbS, SioS, SroS] = obj.ta.getMovingAvgs(stockData, avgData, windSize, beta);
+                
+                
+                if obj.pMoving(1) ~= 0 & ishandle(obj.pMoving)
+                    delete(obj.pMoving);
+                end
+                
+                set(0,'CurrentFigure',1)
+                obj.pMoving(1) = plot(daRange,SioS, 'b.');
+                obj.pMoving(2) = plot(daRange,ScbS,'r.');
+                obj.pMoving(3) = plot(daRange,SroS, 'k.');
+                
+            end
+            
+        end
+       
         
         
     end
     
 end
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
