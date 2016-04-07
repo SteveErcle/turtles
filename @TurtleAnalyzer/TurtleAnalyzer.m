@@ -10,8 +10,8 @@ classdef TurtleAnalyzer < handle
         
         function beta = calcBeta(obj, dAll ,dAvg)
             
-            cl = dAll(:,5);
-            clD = dAvg(:,5);
+            cl = dAll(:,7);
+            clD = dAvg(:,7);
             
             perCl = [];
             perClD = [];
@@ -52,6 +52,16 @@ classdef TurtleAnalyzer < handle
             SroS = flipud(tsmovavg(flipud(Sro(:,4)),'e',window_size,1));
             
             
+        end
+        
+        function [RSI, RSIma] = getRSI(obj, stockData, avgData, window_size)
+        
+            cl = stockData(:,5);
+            clD = avgData(:,5);
+            
+            RSI = (cl./clD)*100;
+            RSIma = flipud(tsmovavg(flipud(RSI),'e',window_size,1));
+          
         end
         
     end

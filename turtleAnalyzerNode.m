@@ -40,20 +40,16 @@ dAvg = fetch(c,averages,past, simulateTo, 'd');
 close(c);
 
 
-
-
-[~,~,cl,~,da] = tf.returnOHLCDarray(dAll);
-[~,~,clD,~,~] = tf.returnOHLCDarray(dAvg);
-disp('Beta: ')
-beta = ta.calcBeta(cl, clD)
-
-datestr(da(1,1))
-
-
-% load('tslaOffline');
 dAll = dAll(simFrom:simTo,:);
 dAvg = dAvg(simFrom:simTo,:);
 
+
+
+disp('Beta: ')
+beta = ta.calcBeta(dAll, dAvg)
+
+
+% load('tslaOffline');
 
 
 p = 0;
@@ -62,22 +58,23 @@ while(true)
     
     [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
     
+    [~,~,clD,~,~] = tf.returnOHLCDarray(dAvg);
     
     wSize = floor(get(handles.wSize, 'Value'));
     set(handles.printSize, 'String', num2str(wSize));
     
     [ScbS, SioS, SroS] = ta.getMovingAvgs(dAll, dAvg, wSize, beta);
-
-    numSub = 2;
     
+    numSub = 2;
     
     subplot(2,1,2)
     cla
     hold on
-    plot(da(1:end-1),flipud(diff(flipud(SioS))), 'b')
-    plot(da(1:end-1),flipud(diff(flipud(SroS))), 'k')
-    plot([da(1),da(end)], [0,0], 'm')
-    
+   
+    [RSI, RSIma] = ta.getRSI(dAll, dAvg, wSize);
+    plot(da,RSI,'c.')
+    hold on
+    plot(da,RSIma,'m.')
     
     subplot(numSub,1,1)
     cla
@@ -85,6 +82,9 @@ while(true)
     plot(da,SioS, 'b.')
     plot(da,ScbS,'r.')
     plot(da,SroS, 'k.')
+    %     plot(da(1:end-1),flipud(diff(flipud(SioS))), 'b')
+    %     plot(da(1:end-1),flipud(diff(flipud(SroS))), 'k')
+    %     plot([da(1),da(end)], [0,0], 'm')
     
     % plot(da,Sio(:,4), 'b')
     % plot(da,Scb(:,4),'r')

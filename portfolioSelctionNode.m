@@ -14,19 +14,27 @@ handles = guihandles(slider);
 tf = TurtleFun;
 ta = TurtleAnalyzer;
 
-simFrom = 100;
-simTo = 200;
+simFrom = 1;
+simTo = 300;
 len = simTo - simFrom;
 axisView = 50;
-setOff = 50;
+offSet = 50;
 
-set(handles.axisView, 'Max', len, 'Min', setOff);
+
+set(handles.axisView, 'Max', len, 'Min', 1);
 set(handles.axisView, 'SliderStep', [1/len, 10/len]);
 set(handles.axisView, 'Value', axisView);
+
+set(handles.axisLen, 'Max', len, 'Min', 25);
+set(handles.axisLen, 'SliderStep', [1/len, 10/len]);
+set(handles.axisLen, 'Value', offSet);
+
 
 set(handles.wSize, 'Max', 30 , 'Min', 1);
 set(handles.wSize, 'SliderStep', [1/30, 10/30]);
 set(handles.wSize, 'Value', 10);
+
+hp = 0;
 
 
 % portfolio = {'NKE'; 'K'; 'CVX'; 'COF'; 'CELG'; 'ETN'; 'AA'; 'DUK'; 'GOOG'; 'WFC'; 'AMT'};
@@ -41,10 +49,10 @@ for hide_getData = 1:1
     if FETCH == 1
         
         c = yahoo;
-
-            dAvg = fetch(c,averages,past, simulateTo, 'd');
-            wAvg = fetch(c,averages,past, simulateTo, 'w');
-            mAvg = fetch(c,averages,past, simulateTo, 'm');
+        
+        dAvg = fetch(c,averages,past, simulateTo, 'd');
+        wAvg = fetch(c,averages,past, simulateTo, 'w');
+        mAvg = fetch(c,averages,past, simulateTo, 'm');
         
         for i = 1:length(portfolio)
             
@@ -54,7 +62,7 @@ for hide_getData = 1:1
                 stockName = stockName(2:end);
                 portfolio{i}= stockName;
             end
-                
+            
             dAll.(stockName) = (fetch(c,stock,past, simulateTo, 'd'));
             wAll.(stockName) = fetch(c,stock,past, simulateTo, 'w');
             mAll.(stockName) = fetch(c,stock,past, simulateTo, 'm');
@@ -80,6 +88,10 @@ figure(1)
 subplot(3,2,1)
 figure(2)
 subplot(3,2,1)
+figure(3)
+[hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(wAvg);
+highlow(hiA, loA, opA, clA, 'red', daA);
+hold on
 
 while(true)
     
@@ -94,7 +106,7 @@ while(true)
         else
             set(0,'CurrentFigure',2)
             j = i-6;
-        end 
+        end
         
         stock = portfolio{i};
         
@@ -110,6 +122,7 @@ while(true)
         stockBeta = beta.(stock);
         [hi, lo, cl, op, da] = tf.returnOHLCDarray(stockData);
         
+        
         [ScbS, SioS, SroS] = ta.getMovingAvgs(stockData, avgData, windSize, stockBeta);
         
         
@@ -123,19 +136,75 @@ while(true)
             plot(da, SroS, 'k.')
         end
         
+        if get(handles.RSI, 'Value')
+            set(handles.movingAverage, 'Value',0);
+            [RSI, RSIma] = ta.getRSI(stockData, avgData, windSize);
+            plot(da,RSI,'c.');
+            plot(da,RSIma,'m.');
+        end
+        
         if get(handles.hiLo, 'Value')
             highlow(hi, lo, lo, hi, 'red', da);
-        else
+        elseif get(handles.ohlc, 'Value')
             highlow(hi, lo, op, cl, 'red', da);
         end
+        
+        
         title(portfolio{i});
         
-        
         xLen = floor(get(handles.axisView, 'Value'));
-        offSet = xLen - setOff;
-        xlim([da(end-offSet), da(end-xLen)]+0.25);
+        
+        offSet = floor(get(handles.axisLen, 'Value'));
+        
+        if offSet > xLen
+            offSet = xLen;
+        end
+        
+        xlim([da(end-xLen+offSet), da(end-xLen)+0.25]);
+        
     end
+    
+    
+    set(0,'CurrentFigure',3)
+    xLo = da(end-xLen+offSet);
+    xHi = da(end-xLen)+0.25;
+    yLimits = ylim(gca);
+    yLo = yLimits(1);
+    yHi = yLimits(2);
+    
+    x = [xLo xHi xHi xLo];
+    y = [yLo yLo yHi yHi];
+    
+    if hp ~= 0 & ishandle(hp)
+        delete(hp);
+    end 
+    hp = patch(x,y, [0.9,1,1]);
+    highlow(hiA, loA, opA, clA, 'red', daA);
     
     pause(0.05)
     
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
