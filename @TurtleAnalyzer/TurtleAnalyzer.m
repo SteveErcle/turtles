@@ -8,7 +8,10 @@ classdef TurtleAnalyzer < handle
     
     methods
         
-        function beta = calcBeta(obj, cl ,clD)
+        function beta = calcBeta(obj, dAll ,dAvg)
+            
+            cl = dAll(:,5);
+            clD = dAvg(:,5);
             
             perCl = [];
             perClD = [];
