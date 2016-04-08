@@ -22,7 +22,7 @@ function varargout = slider(varargin)
 
 % Edit the above text to modify the response to help slider
 
-% Last Modified by GUIDE v2.5 07-Apr-2016 19:41:35
+% Last Modified by GUIDE v2.5 07-Apr-2016 20:34:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -200,3 +200,12 @@ function axisSecondary_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
+
+
+% --- Executes on button press in accessSecondary.
+function accessSecondary_Callback(hObject, eventdata, handles)
+% hObject    handle to accessSecondary (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of accessSecondary

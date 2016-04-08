@@ -147,7 +147,7 @@ classdef TurtleData
             
             if isempty(dateIndx)
                 
-                disp('Finding Closest Date')
+%                 disp('Finding Closest Date')
                 
                 [M dateIndx] = min( abs(array - date));
     
@@ -155,6 +155,39 @@ classdef TurtleData
             
         end
     
+        
+        function [primaryRange, secondaryRange, primaryDates, secondaryDates] = setRanges(obj, handles, tAll)
+        
+            
+            primaryStartDate = floor(get(handles.axisView, 'Value'));
+            secondaryStartDate = floor(get(handles.axisSecondary, 'Value'));
+            
+            primaryStartIndx = obj.getDateIndx(tAll.GSPC(:,1), primaryStartDate);
+            secondaryStartIndx = obj.getDateIndx(tAll.GSPC(:,1), secondaryStartDate);
+            
+            offSet = floor(get(handles.axisLen, 'Value'));
+            
+            primaryEndDate = primaryStartDate - offSet;
+            secondaryEndDate = secondaryStartDate - offSet;
+            
+            primaryEndIndx = obj.getDateIndx(tAll.GSPC(:,1), primaryEndDate);
+            secondaryEndIndx = obj.getDateIndx(tAll.GSPC(:,1), secondaryEndDate);
+            
+           
+            primaryRange = primaryStartIndx:primaryEndIndx;
+            secondaryRange = secondaryStartIndx:secondaryEndIndx;
+            
+            if length(primaryRange) > length(secondaryRange)
+                secondaryRange = secondaryStartIndx:secondaryEndIndx+1;
+            elseif length(primaryRange) < length(secondaryRange)
+                secondaryRange = secondaryStartIndx:secondaryEndIndx-1;
+            end
+            
+            primaryDates = [primaryEndDate, primaryStartDate];
+            
+            secondaryDates = [secondaryEndDate, secondaryStartDate];
+            
+        end
     end
     
 end

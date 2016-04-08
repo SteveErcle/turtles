@@ -12,22 +12,30 @@ FETCH = 0;
 delete(slider);
 handles = guihandles(slider);
 tf = TurtleFun;
+td = TurtleData;
 ta = TurtleAnalyzer;
 
 simFrom = 1;
 simTo = 300;
-len = simTo - simFrom;
-axisView = 50;
-offSet = 50;
 
+axisView = now-50;
+offSet = 200;
 
-set(handles.axisView, 'Max', len, 'Min', 1);
+past = '1/1/01';
+simulateTo = now;
+len = now-datenum(past);
+
+set(handles.axisView, 'Max', now, 'Min', datenum(past));
 set(handles.axisView, 'SliderStep', [1/len, 10/len]);
 set(handles.axisView, 'Value', axisView);
 
 set(handles.axisLen, 'Max', len, 'Min', 25);
 set(handles.axisLen, 'SliderStep', [1/len, 10/len]);
 set(handles.axisLen, 'Value', offSet);
+
+set(handles.axisSecondary, 'Max', now, 'Min', datenum(past));
+set(handles.axisSecondary, 'SliderStep', [1/len, 10/len]);
+set(handles.axisSecondary, 'Value', axisView);
 
 
 set(handles.wSize, 'Max', 30 , 'Min', 1);
@@ -41,8 +49,7 @@ hp = 0;
 portfolio = {'XLY'; 'XLP'; 'XLE'; 'XLF'; 'XLV'; 'XLI'; 'XLB'; 'XLU'; 'XLK'; '^GSPC';'^NYA'; '^DJI'}; %'XLFS'; 'XLRE'};
 averages = '^GSPC';
 
-past = '1/1/01';
-simulateTo = now;
+
 
 for hide_getData = 1:1
     
@@ -80,7 +87,7 @@ for hide_getData = 1:1
 end
 
 
-range = simFrom:simTo;
+primaryRange = simFrom:simTo;
 
 p = 0;
 
@@ -90,13 +97,20 @@ figure(2)
 subplot(3,2,1)
 figure(3)
 [hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(wAvg);
-highlow(hiA, loA, opA, clA, 'red', daA);
+hl = highlow(hiA, loA, opA, clA, 'red', daA);
 hold on
 
 while(true)
     
     windSize = floor(get(handles.wSize, 'Value'));
     set(handles.printSize, 'String', num2str(windSize));
+    
+    if get(handles.W, 'Value')
+        [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, wAll);
+    else
+        [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, dAll); 
+    end
+    
     
     for i = 1:12
         
@@ -112,35 +126,51 @@ while(true)
         
         
         if get(handles.W, 'Value')
-            stockData = wAll.(stock)(range,:);
-            avgData = wAvg(range,:);
+            stockData = wAll.(stock)(primaryRange,:);
+            avgData = wAvg(primaryRange,:);
+            stockData2 = wAll.(stock)(secondaryRange,:);
+            avgData2 = wAvg(secondaryRange,:);   
         else
-            stockData = dAll.(stock)(range,:);
-            avgData = dAvg(range,:);
+            stockData = dAll.(stock)(primaryRange,:);
+            avgData = dAvg(primaryRange,:);
         end
         
         stockBeta = beta.(stock);
         [hi, lo, cl, op, da] = tf.returnOHLCDarray(stockData);
         
         
-        [ScbS, SioS, SroS] = ta.getMovingAvgs(stockData, avgData, windSize, stockBeta);
-        
+       
         
         subplot(3,2,j)
         cla
         hold on
         
         if get(handles.movingAverage, 'Value')
+            [ScbS, SioS, SroS] = ta.getMovingAvgs(stockData, avgData, windSize, stockBeta);
             plot(da, ScbS, 'r.')
             plot(da, SioS, 'b.')
-            plot(da, SroS, 'k.')
-        end
+            plot(da, SroS, 'k', 'Marker', '.')
+            
+            if get(handles.accessSecondary, 'Value')
+                [ScbS, SioS, SroS] = ta.getMovingAvgs(stockData2, avgData2, windSize, stockBeta);
+                plot(da, ScbS, 'm.')
+                plot(da, SioS, 'c.')
+                plot(da, SroS, 'color', [0.70,0.70,0.70], 'Marker', '.')
+            end
+        end 
         
         if get(handles.RSI, 'Value')
             set(handles.movingAverage, 'Value',0);
             [RSI, RSIma] = ta.getRSI(stockData, avgData, windSize);
             plot(da,RSI,'c.');
             plot(da,RSIma,'m.');
+            
+            if get(handles.accessSecondary, 'Value')
+                [RSI, RSIma] = ta.getRSI(stockData2, avgData2, windSize);
+                plot(da,RSI,'g.');
+                plot(da,RSIma,'b.');
+            end
+            
         end
         
         if get(handles.hiLo, 'Value')
@@ -149,39 +179,41 @@ while(true)
             highlow(hi, lo, op, cl, 'red', da);
         end
         
+     
+        
         
         title(portfolio{i});
-        
-        xLen = floor(get(handles.axisView, 'Value'));
-        
-        offSet = floor(get(handles.axisLen, 'Value'));
-        
-        if offSet > xLen
-            offSet = xLen;
-        end
-        
-        xlim([da(end-xLen+offSet), da(end-xLen)+0.25]);
-        
+
+        xlim([primaryDates(1), primaryDates(2)]);
+%         
     end
     
     
     set(0,'CurrentFigure',3)
-    xLo = da(end-xLen+offSet);
-    xHi = da(end-xLen)+0.25;
+    xLo = primaryDates(1);
+    xHi = primaryDates(2);
+    xLo2 = secondaryDates(1);
+    xHi2 = secondaryDates(2);
+    
     yLimits = ylim(gca);
     yLo = yLimits(1);
     yHi = yLimits(2);
     
     x = [xLo xHi xHi xLo];
+    x2 = [xLo2 xHi2 xHi2 xLo2];
     y = [yLo yLo yHi yHi];
+    
     
     if hp ~= 0 & ishandle(hp)
         delete(hp);
+        delete(hp2);
+        delete(hl);
     end 
+    hp2 = patch(x2,y, [1,0.9,1]);
     hp = patch(x,y, [0.9,1,1]);
-    highlow(hiA, loA, opA, clA, 'red', daA);
-    
-    pause(0.05)
+    hl = highlow(hiA, loA, opA, clA, 'red', daA);
+
+    pause(0.1)
     
 end
 
