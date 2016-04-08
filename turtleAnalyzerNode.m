@@ -71,6 +71,15 @@ while(true)
     cla
     hold on
    
+   
+    
+    [stockStandardCl, avgStandardCl] = ta.getStandardized(dAll, dAvg);
+    
+    plot(stockStandardCl)
+    plot(avgStandardCl)
+    
+    return
+    
     [RSI, RSIma] = ta.getRSI(dAll, dAvg, wSize);
     plot(da,RSI,'c.')
     hold on
@@ -85,32 +94,14 @@ while(true)
     %     plot(da(1:end-1),flipud(diff(flipud(SioS))), 'b')
     %     plot(da(1:end-1),flipud(diff(flipud(SroS))), 'k')
     %     plot([da(1),da(end)], [0,0], 'm')
-    
-    % plot(da,Sio(:,4), 'b')
-    % plot(da,Scb(:,4),'r')
-    % plot(da,Sro(:,4), 'k')
-    
-    
-    
+        
     subplot(numSub,1,1)
     [hi, lo, cl, op, da] = tf.returnOHLCDarray(dAll);
     highlow(hi, lo, op, cl, 'red', da);
     hold on;
     
     
-    % subplot(numSub,1,2)
-    % [hi, lo, cl, op, da] = tf.returnOHLCDarray([da,Sro]);
-    % highlow(hi, lo, op, cl, 'black', da);
-    % hold on;
-    %
-    % subplot(numSub,1,2)
-    % [hi, lo, cl, op, da] = tf.returnOHLCDarray([da,Sio]);
-    % highlow(hi, lo, op, cl, 'blue', da);
-    % hold on;
-    
-    
-    % while(true)
-    %
+
     xLen = floor(get(handles.axisView, 'Value'));
     offSet = xLen - setOff;
     subplot(numSub,1,1)

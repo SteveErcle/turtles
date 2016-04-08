@@ -37,7 +37,6 @@ set(handles.axisSecondary, 'Max', now, 'Min', datenum(past));
 set(handles.axisSecondary, 'SliderStep', [1/len, 10/len]);
 set(handles.axisSecondary, 'Value', axisView);
 
-
 set(handles.wSize, 'Max', 30 , 'Min', 1);
 set(handles.wSize, 'SliderStep', [1/30, 10/30]);
 set(handles.wSize, 'Value', 10);
@@ -108,7 +107,7 @@ while(true)
     if get(handles.W, 'Value')
         [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, wAll);
     else
-        [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, dAll); 
+        [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, dAll);
     end
     
     
@@ -129,21 +128,37 @@ while(true)
             stockData = wAll.(stock)(primaryRange,:);
             avgData = wAvg(primaryRange,:);
             stockData2 = wAll.(stock)(secondaryRange,:);
-            avgData2 = wAvg(secondaryRange,:);   
+            avgData2 = wAvg(secondaryRange,:);
         else
             stockData = dAll.(stock)(primaryRange,:);
             avgData = dAvg(primaryRange,:);
         end
         
-        stockBeta = beta.(stock);
+        stockBeta = beta.(stock); % Calc beta on the fly
         [hi, lo, cl, op, da] = tf.returnOHLCDarray(stockData);
         
         
-       
         
         subplot(3,2,j)
         cla
         hold on
+        
+        
+        if get(handles.standardize, 'Value')
+            [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getStandardized(stockData, avgData, windSize);
+            [stockStandard2Cl, avgStandard2Cl, rawStandard2Cl] = ta.getStandardized(stockData2, avgData2, windSize);
+            
+            plot(da, stockStandardCl, 'r', 'Marker', '.');
+            plot(da, avgStandardCl, 'b', 'Marker', '.');
+            plot(da, rawStandardCl, 'k', 'Marker', '.');
+            
+            if get(handles.accessSecondary, 'Value')
+                
+                plot(da, stockStandard2Cl, 'm', 'Marker', '.');
+                plot(da, avgStandard2Cl, 'c', 'Marker', '.');
+                plot(da, rawStandard2Cl, 'color', [0.70,0.70,0.70], 'Marker', '.')
+            end
+        end
         
         if get(handles.movingAverage, 'Value')
             [ScbS, SioS, SroS] = ta.getMovingAvgs(stockData, avgData, windSize, stockBeta);
@@ -157,7 +172,7 @@ while(true)
                 plot(da, SioS, 'c.')
                 plot(da, SroS, 'color', [0.70,0.70,0.70], 'Marker', '.')
             end
-        end 
+        end
         
         if get(handles.RSI, 'Value')
             set(handles.movingAverage, 'Value',0);
@@ -179,13 +194,13 @@ while(true)
             highlow(hi, lo, op, cl, 'red', da);
         end
         
-     
+        
         
         
         title(portfolio{i});
-
+        
         xlim([primaryDates(1), primaryDates(2)]);
-%         
+        
     end
     
     
@@ -204,15 +219,15 @@ while(true)
     y = [yLo yLo yHi yHi];
     
     
-    if hp ~= 0 & ishandle(hp)
+    if hp ~= 0 && ishandle(hp)
         delete(hp);
         delete(hp2);
         delete(hl);
-    end 
+    end
     hp2 = patch(x2,y, [1,0.9,1]);
     hp = patch(x,y, [0.9,1,1]);
     hl = highlow(hiA, loA, opA, clA, 'red', daA);
-
+    
     pause(0.1)
     
 end
