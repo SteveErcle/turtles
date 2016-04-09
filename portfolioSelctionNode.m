@@ -45,7 +45,8 @@ hp = 0;
 
 
 % portfolio = {'NKE'; 'K'; 'CVX'; 'COF'; 'CELG'; 'ETN'; 'AA'; 'DUK'; 'GOOG'; 'WFC'; 'AMT'};
-portfolio = {'XLY'; 'XLP'; 'XLE'; 'XLF'; 'XLV'; 'XLI'; 'XLB'; 'XLU'; 'XLK'; '^GSPC';'^NYA'; '^DJI'}; %'XLFS'; 'XLRE'};
+portfolio.sectors = {'XLY'; 'XLP'; 'XLE'; 'XLF'; 'XLV'; 'XLI'; 'XLB'; 'XLU'; 'XLK'; '^GSPC';'^NYA'; '^DJI'}; %'XLFS'; 'XLRE'};
+portfolio.finance = {'BRK-B'; 'WFC'; 'BAC'; 'C'; 'USB'; 'AIG'; 'JPM';  'CB'; 'SPG'; 'AXP'; 'PNC'; 'BK'};
 averages = '^GSPC';
 
 
@@ -60,23 +61,33 @@ for hide_getData = 1:1
         wAvg = fetch(c,averages,past, simulateTo, 'w');
         mAvg = fetch(c,averages,past, simulateTo, 'm');
         
-        for i = 1:length(portfolio)
+        for i = 1: length(fieldnames(portfolio))
+            markets = fieldnames(portfolio);
+            market = markets{i};
             
-            stock = portfolio{i}
-            stockName = stock;
-            if stockName(1) == '^'
-                stockName = stockName(2:end);
-                portfolio{i}= stockName;
+            for j = 1:length(portfolio.(market))
+                
+                stock = portfolio.(market){j};
+                disp(stock);
+                
+                stockName = stock;
+                if stockName(1) == '^'
+                    stockName = stockName(2:end);
+                    portfolio.(market){j}= stockName;
+                elseif sum(stockName == '-') > 0
+                    stockName(find(stockName == '-')) = [];
+                    portfolio.(market){j}= stockName;
+                end 
+                
+                dAll.(stockName) = (fetch(c,stock,past, simulateTo, 'd'));
+                wAll.(stockName) = fetch(c,stock,past, simulateTo, 'w');
+                mAll.(stockName) = fetch(c,stock,past, simulateTo, 'm');
+                
+                beta.(stockName) = ta.calcBeta(dAll.(stockName), dAvg);
             end
             
-            dAll.(stockName) = (fetch(c,stock,past, simulateTo, 'd'));
-            wAll.(stockName) = fetch(c,stock,past, simulateTo, 'w');
-            mAll.(stockName) = fetch(c,stock,past, simulateTo, 'm');
-            
-            beta.(stockName) = ta.calcBeta(dAll.(stockName), dAvg);
+            close(c);
         end
-        
-        close(c);
         
         save(strcat('portfolio', 'Data'), 'portfolio', 'mAll', 'wAll', 'dAll', 'dAvg', 'wAvg', 'mAvg', 'beta');
     else
@@ -104,12 +115,10 @@ while(true)
     windSize = floor(get(handles.wSize, 'Value'));
     set(handles.printSize, 'String', num2str(windSize));
     
-    if get(handles.W, 'Value')
-        [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, wAll);
-    else
-        [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, dAll);
-    end
-    
+      
+        markets = get(handles.market, 'String');
+        selectedMarket = get(handles.market, 'Value');
+        market = lower(markets{selectedMarket});
     
     for i = 1:12
         
@@ -120,23 +129,27 @@ while(true)
             set(0,'CurrentFigure',2)
             j = i-6;
         end
+      
         
-        stock = portfolio{i};
-        
+        stock = portfolio.(market){i};
+          
         
         if get(handles.W, 'Value')
+            [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, wAll);
+            primaryRange = primaryRange(2:end);
+            secondaryRange = secondaryRange(2:end);
             stockData = wAll.(stock)(primaryRange,:);
             avgData = wAvg(primaryRange,:);
             stockData2 = wAll.(stock)(secondaryRange,:);
             avgData2 = wAvg(secondaryRange,:);
         else
+            [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, dAll);
             stockData = dAll.(stock)(primaryRange,:);
             avgData = dAvg(primaryRange,:);
         end
         
         stockBeta = beta.(stock); % Calc beta on the fly
         [hi, lo, cl, op, da] = tf.returnOHLCDarray(stockData);
-        
         
         
         subplot(3,2,j)
@@ -153,7 +166,6 @@ while(true)
             plot(da, rawStandardCl, 'k', 'Marker', '.');
             
             if get(handles.accessSecondary, 'Value')
-                
                 plot(da, stockStandard2Cl, 'm', 'Marker', '.');
                 plot(da, avgStandard2Cl, 'c', 'Marker', '.');
                 plot(da, rawStandard2Cl, 'color', [0.70,0.70,0.70], 'Marker', '.')
@@ -194,12 +206,9 @@ while(true)
             highlow(hi, lo, op, cl, 'red', da);
         end
         
+        title(portfolio.(market){i});
         
-        
-        
-        title(portfolio{i});
-        
-        xlim([primaryDates(1), primaryDates(2)]);
+        xlim([primaryDates(1), primaryDates(2)+10]);
         
     end
     
