@@ -22,7 +22,7 @@ set(handles.wSize, 'SliderStep', [1/30, 10/30]);
 set(handles.wSize, 'Value', 10);
 
 
-
+        
 past = '1/1/01';
 simulateTo = now;
 

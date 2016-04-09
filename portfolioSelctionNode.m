@@ -41,19 +41,26 @@ set(handles.wSize, 'Max', 30 , 'Min', 1);
 set(handles.wSize, 'SliderStep', [1/30, 10/30]);
 set(handles.wSize, 'Value', 10);
 
-hp = 0;
 
 
-% portfolio = {'NKE'; 'K'; 'CVX'; 'COF'; 'CELG'; 'ETN'; 'AA'; 'DUK'; 'GOOG'; 'WFC'; 'AMT'};
-portfolio.sectors = {'XLY'; 'XLP'; 'XLE'; 'XLF'; 'XLV'; 'XLI'; 'XLB'; 'XLU'; 'XLK'; '^GSPC';'^NYA'; '^DJI'}; %'XLFS'; 'XLRE'};
-portfolio.finance = {'BRK-B'; 'WFC'; 'BAC'; 'C'; 'USB'; 'AIG'; 'JPM';  'CB'; 'SPG'; 'AXP'; 'PNC'; 'BK'};
 averages = '^GSPC';
-
 
 
 for hide_getData = 1:1
     
-    if FETCH == 1
+    portfolio.sectors = {'XLY'; 'XLP'; 'XLE'; 'XLF'; 'XLV'; 'XLI'; 'XLB'; 'XLU'; 'XLK'; '^GSPC';'^NYA'; '^DJI'}; %'XLFS'; 'XLRE'};
+    portfolio.discretionary = {'AMZN';'HD';'CMCSA';'DIS';'MCD';'SBUX';'NKE';'LOW';'PCLN';'TWX';'TWC'; 'TJX'};
+    portfolio.staples = {'PG';'KO';'PM';'CVS';'MO';'WMT';'PEP';'WBA';'COST';'CL';'MDLZ';'KMB'};
+    portfolio.energy = {'XOM';'CVX';'SLB';'PXD';'EOG';'OXY';'VLO';'PSX';'HAL';'COP';'KMI';'TSO'};
+    portfolio.finance = {'BRK-B'; 'WFC'; 'BAC'; 'C'; 'USB'; 'AIG'; 'JPM';  'CB'; 'SPG'; 'AXP'; 'PNC'; 'BK'};
+    portfolio.healthcare = {'JNJ';'PFE';'MRK';'GILD';'UNH';'AMGN';'BMY';'MDT';'AGN';'ABBV';'CELG';'LLY'};
+    portfolio.industrials = {'GE';'MMM';'HON';'BA';'UTX';'UPS';'UNP';'LMT';'DHR';'CAT';'FDX';'GD'};
+    portfolio.materials = {'DOW';'DD';'MON';'PX';'ECL';'PPG';'LYB';'APD';'SHW';'IP'; 'FCX'; 'VMC'};
+    portfolio.utilities = {'NEE';'DUK';'SO';'D';'AEP';'EXC';'PCG';'PPL';'SRE';'PEG';'EIX';'ED'};
+    portfolio.technology = {'AAPL'; 'MSFT'; 'FB'; 'T'; 'GOOGL'; 'GOOG'; 'VZ'; 'INTC'; 'V'; 'CSCO'; 'IBM'; 'ACN'};
+    
+
+if FETCH == 1
         
         c = yahoo;
         
@@ -108,6 +115,8 @@ subplot(3,2,1)
 figure(3)
 [hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(wAvg);
 hl = highlow(hiA, loA, opA, clA, 'red', daA);
+hp = 0;
+
 hold on
 
 while(true)
