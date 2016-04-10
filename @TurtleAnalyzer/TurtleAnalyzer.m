@@ -60,6 +60,7 @@ classdef TurtleAnalyzer < handle
             clD = avgData(:,5);
             
             RSI = (cl./clD)*100;
+            RSI = (RSI - mean(RSI)) ./ std(RSI);
             RSIma = flipud(tsmovavg(flipud(RSI),'e',window_size,1));
           
         end

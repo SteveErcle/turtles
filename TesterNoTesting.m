@@ -4,13 +4,13 @@ past = '1/1/01';
 simulateTo = now;
 stock = '^GSPC';
 
-url1 = 'http://finance.yahoo.com/d/quotes.csv?s=TSLA&f=b';
+url1 = 'http://finance.yahoo.com/d/quotes.csv?s=TSLA&f=b+b6+a+a5+b4+k3';
 
 % url2 = ['http://ichart.finance.yahoo.com/table.csv?',...
 %     's=WU&a=01&b=19&c=2010&d=01&e=19&f=2010&g=d&ignore=.csv'];
 
 % url3 = 'http://marketdata.websol.barchart.com/getHistory.csv?key=62d3930b91bd9eb96bc053a405fe3412&symbol=IBM&type=daily&startDate=20150409000000'
-for i = 1:100
+for i = 1:1
 tic 
 f = urlwrite(url1, 'tempStockPrice.csv');
 data = importdata(f)
