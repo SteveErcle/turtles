@@ -155,7 +155,6 @@ classdef TurtleData
             
         end
     
-        
         function [primaryRange, secondaryRange, primaryDates, secondaryDates] = setRanges(obj, handles, tAll)
         
             

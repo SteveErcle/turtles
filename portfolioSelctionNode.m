@@ -5,7 +5,7 @@ clear all; clc; close all;
 
 tf = TurtleFun;
 ta = TurtleAnalyzer;
-FETCH = 0;
+FETCH = 1;
 
 
 delete(slider);
@@ -36,13 +36,15 @@ set(handles.axisSecondary, 'Max', now, 'Min', datenum(past));
 set(handles.axisSecondary, 'SliderStep', [1/len, 10/len]);
 set(handles.axisSecondary, 'Value', axisView);
 
+set(handles.ref, 'Max', now, 'Min', datenum(past));
+set(handles.ref, 'SliderStep', [1/len, 10/len]);
+set(handles.ref, 'Value', axisView);
+
 set(handles.wSize, 'Max', 30 , 'Min', 1);
 set(handles.wSize, 'SliderStep', [1/30, 10/30]);
 set(handles.wSize, 'Value', 10);
 
-
-
-averages = '^GSPC';
+randColors = [0.349983765984809,0.196595250431208,0.251083857976031;0.616044676146639,0.473288848902729,0.351659507062997;0.830828627896291,0.585264091152724,0.549723608291140;0.917193663829810,0.285839018820374,0.757200229110721;0.753729094278495,0.380445846975357,0.567821640725221;0.0758542895630636,0.0539501186666072,0.530797553008973;0.779167230102011,0.934010684229183,0.129906208473730;0.568823660872193,0.469390641058206,0.0119020695012414;0.337122644398882,0.162182308193243,0.794284540683907;0.311215042044805,0.528533135506213,0.165648729499781;0.601981941401637,0.262971284540144,0.654079098476782;0.689214503140008,0.748151592823710,0.450541598502498];
 
 
 for hide_getData = 1:1
@@ -53,7 +55,7 @@ for hide_getData = 1:1
     portfolio.energy = {'XOM';'CVX';'SLB';'PXD';'EOG';'OXY';'VLO';'PSX';'HAL';'COP';'KMI';'TSO'};
     portfolio.finance = {'BRK-B'; 'WFC'; 'BAC'; 'C'; 'USB'; 'AIG'; 'JPM';  'CB'; 'SPG'; 'AXP'; 'PNC'; 'BK'};
     portfolio.healthcare = {'JNJ';'PFE';'MRK';'GILD';'UNH';'AMGN';'BMY';'MDT';'AGN';'ABBV';'CELG';'LLY'};
-    portfolio.industrials = {'GE';'MMM';'HON';'BA';'UTX';'UPS';'UNP';'LMT';'DHR';'CAT';'FDX';'GD'};
+    portfolio.industrials = {'GE';'MMM';'HON';'BWA';'UTX';'UPS';'UNP';'LMT';'DHR';'CAT';'FDX';'GD'};
     portfolio.materials = {'DOW';'DD';'MON';'PX';'ECL';'PPG';'LYB';'APD';'SHW';'IP'; 'FCX'; 'VMC'};
     portfolio.utilities = {'NEE';'DUK';'SO';'D';'AEP';'EXC';'PCG';'PPL';'SRE';'PEG';'EIX';'ED'};
     portfolio.technology = {'AAPL'; 'MSFT'; 'FB'; 'T'; 'GOOGL'; 'GOOG'; 'VZ'; 'INTC'; 'V'; 'CSCO'; 'IBM'; 'ACN'};
@@ -63,9 +65,7 @@ for hide_getData = 1:1
         
         c = yahoo;
         
-        dAvg = fetch(c,averages,past, simulateTo, 'd');
-        wAvg = fetch(c,averages,past, simulateTo, 'w');
-        mAvg = fetch(c,averages,past, simulateTo, 'm');
+        dSP= (fetch(c,'^GSPC',past, simulateTo, 'd'));
         
         for i = 1: length(fieldnames(portfolio))
             markets = fieldnames(portfolio);
@@ -89,13 +89,13 @@ for hide_getData = 1:1
                 wAll.(stockName) = fetch(c,stock,past, simulateTo, 'w');
                 mAll.(stockName) = fetch(c,stock,past, simulateTo, 'm');
                 
-                beta.(stockName) = ta.calcBeta(dAll.(stockName), dAvg);
+                beta.(stockName) = ta.calcBeta(dAll.(stockName), dSP);
             end
             
             close(c);
         end
         
-        save(strcat('portfolio', 'Data'), 'portfolio', 'mAll', 'wAll', 'dAll', 'dAvg', 'wAvg', 'mAvg', 'beta');
+        save(strcat('portfolio', 'Data'), 'portfolio', 'mAll', 'wAll', 'dAll', 'beta');
     else
         load('portfolioData')
     end
@@ -114,11 +114,11 @@ figure(2)
 set(gcf, 'Position', [-1080,1,1079,1824]);
 subplot(3,2,1)
 figure(3)
-[hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(wAvg);
+[hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(wAll.GSPC);
 hl = highlow(hiA, loA, opA, clA, 'red', daA);
 hp = 0;
-
-hold on
+hold on;
+figure(4)
 
 while(true)
     
@@ -156,6 +156,7 @@ while(true)
         
         
         if get(handles.W, 'Value')
+            period = 'w';
             [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, wAll);
             primaryRange = primaryRange(2:end);
             secondaryRange = secondaryRange(2:end);
@@ -164,13 +165,14 @@ while(true)
             stockData2 = wAll.(stock)(secondaryRange,:);
             avgData2 = wAll.(idx)(secondaryRange,:);
         else
+            period = 'd';
             [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, dAll);
-            primaryRange = primaryRange(2:end);
-            secondaryRange = secondaryRange(2:end);
+            primaryRange = primaryRange(1:end);
+            secondaryRange = secondaryRange(1:end);
             stockData = dAll.(stock)(primaryRange,:);
-            avgData = dAvg(primaryRange,:);
+            avgData = dAll.(idx)(primaryRange,:);
             stockData2 = dAll.(stock)(secondaryRange,:);
-            avgData2 = dAvg(secondaryRange,:);
+            avgData2 = dAll.(idx)(secondaryRange,:);
         end
         
         stockBeta = beta.(stock); % Calc beta on the fly
@@ -181,6 +183,7 @@ while(true)
         end
         cla
         hold on
+        
         
         
         if get(handles.standardize, 'Value')
@@ -231,6 +234,11 @@ while(true)
             highlow(hi, lo, op, cl, 'red', da);
         end
         
+    
+        ref = get(handles.ref, 'Value');
+        ylimit = ylim;
+        plot([ref, ref], [ylimit(1), ylimit(2)], 'c');
+        
         title(stock);
         
         xlim([primaryDates(1), primaryDates(2)+10]);
@@ -263,6 +271,48 @@ while(true)
         hp = patch(x,y, [0.9,1,1]);
         hl = highlow(hiA, loA, opA, clA, 'red', daA);
     end
+    
+    
+    p4 = 0;
+    names = [];
+    set(0,'CurrentFigure',4)
+    hold off all 
+    cla
+    for i = 1:12
+        stock = portfolio.(market){i};
+        if strcmp(period, 'w')
+            stockData = wAll.(stock)(primaryRange,:);
+        else
+            stockData = dAll.(stock)(primaryRange,:);
+        end
+        [hi, lo, cl, op, da] = tf.returnOHLCDarray(stockData);
+
+        if get(handles.standardize, 'Value')
+            [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getStandardized(stockData, avgData, windSize);
+            p4(i) = plot(da, stockStandardCl, 'color', randColors(i,:), 'Marker', '.');
+        end
+        
+        if get(handles.RSI, 'Value')
+            set(handles.movingAverage, 'Value',0);
+            [RSI, RSIma] = ta.getRSI(stockData, avgData, windSize);
+            p4(i) = plot(da,RSIma, 'color', randColors(i,:), 'Marker', '.');
+        end
+        
+        names = [names; {stock}];
+        xlim([primaryDates(1), primaryDates(2)+10]);
+        hold all
+    end
+    
+ 
+    
+    if p4 ~= 0 & ishandle(p4)
+        legend(p4, names, 'Location', 'bestoutside');
+    end
+    
+    ref = get(handles.ref, 'Value');
+    ylimit = ylim;
+    plot([ref, ref], [ylimit(1), ylimit(2)], 'c');
+    
     
     
     pause(0.1)

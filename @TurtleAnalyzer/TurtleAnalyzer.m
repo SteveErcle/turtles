@@ -77,7 +77,23 @@ classdef TurtleAnalyzer < handle
             rawStandardCl = flipud(tsmovavg(flipud(rawStandardCl),'e',window_size,1));
             
         end
+   
+        function [dateOnPlot] = getDate(obj)
+            
+            h = gcf;
+            axesObjs = get(h, 'Children');
+            axesObjs = findobj(axesObjs, 'type', 'axes');
+            dataTips = findall(axesObjs, 'Type', 'hggroup', 'HandleVisibility', 'off');
+            
+            if length(dataTips) > 0
+                cursor = datacursormode(gcf);
+                dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
+                value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
+                
+                delete(dataTips);
+            end
+            
+        end
+        
     end
-    
-    
 end
