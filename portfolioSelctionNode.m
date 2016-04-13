@@ -1,11 +1,11 @@
 % portfolioSelectionNode
 
-clear all; clc; close all;
+clc; close all; clear all; 
 
 
 tf = TurtleFun;
 ta = TurtleAnalyzer;
-FETCH = 1;
+FETCH = 0;
 
 
 delete(slider);
@@ -135,7 +135,7 @@ while(true)
     market = lower(markets{selectedMarket});
     
     indiv = get(handles.indivAnalysis, 'Value');
-
+    
     
     for i = 1:13
         
@@ -228,13 +228,19 @@ while(true)
             
         end
         
+        
+        if get(handles.corr, 'Value')
+            [R] = ta.getCorr(stockData, avgData, windSize);
+            plot(da, R, 'k', 'Marker', '.');
+        end 
+        
         if get(handles.hiLo, 'Value')
             highlow(hi, lo, lo, hi, 'red', da);
         elseif get(handles.ohlc, 'Value')
             highlow(hi, lo, op, cl, 'red', da);
         end
         
-    
+        
         ref = get(handles.ref, 'Value');
         ylimit = ylim;
         plot([ref, ref], [ylimit(1), ylimit(2)], 'c');
@@ -276,7 +282,7 @@ while(true)
     p4 = 0;
     names = [];
     set(0,'CurrentFigure',4)
-    hold off all 
+    hold off all
     cla
     for i = 1:12
         stock = portfolio.(market){i};
@@ -286,16 +292,23 @@ while(true)
             stockData = dAll.(stock)(primaryRange,:);
         end
         [hi, lo, cl, op, da] = tf.returnOHLCDarray(stockData);
-
-        if get(handles.standardize, 'Value')
-            [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getStandardized(stockData, avgData, windSize);
-            p4(i) = plot(da, stockStandardCl, 'color', randColors(i,:), 'Marker', '.');
-        end
         
-        if get(handles.RSI, 'Value')
+        
+        if get(handles.RSIcong, 'Value')
             set(handles.movingAverage, 'Value',0);
             [RSI, RSIma] = ta.getRSI(stockData, avgData, windSize);
-            p4(i) = plot(da,RSIma, 'color', randColors(i,:), 'Marker', '.');
+            p4(i) = plot(da,RSIma+i*.8, 'color', randColors(i,:), 'Marker', '.');
+        end 
+        
+        if  get(handles.corrCong, 'Value')
+            [R] = ta.getCorr(stockData, avgData, windSize);
+            p4(i) = plot(da, R+i*1.5, 'color', randColors(i,:), 'Marker', '.');
+        end
+        
+            
+        if get(handles.standardizeCong, 'Value')
+            [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getStandardized(stockData, avgData, windSize);
+            p4(i) = plot(da, stockStandardCl+i, 'color', randColors(i,:), 'Marker', '.');
         end
         
         names = [names; {stock}];
@@ -303,7 +316,7 @@ while(true)
         hold all
     end
     
- 
+    
     
     if p4 ~= 0 & ishandle(p4)
         legend(p4, names, 'Location', 'bestoutside');
@@ -331,7 +344,7 @@ end
 % pos(3) = 0.9;
 % set(gca, 'Position', pos)
 
-% % % % 
+% % % %
 
 
 

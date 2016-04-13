@@ -53,14 +53,14 @@ classdef TurtleAnalyzer < handle
             
             
         end
-        
+       
         function [RSI, RSIma] = getRSI(obj, stockData, avgData, window_size)
         
             cl = stockData(:,5);
             clD = avgData(:,5);
             
             RSI = (cl./clD)*100;
-            RSI = (RSI - mean(RSI)) ./ std(RSI);
+            RSI = (RSI - min(RSI)) ./ range(RSI);
             RSIma = flipud(tsmovavg(flipud(RSI),'e',window_size,1));
           
         end
@@ -78,6 +78,37 @@ classdef TurtleAnalyzer < handle
             
         end
    
+        
+        function [R] = getCorr(obj, stockData, avgData, window_size)
+            
+            len = window_size;
+            
+            cl = stockData(:,5);
+            clD = avgData(:,5);
+            
+            R = [];
+          
+            clx = flipud(cl);
+            clDy = flipud(clD);
+            for  i = 1:length(cl)
+                if i-len+1 >= 1
+                x = clx(i-len+1:i);
+                y = clDy(i-len+1:i);
+                cc =  corrcoef(x,y);
+                R = [R; cc(1,2)];
+                else
+                    R = [R; NaN];
+                end 
+            end
+            
+%             R = padarray(R, length(cl) - length(R), 'post');
+%             R(R == 0) = NaN;
+            R = flipud(R);
+            
+            R(1:end-len+1) = (R(1:end-len+1) - min(R(1:end-len+1))) ./ range(R(1:end-len+1));
+        end
+        
+        
         function [dateOnPlot] = getDate(obj)
             
             h = gcf;
