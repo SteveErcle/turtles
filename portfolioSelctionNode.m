@@ -155,7 +155,16 @@ while(true)
         end
         
         
-        if get(handles.W, 'Value')
+        if get(handles.M, 'Value')
+            period = 'm';
+            [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, mAll);
+            primaryRange = primaryRange(2:end);
+            secondaryRange = secondaryRange(2:end);
+            stockData = mAll.(stock)(primaryRange,:);
+            avgData = mAll.(idx)(primaryRange,:);
+            stockData2 = mAll.(stock)(secondaryRange,:);
+            avgData2 = mAll.(idx)(secondaryRange,:);    
+        elseif get(handles.W, 'Value')
             period = 'w';
             [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, wAll);
             primaryRange = primaryRange(2:end);
@@ -286,7 +295,9 @@ while(true)
     cla
     for i = 1:12
         stock = portfolio.(market){i};
-        if strcmp(period, 'w')
+        if strcmp(period, 'm')
+            stockData = mAll.(stock)(primaryRange,:);
+        elseif strcmp(period, 'w')
             stockData = wAll.(stock)(primaryRange,:);
         else
             stockData = dAll.(stock)(primaryRange,:);
