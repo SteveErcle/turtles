@@ -77,8 +77,7 @@ classdef TurtleAnalyzer < handle
             rawStandardCl = flipud(tsmovavg(flipud(rawStandardCl),'e',window_size,1));
             
         end
-   
-        
+    
         function [R] = getCorr(obj, stockData, avgData, window_size)
             
             len = window_size;
@@ -107,7 +106,6 @@ classdef TurtleAnalyzer < handle
             
             R(1:end-len+1) = (R(1:end-len+1) - min(R(1:end-len+1))) ./ range(R(1:end-len+1));
         end
-        
         
         function [dateOnPlot] = getDate(obj)
             

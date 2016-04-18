@@ -28,20 +28,20 @@ simulateTo = now;
 
 stock = 'AXL';
 
-c = yahoo;
+% c = yahoo;
+% 
+% dAll = (fetch(c,stock,past, simulateTo, 'd'));
+% wAll = fetch(c,stock,past, simulateTo, 'w');
+% mAll = fetch(c,stock,past, simulateTo, 'm');
+% 
+% averages = '^GSPC';
+% dAvg = fetch(c,averages,past, simulateTo, 'd');
+% 
+% close(c);
+load('tslaOffline')
 
-dAll = (fetch(c,stock,past, simulateTo, 'd'));
-wAll = fetch(c,stock,past, simulateTo, 'w');
-mAll = fetch(c,stock,past, simulateTo, 'm');
-
-averages = '^GSPC';
-dAvg = fetch(c,averages,past, simulateTo, 'd');
-
-close(c);
-
-
-dAll = dAll(simFrom:simTo,:);
-dAvg = dAvg(simFrom:simTo,:);
+% dAll = dAll(simFrom:simTo,:);
+% dAvg = dAvg(simFrom:simTo,:);
 
 
 
@@ -70,30 +70,29 @@ while(true)
 %     subplot(2,1,2)
     cla
     hold on
+    
+    window_size  = 10;
+  
+rangeM = 1;
+rangeW = 4;
+rangeD = 20;
+    mAllf = flipud(tsmovavg(flipud(mAll),'e',window_size,1));
+    mDerv = flipud(diff(mAllf(:,5)));
+    
+    wAllf = flipud(wAll);
+    
+    plot(mDerv);
    
-    len = 50;
+    if mDerv < 0
     
-   
-    close all
-    R = [];
-    clx = flipud(cl);
-    clDy = flipud(clD)
-    for  i = 1:length(cl) - len + 1
-        x = clx(i:i-1+len);
-        y = clDy(i:i-1+len);
-       cc =  corrcoef(x,y)
-       R = [R; cc(1,2)];
-    end 
+        mAllf(1,1)
+        mAllf(2,1)
+        
+        wAllf(1,1)
+        wAllf(2,1)
+        wAllf(3,1)
+        wAllf(4,1)
     
-    R = padarray(R, length(cl) - length(R), 'post');
-    R(R == 0) = NaN;
-    
-    subplot(3,1,1)
-    plot(da, cl)
-    subplot(3,1,2)
-    plot(da, clD)
-    subplot(3,1,3)
-    plot(da, R)
     
     return
     
