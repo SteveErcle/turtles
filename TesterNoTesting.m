@@ -4,10 +4,16 @@ past = '1/1/01';
 simulateTo = now;
 stock = '^GSPC';
 
+
+while ~strcmp(datestr(now,15), '09:30')
+    pause(5)
+end
+
+
 % url1 = 'http://finance.yahoo.com/d/quotes.csv?s=TSLA&f=b+b6+a+a5';
 % url1 = 'http://finance.yahoo.com/d/quotes.csv?s=TSLA&f=i5+l+ll+k3';
 
-url1 = 'http://finance.yahoo.com/d/quotes.csv?s=TSLA&f=v+l+l1+k3+b+b6+a+a5';
+url1 = 'http://finance.yahoo.com/d/quotes.csv?s=BAC&f=v+l+l1+k3+b+b6+a+a5';
 
 % url2 = ['http://ichart.finance.yahoo.com/table.csv?',...
 %     's=WU&a=01&b=19&c=2010&d=01&e=19&f=2010&g=d&ignore=.csv'];
@@ -57,7 +63,7 @@ disp('  ')
 % 
 % disp([data.data, data.textdata(5)]);
 
-pause(1)
+pause(2)
 
 
 end

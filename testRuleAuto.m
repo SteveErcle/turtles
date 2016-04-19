@@ -10,28 +10,81 @@ td = TurtleData;
 stock = 'BAC';
 
 past = datenum('3/1/14');
-pres = datenum('5/1/15');
+pres = datenum('2/1/16');
 startDay = pres;
 
 delete(slider);
 handles = guihandles(slider);
 
-% FETCH = 0;
-%
-% if FETCH == 1
-%     [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.getData(stock, past, pres, now);
-%     td.saveData(stock, mAll, mCong, wAll, wCong, dAll, dCong, iAll);
-% else
-%     [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.loadData(stock);
+FETCH = 0;
+
+if FETCH == 1
+    [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.getData(stock, past, pres, now);
+    td.saveData(stock, mAll, mCong, wAll, wCong, dAll, dCong, iAll);
+else
+    [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.loadData(stock);
+end
+
+
+dPast = td.resetPast(dCong, dAll, startDay);
+wPast = td.resetPast(wCong, wAll, startDay);
+mPast = td.resetPast(mCong, mAll, startDay);
+
+% c = yahoo;
+
+% for dateIndx = size(wCong,1) : -1: 1
+%     
+%     dNow = [dCong(dateIndx:end,1:7); dPast];
+%     wNow = [td.getTimeDomain(dateIndx, wCong); wPast];
+%     mNow = [td.getTimeDomain(dateIndx, mCong); mPast];
+%     
+%     
+%     past = dNow(1,1) - 300;
+%     pres = dNow(1,1);
+%     
+%     dAll = (fetch(c, stock, past, pres, 'd'));
+%     wAll = (fetch(c, stock, past, pres, 'w'));
+%     mAll = (fetch(c, stock, past, pres, 'm'));
+%     
+%     
+%     subplot(3,1,1)
+%     hold on;
+%     cla
+%     [hi, lo, clD, op, daD] = tf.returnOHLCDarray(dAll);
+%     highlow(hi, lo, op, clD, 'red', daD);
+%     [hi, lo, cl, op, daD] = tf.returnOHLCDarray(dNow);
+%     highlow(hi, lo, op, cl, 'blue', daD);
+% %     xlim([pres-100, pres+10]);
+%     
+%     
+%     subplot(3,1,2)
+%     hold on;
+%     cla
+%     [hi, lo, cl, op, daW] = tf.returnOHLCDarray(wAll);
+%     highlow(hi, lo, op, cl, 'red', daW);
+%     [hi, lo, cl, op, daW] = tf.returnOHLCDarray(wNow);
+%     highlow(hi, lo, op, cl, 'blue', daW);
+%     xlim([pres-100, pres+10]);
+%     
+%     
+%     subplot(3,1,3)
+%     hold on;
+%     cla
+%     [hi, lo, cl, op, daM] = tf.returnOHLCDarray(mAll);
+%     highlow(hi, lo, op, cl, 'red', daM);
+%     [hi, lo, cl, op, daM] = tf.returnOHLCDarray(mNow);
+%     highlow(hi, lo, op, cl, 'blue', daM);
+%     xlim([pres-100, pres+10]);
+%     
+%     
+%     pause
 % end
+% 
+% 
+% 
+% return
 
 
-% dPast = td.resetPast(dCong, dAll, startDay);
-% wPast = td.resetPast(wCong, wAll, startDay);
-% mPast = td.resetPast(mCong, mAll, startDay);
-
-
-c = yahoo;
 
 dCheck = 0;
 enterLong  = [0,0];
@@ -42,31 +95,36 @@ enteredL = 0;
 enteredS = 0;
 priceEntered = [];
 
-while(true)
+% while(true)
     
-    %     [dateIndx] = td.getDateIndx(dCong(:,1), pres);
-    %
-    %     dtoday = dCong(dateIndx:end, :);
-    %     wtoday = wCong(dateIndx:end, :);
-    %     mtoday = mCong(dateIndx:end, :);
+
     
-    dAll = (fetch(c, stock, past, pres, 'd'));
+    for dateIndx = size(wCong,1) : -1: 1
     
-    while dAll(1,1) == dCheck
-        pres = pres+1;
-        dAll = (fetch(c, stock, past, pres, 'd'));
-    end
+    dNow = [dCong(dateIndx:end,1:7); dPast];
+    wNow = [td.getTimeDomain(dateIndx, wCong); wPast];
+    mNow = [td.getTimeDomain(dateIndx, mCong); mPast];
     
-    dCheck = dAll(1,1);
+    pres = dNow(1,1);
     
-    wAll = (fetch(c, stock, past, pres, 'w'));
-    mAll = (fetch(c, stock, past, pres, 'm'));
     
+%     dAll = (fetch(c, stock, past, pres, 'd'));
+%     
+%     while dAll(1,1) == dCheck
+%         pres = pres+1;
+%         dAll = (fetch(c, stock, past, pres, 'd'));
+%     end
+%     
+%     dCheck = dAll(1,1);
+%     
+%     wAll = (fetch(c, stock, past, pres, 'w'));
+%     mAll = (fetch(c, stock, past, pres, 'm'));
+%     
     
     
     subplot(3,1,1)
     cla
-    [hi, lo, clD, op, daD] = tf.returnOHLCDarray(dAll);
+    [hi, lo, clD, op, daD] = tf.returnOHLCDarray(dNow);
     highlow(hi, lo, op, clD, 'red', daD);
     xlim([pres-100, pres+10])
     
@@ -74,23 +132,23 @@ while(true)
     
     subplot(3,1,2)
     cla
-    [hi, lo, cl, op, daW] = tf.returnOHLCDarray(wAll);
+    [hi, lo, cl, op, daW] = tf.returnOHLCDarray(wNow);
     highlow(hi, lo, op, cl, 'red', daW);
     xlim([pres-100, pres+10])
     hold on;
     
     subplot(3,1,3)
     cla
-    [hi, lo, cl, op, daM] = tf.returnOHLCDarray(mAll);
+    [hi, lo, cl, op, daM] = tf.returnOHLCDarray(mNow);
     highlow(hi, lo, op, cl, 'red', daM);
     xlim([pres-100, pres+10])
     hold on;
     
     window_size = 10;
     
-    dtodayf = [daD, flipud(tsmovavg(flipud(dAll(:,5)),'e',window_size*2,1))];
-    wtodayf = [daW, flipud(tsmovavg(flipud(wAll(:,5)),'e',window_size,1))];
-    mtodayf = [daM, flipud(tsmovavg(flipud(mAll(:,5)),'e',window_size,1))];
+    dtodayf = [daD, flipud(tsmovavg(flipud(dNow(:,5)),'e',window_size*2,1))];
+    wtodayf = [daW, flipud(tsmovavg(flipud(wNow(:,5)),'e',window_size,1))];
+    mtodayf = [daM, flipud(tsmovavg(flipud(mNow(:,5)),'e',window_size,1))];
     
     dervD = flipud(diff(flipud(dtodayf(:,2))));
     sdervD = flipud(diff(flipud(dervD)));
@@ -168,6 +226,5 @@ while(true)
     
     pause;
     
-    pres = pres + 1;
     
 end

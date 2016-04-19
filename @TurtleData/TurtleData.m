@@ -187,6 +187,21 @@ classdef TurtleData
             secondaryDates = [secondaryEndDate, secondaryStartDate];
             
         end
+        
+        
+        function [tNow] = getTimeDomain(obj, dateIndx, tCong)
+            
+            
+            tNow = [];
+            thisT = tCong(dateIndx:end,1:7);
+            
+            for j = flipud(unique(thisT(:,1)))'
+                tNow = [tNow; thisT(min(find(thisT == j)), :)];
+            end
+            
+        end
+        
+        
     end
     
 end
