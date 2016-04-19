@@ -65,7 +65,7 @@ for hide_getData = 1:1
         
         c = yahoo;
         
-        dSP= (fetch(c,'^GSPC',past, simulateTo, 'd'));
+        dSP = (fetch(c,'^GSPC',past, simulateTo, 'd'));
         
         for i = 1: length(fieldnames(portfolio))
             markets = fieldnames(portfolio);
