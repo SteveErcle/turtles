@@ -65,8 +65,8 @@ for hide_getData = 1:1
         
         c = yahoo;
         
-        dSP = (fetch(c,'^GSPC',past, simulateTo, 'd'));
-        
+        dSP = fetch(c,'^GSPC',past, simulateTo, 'd');
+       
         for i = 1: length(fieldnames(portfolio))
             markets = fieldnames(portfolio);
             market = markets{i};
@@ -85,7 +85,7 @@ for hide_getData = 1:1
                     portfolio.(market){j}= stockName;
                 end
                 
-                dAll.(stockName) = (fetch(c,stock,past, simulateTo, 'd'));
+                dAll.(stockName) = fetch(c,stock,past, simulateTo, 'd');
                 wAll.(stockName) = fetch(c,stock,past, simulateTo, 'w');
                 mAll.(stockName) = fetch(c,stock,past, simulateTo, 'm');
                 

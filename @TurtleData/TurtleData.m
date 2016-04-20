@@ -188,7 +188,6 @@ classdef TurtleData
             
         end
         
-        
         function [tNow] = getTimeDomain(obj, dateIndx, tCong)
             
             
