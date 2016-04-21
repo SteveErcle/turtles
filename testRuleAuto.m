@@ -10,8 +10,8 @@ ta = TurtleAnalyzer;
 
 stock = 'BAC';
 
-past = datenum('3/1/13');
-pres = datenum('1/1/14');
+past = datenum('3/1/09');
+pres = datenum('1/1/11');
 
 c = yahoo;
 dSP = fetch(c,'^GSPC',past, now, 'd');
@@ -22,7 +22,7 @@ close(c)
 delete(slider);
 handles = guihandles(slider);
 
-FETCH = 1;
+FETCH = 0;
 
 if FETCH == 1
     [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.getData(stock, past, pres, now);
@@ -44,7 +44,8 @@ enterShort = [0,0];
 exitShort = [0,0];
 enteredL = 0;
 enteredS = 0;
-priceEntered = [];
+priceEnteredL = [];
+priceEnteredS = [];
 
 % while(true)
 
@@ -55,24 +56,48 @@ for dateIndx = size(wCong,1) : -1: 1
     window_size = 10;
     
     dNow = [dCong(dateIndx:end,1:7); dPast];
+    dNow = dNow(1:200,:);
     wNow = [td.getTimeDomain(dateIndx, wCong); wPast];
     mNow = [td.getTimeDomain(dateIndx, mCong); mPast];
     
     pres = dNow(1,1);
     
     dSPnow = dSP(td.getDateIndx(dSP(:,1), pres):end,:);
+    dSPnow = dSPnow(1:200,:);
     wSPnow = wSP(td.getDateIndx(wSP(:,1), pres):end,:); if (size(wSPnow,1) > size(wNow)), wSPnow(1,:) = []; end
     mSPnow = mSP(td.getDateIndx(mSP(:,1), pres):end,:); if (size(mSPnow,1) > size(mNow)), mSPnow(1,:) = []; end
+    
+    stockBeta = ta.calcBeta(dNow, dSPnow);
+    
+    
+    dNow = dNow(1:window_size*10+1,:);
+    wNow = wNow(1:window_size*4+1,:);
+    mNow = mNow(1:window_size*1+1,:);
+    
+    dSPnow = dSPnow(1:window_size*10+1,:);
+    wSPnow = wSPnow(1:window_size*4+1,:);
+    mSPnow = mSPnow(1:window_size*1+1,:);
+    
+    %     stockBeta = ta.calcBeta(dNow, dSPnow);
+    
+
+    
     
     [hiD, loD, clD, opD, daD] = tf.returnOHLCDarray(dNow);
     [hiW, loW, clW, opW, daW] = tf.returnOHLCDarray(wNow);
     [hiM, loM, clM, opM, daM] = tf.returnOHLCDarray(mNow);
     
-    stockBeta = ta.calcBeta(dNow, dSPnow);
     
-    [ScbSD, SioSD, SroSD] = ta.getMovingAvgs(dNow, dSPnow, window_size, stockBeta);
-    [ScbSW, SioSW, SroSW] = ta.getMovingAvgs(wNow, wSPnow, window_size, stockBeta);
-    [ScbSM, SioSM, SroSM] = ta.getMovingAvgs(mNow, mSPnow, window_size, stockBeta);
+    
+    %         [clSmaD, clAmaD, clRmaD] = ta.getMovingAvgs(dNow, dSPnow, window_size, stockBeta);
+    %         [clSmaW, clAmaW, clRmaW] = ta.getMovingAvgs(wNow, wSPnow, window_size, stockBeta);
+    %         [clSmaM, clAmaM, clRmaM] = ta.getMovingAvgs(mNow, mSPnow, window_size, stockBeta);
+    
+    [clSmaD, clAmaD, clRmaD] = ta.getMovingStandard(dNow, dSPnow, window_size);
+    [clSmaW, clAmaW, clRmaW] = ta.getMovingStandard(wNow, wSPnow, window_size);
+    [clSmaM, clAmaM, clRmaM] = ta.getMovingStandard(mNow, mSPnow, window_size);
+    
+    
     
     
     dtodayf = [daD, flipud(tsmovavg(flipud(dNow(:,5)),'e',window_size*2,1))];
@@ -81,13 +106,13 @@ for dateIndx = size(wCong,1) : -1: 1
     
     dervD = flipud(diff(flipud(dtodayf(:,2))));
     sdervD = flipud(diff(flipud(dervD)));
-    dervRawD = flipud(diff(flipud(SroSD)));
+    dervRawD = flipud(diff(flipud(clRmaD)));
     meanD = mean(dtodayf(~isnan(dtodayf(:,2)),2));
     
     dervW = flipud(diff(flipud(wtodayf(:,2))));
     sdervW = flipud(diff(flipud(dervW)));
-    dervRawW = flipud(diff(flipud(SroSW)));
-    dervIdxW = flipud(diff(flipud(SioSW)));
+    dervRawW = flipud(diff(flipud(clRmaW)));
+    dervIdxW = flipud(diff(flipud(clAmaW)));
     meanW = mean(wtodayf(~isnan(wtodayf(:,2)),2));
     
     dervM = flipud(diff(flipud(mtodayf(:,2))));
@@ -98,10 +123,13 @@ for dateIndx = size(wCong,1) : -1: 1
         if dervM(1) > dervM(2)
             if dervW(1) > dervW(2)
                 if dervD(1) > dervD(2)
-                    if dervRawW(1) >= 0 & dervIdxW(1) >= 0 & ScbSD(1) > dtodayf(1,2) & ScbSD(2) <= dtodayf(2,2) 
+                    if dervRawW(1) >= 0 & dervIdxW(1) >= 0 & clSmaD(1) > dtodayf(1,2) & clSmaD(2) <= dtodayf(2,2)
+                        %                         if dervRawD(1) >= 0 & dervRawD(2) < 0
                         enterLong = [enterLong; [dtodayf(1,1), dtodayf(1,2)]];
                         enteredL = 1;
-                        priceEntered = [priceEntered; [clD(1), 0, 0]];
+                        set(handles.corr, 'Value', 1);
+                        priceEnteredL = [priceEnteredL; [clD(1), 0, 0]];
+                        %                         end
                     end
                 end
             end
@@ -110,9 +138,9 @@ for dateIndx = size(wCong,1) : -1: 1
         if dervD(1) < dervD(2)
             exitLong = [exitLong; [dtodayf(1,1), dtodayf(1,2)]];
             enteredL = 0;
-            priceEntered(end,2) = clD(1);
-            priceEntered(end,3) = (priceEntered(end,2) - priceEntered(end,1)) / priceEntered(end,1) * 100
-            disp(sum(priceEntered(:,3)));
+            priceEnteredL(end,2) = clD(1);
+            priceEnteredL(end,3) = (priceEnteredL(end,2) - priceEnteredL(end,1)) / priceEnteredL(end,1) * 100
+            disp(sum(priceEnteredL(:,3)));
         end
     end
     
@@ -120,9 +148,15 @@ for dateIndx = size(wCong,1) : -1: 1
     if enteredS == 0
         if dervM(1) < dervM(2)
             if dervW(1) < dervW(2)
-                if dervD(1) > dervD(2)
-                    enterShort = [enterShort; [dtodayf(1,1), dtodayf(1,2)]];
-                    enteredS = 1;
+                if dervD(1) < dervD(2)
+                    if dervRawW(1) <= 0 & dervIdxW(1) <= 0 & clSmaD(1) < dtodayf(1,2) & clSmaD(2) >= dtodayf(2,2)
+                        %                         if dervRawD(1) >= 0 & dervRawD(2) < 0
+                        enterShort = [enterShort; [dtodayf(1,1), dtodayf(1,2)]];
+                        enteredS = 1;
+                        set(handles.corr, 'Value', 1);
+                        priceEnteredS = [priceEnteredS; [clD(1), 0, 0]];
+                        %                         end
+                    end
                 end
             end
         end
@@ -130,59 +164,66 @@ for dateIndx = size(wCong,1) : -1: 1
         if dervD(1) > dervD(2)
             exitShort = [exitShort; [dtodayf(1,1), dtodayf(1,2)]];
             enteredS = 0;
+            priceEnteredS(end,2) = clD(1);
+            priceEnteredS(end,3) = (priceEnteredS(end,1) - priceEnteredS(end,2)) / priceEnteredS(end,1) * 100
+            disp(sum(priceEnteredS(:,3)));
         end
     end
     
     
-    subplot(3,1,1)
-    cla
-    hold on;
-    highlow(hiD, loD, opD, clD, 'red', daD);
-    plot(dtodayf(:,1), dtodayf(:,2), 'm', 'Marker' , '.');
-    plot(daD(1:end-1), dervD*5+meanD, 'k', 'Marker' , '.')
-    plot([daD(1,1), daD(end,1)], [meanD, meanD], 'k')
-    plot(enterLong(:,1), enterLong(:,2),'go');
-    plot(exitLong(:,1), exitLong(:,2),'ko');
-    plot(enterShort(:,1), enterShort(:,2),'ro');
-    plot(exitShort(:,1), exitShort(:,2),'ko');
-    plot(daD, ScbSD, 'r', 'Marker', '.'); plot(daD, SioSD-1, 'b.'); plot(daD, SroSD+1, 'color', [0.70,0.70,0.70], 'Marker', '.');
     
-    yOne = ylim;
-    xlim([pres-75, pres+10]);
-    
-    subplot(3,1,2)
-    cla
-    hold on;
-    highlow(hiW, loW, opW, clW, 'red', daW);
-    plot(wtodayf(:,1), wtodayf(:,2), 'm', 'Marker' , '.');
-    plot(daW(1:end-1), dervW*5+meanW, 'k', 'Marker' , '.')
-    plot([daW(1,1), daW(end,1)], [meanW, meanW], 'k')
-    plot(daW, ScbSW, 'r', 'Marker', '.'); plot(daW, SioSW, 'b.'); plot(daW, SroSW, 'color', [0.70,0.70,0.70], 'Marker', '.');
-    
-    yTwo = ylim;
-    xlim([pres-200, pres+10]);
-    
-    subplot(3,1,3)
-    cla
-    hold on;
-    highlow(hiM, loM, opM, clM, 'red', daM);
-    plot(mtodayf(:,1), mtodayf(:,2), 'm', 'Marker' , '.');
-    plot(daM(1:end-1), dervM*5+meanM, 'k', 'Marker' , '.')
-    plot([daM(1,1), daM(end,1)], [meanM, meanM], 'k');
-    plot(daM, ScbSM, 'r', 'Marker', '.'); plot(daM, SioSM, 'b.'); plot(daM, SroSM, 'color', [0.70,0.70,0.70], 'Marker', '.');
-    
-    yThree = ylim;
-    xlim([pres-250, pres+10]);
-    
-    if enteredL == 1        
-        pause;
-    end
+%     if get(handles.corr, 'Value');
+%         subplot(3,1,1)
+%         cla
+%         hold on;
+%                 
+%         highlow(hiD, loD, opD, clD, 'red', daD);
+%         plot(dtodayf(:,1), dtodayf(:,2), 'm', 'Marker' , '.');
+%         plot(daD, clD, 'r.');
+%         plot(daD(1:end-1), dervD*5+meanD, 'k', 'Marker' , '.')
+%         plot([daD(1,1), daD(end,1)], [meanD, meanD], 'k')
+%         plot(enterLong(:,1), enterLong(:,2),'go');
+%         plot(exitLong(:,1), exitLong(:,2),'ko');
+%         plot(enterShort(:,1), enterShort(:,2),'ro');
+%         plot(exitShort(:,1), exitShort(:,2),'ko');
+%         
+%         plot(daD, clSmaD, 'r', 'Marker', '.'); plot(daD, clAmaD, 'b.'); plot(daD, clRmaD, 'color', [0.70,0.70,0.70], 'Marker', '.');
+%         
+%         yOne = ylim;
+%         xlim([pres-75, pres+10]);
+%         
+%         subplot(3,1,2)
+%         cla
+%         hold on;
+%         highlow(hiW, loW, opW, clW, 'red', daW);
+%         plot(wtodayf(:,1), wtodayf(:,2), 'm', 'Marker' , '.');
+%         plot(daW(1:end-1), dervW*5+meanW, 'k', 'Marker' , '.')
+%         plot([daW(1,1), daW(end,1)], [meanW, meanW], 'k')
+%         plot(daW, clSmaW, 'r', 'Marker', '.'); plot(daW, clAmaW, 'b.'); plot(daW, clRmaW, 'color', [0.70,0.70,0.70], 'Marker', '.');
+%         
+%         yTwo = ylim;
+%         xlim([pres-200, pres+10]);
+%         
+%         subplot(3,1,3)
+%         cla
+%         hold on;
+%         highlow(hiM, loM, opM, clM, 'red', daM);
+%         plot(mtodayf(:,1), mtodayf(:,2), 'm', 'Marker' , '.');
+%         plot(daM(1:end-1), dervM*5+meanM, 'k', 'Marker' , '.')
+%         plot([daM(1,1), daM(end,1)], [meanM, meanM], 'k');
+%         plot(daM, clSmaM, 'r', 'Marker', '.'); plot(daM, clAmaM, 'b.'); plot(daM, clRmaM, 'color', [0.70,0.70,0.70], 'Marker', '.');
+%         
+%         yThree = ylim;
+%         xlim([pres-250, pres+10]);
+%         
+%         pause;
+%     end
     
 end
 
 
 
-
+%% FIND LONG TERM ANSWERS FIRST. MAKE SOLVER KNOWING LONG TERM TREND.
 
 subplot(3,1,1)
 cla

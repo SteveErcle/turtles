@@ -124,5 +124,21 @@ classdef TurtleAnalyzer < handle
             
         end
         
+        function [clSma, clAma, clRma] = getMovingStandard(obj, stockData, avgData, window_size)
+            
+            clSs = (stockData(:,5) - mean(stockData(:,5))) ./ std(stockData(:,5));
+            clAs = (avgData(:,5) - mean(avgData(:,5))) ./ std(avgData(:,5));
+            clRs = clSs + (clSs - clAs);
+            
+            clS = stockData(:,5);
+            clA = clAs.*std(clS)+mean(clS);
+            clR = clRs.*std(clS)+mean(clS);
+            
+            clSma = flipud(tsmovavg(flipud(clS),'e',window_size,1));
+            clAma = flipud(tsmovavg(flipud(clA),'e',window_size,1));
+            clRma = flipud(tsmovavg(flipud(clR),'e',window_size,1));
+            
+        end
+        
     end
 end
