@@ -1,12 +1,18 @@
 % analyzeBidAsk
 clc; close all; clear all;
 
-load('bidAskData');
+load('bidAskBAC0421')
 
 
 delete(slider);
 handles = guihandles(slider);
 
+
+stockexchange = 'NASDAQ';
+symbol = 'BAC';
+interval = '1';
+prevdays = '1d';
+data = IntraDayStockData(symbol, stockexchange, interval, prevdays)
 
 volume(volume == 0) = [];
 price(price == 0) = [];
@@ -26,14 +32,14 @@ set(handles.axisLen, 'SliderStep', [1/1000, 10/1000]);
 set(handles.axisLen, 'Value', 0);
 
 
-range = 1:1986;
+range = 1:5564;
 
-figure
-hold all;
-plot(tradeSize(range), '.')
-plot(bidSize(range), '.')
-plot(askSize(range), '.')
-legend('Trade', 'Bid', 'Ask')
+% figure
+% hold all;
+% plot(tradeSize(range), '.')
+% plot(bidSize(range), '.')
+% plot(askSize(range), '.')
+% legend('Trade', 'Bid', 'Ask')
 
 waterLevel = 0;
 waterRecord = [];
@@ -62,15 +68,43 @@ for i = range
     %     pause
     
 end
+% subplot(2,1,1)
+% hold all;
+% plot(data.date, data.close);
+% plot(timeCollected-0.0105, price);
+% 
+% subplot(2,1,2)
+% hold all;
+% plot(timeCollected, waterRecord);
+% plot(timeCollected-0.0105, waterRecord);
+
+% return
 
 window_size = 200;
 
-priceMA = tsmovavg(price(range),'e',window_size,1);
-
-
+% priceMA = tsmovavg(price(range),'e',window_size,1);
+priceMA = tsmovavg(data.close,'e',window_size,1);
 waterRecordMA = tsmovavg((waterRecord),'e',window_size,1);
 
 
+% wrnn = waterRecordMA(~isnan(waterRecordMA));
+% pnn  = priceMA(~isnan(priceMA));
+% wStand = (wrnn - mean(wrnn)) ./ std(wrnn);
+% pStand = (pnn - mean(pnn)) ./ std(pnn);
+price = data.close;
+
+waterRecordS =  (waterRecord - mean(waterRecord)) ./ std(waterRecord);
+waterRecordMAS = tsmovavg((waterRecordS),'e',window_size,1);
+
+priceS = (price - mean(price)) ./ std(price);
+priceMAS = tsmovavg(priceS,'e',window_size/10,1);
+
+
+plot(data.date, priceMAS, 'r')
+hold on;
+plot(timeCollected-0.0105, waterRecordMAS)
+
+return
 
 cla
 subplot(2,1,1)

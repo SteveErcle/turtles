@@ -8,10 +8,11 @@ tf = TurtleFun;
 td = TurtleData;
 ta = TurtleAnalyzer;
 
-stock = 'BAC';
+stock = 'APD';
 
-past = datenum('3/1/09');
-pres = datenum('1/1/11');
+past = datenum('1/1/13');
+pres = datenum('1/2/15');
+simTo = '4/2/15';
 
 c = yahoo;
 dSP = fetch(c,'^GSPC',past, now, 'd');
@@ -22,10 +23,10 @@ close(c)
 delete(slider);
 handles = guihandles(slider);
 
-FETCH = 0;
+FETCH = 1;
 
 if FETCH == 1
-    [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.getData(stock, past, pres, now);
+    [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.getData(stock, past, pres, simTo);
     td.saveData(stock, mAll, mCong, wAll, wCong, dAll, dCong, iAll);
 else
     [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = td.loadData(stock);
@@ -47,11 +48,34 @@ enteredS = 0;
 priceEnteredL = [];
 priceEnteredS = [];
 
-% while(true)
 
+% len = 20;
+% datesToExamine = {};
+% for i = len+1:size(dAll,1)
+%
+%     perRet = (dAll(i-len,5) - dAll(i,5)) / dAll(i,5);
+%
+%     if perRet > 0.10 & dAll(i-len,1) > pres+10
+%         datesToExamine = [datesToExamine; {datestr(dAll(i,1),12)}];
+%     end
+% end
+%
+% datesToExamine = unique(datesToExamine);
+% datesToExamine = datenum(datesToExamine,'mmmyy');
+%
+%
+% dateToExamine = datenum('04/1/16');
 
-
+% for k = 1:length(datesToExamine)
+%
+%     dateIndxStart = td.getDateIndx(dCong(:,1), datesToExamine(k));
+%
 for dateIndx = size(wCong,1) : -1: 1
+    %     for dateIndx = dateIndxStart :-1 : 1
+    %     dateIndx = dateIndxStart;
+    
+    %     while(true)
+    
     
     window_size = 10;
     
@@ -61,6 +85,8 @@ for dateIndx = size(wCong,1) : -1: 1
     mNow = [td.getTimeDomain(dateIndx, mCong); mPast];
     
     pres = dNow(1,1);
+    
+    datestr(pres,2)
     
     dSPnow = dSP(td.getDateIndx(dSP(:,1), pres):end,:);
     dSPnow = dSPnow(1:200,:);
@@ -72,15 +98,15 @@ for dateIndx = size(wCong,1) : -1: 1
     
     dNow = dNow(1:window_size*10+1,:);
     wNow = wNow(1:window_size*4+1,:);
-    mNow = mNow(1:window_size*1+1,:);
+    mNow = mNow(1:window_size*2+1,:);
     
     dSPnow = dSPnow(1:window_size*10+1,:);
     wSPnow = wSPnow(1:window_size*4+1,:);
-    mSPnow = mSPnow(1:window_size*1+1,:);
+    mSPnow = mSPnow(1:window_size*2+1,:);
     
     %     stockBeta = ta.calcBeta(dNow, dSPnow);
     
-
+    
     
     
     [hiD, loD, clD, opD, daD] = tf.returnOHLCDarray(dNow);
@@ -172,52 +198,76 @@ for dateIndx = size(wCong,1) : -1: 1
     
     
     
-%     if get(handles.corr, 'Value');
-%         subplot(3,1,1)
-%         cla
-%         hold on;
-%                 
-%         highlow(hiD, loD, opD, clD, 'red', daD);
-%         plot(dtodayf(:,1), dtodayf(:,2), 'm', 'Marker' , '.');
-%         plot(daD, clD, 'r.');
-%         plot(daD(1:end-1), dervD*5+meanD, 'k', 'Marker' , '.')
-%         plot([daD(1,1), daD(end,1)], [meanD, meanD], 'k')
-%         plot(enterLong(:,1), enterLong(:,2),'go');
-%         plot(exitLong(:,1), exitLong(:,2),'ko');
-%         plot(enterShort(:,1), enterShort(:,2),'ro');
-%         plot(exitShort(:,1), exitShort(:,2),'ko');
-%         
-%         plot(daD, clSmaD, 'r', 'Marker', '.'); plot(daD, clAmaD, 'b.'); plot(daD, clRmaD, 'color', [0.70,0.70,0.70], 'Marker', '.');
-%         
-%         yOne = ylim;
-%         xlim([pres-75, pres+10]);
-%         
-%         subplot(3,1,2)
-%         cla
-%         hold on;
-%         highlow(hiW, loW, opW, clW, 'red', daW);
-%         plot(wtodayf(:,1), wtodayf(:,2), 'm', 'Marker' , '.');
-%         plot(daW(1:end-1), dervW*5+meanW, 'k', 'Marker' , '.')
-%         plot([daW(1,1), daW(end,1)], [meanW, meanW], 'k')
-%         plot(daW, clSmaW, 'r', 'Marker', '.'); plot(daW, clAmaW, 'b.'); plot(daW, clRmaW, 'color', [0.70,0.70,0.70], 'Marker', '.');
-%         
-%         yTwo = ylim;
-%         xlim([pres-200, pres+10]);
-%         
-%         subplot(3,1,3)
-%         cla
-%         hold on;
-%         highlow(hiM, loM, opM, clM, 'red', daM);
-%         plot(mtodayf(:,1), mtodayf(:,2), 'm', 'Marker' , '.');
-%         plot(daM(1:end-1), dervM*5+meanM, 'k', 'Marker' , '.')
-%         plot([daM(1,1), daM(end,1)], [meanM, meanM], 'k');
-%         plot(daM, clSmaM, 'r', 'Marker', '.'); plot(daM, clAmaM, 'b.'); plot(daM, clRmaM, 'color', [0.70,0.70,0.70], 'Marker', '.');
-%         
-%         yThree = ylim;
-%         xlim([pres-250, pres+10]);
-%         
-%         pause;
-%     end
+    %     if get(handles.corr, 'Value');
+    subplot(3,1,1)
+    cla
+    hold on;
+    
+    highlow(hiD, loD, opD, clD, 'red', daD);
+    plot(dtodayf(:,1), dtodayf(:,2), 'm', 'Marker' , '.');
+    plot(daD, clD, 'r.');
+    plot(daD(1:end-1), dervD*5+meanD, 'k', 'Marker' , '.')
+    plot([daD(1,1), daD(end,1)], [meanD, meanD], 'k')
+    plot(enterLong(:,1), enterLong(:,2),'go');
+    plot(exitLong(:,1), exitLong(:,2),'ko');
+    plot(enterShort(:,1), enterShort(:,2),'ro');
+    plot(exitShort(:,1), exitShort(:,2),'ko');
+    
+    plot(daD, clSmaD, 'r', 'Marker', '.'); plot(daD, clAmaD, 'b.'); plot(daD, clRmaD, 'color', [0.70,0.70,0.70], 'Marker', '.');
+    
+    yOne = ylim;
+    xlim([pres-75, pres+10]);
+    
+    subplot(3,1,2)
+    cla
+    hold on;
+    highlow(hiW, loW, opW, clW, 'red', daW);
+    plot(wtodayf(:,1), wtodayf(:,2), 'm', 'Marker' , '.');
+    plot(daW(1:end-1), dervW*5+meanW, 'k', 'Marker' , '.')
+    plot([daW(1,1), daW(end,1)], [meanW, meanW], 'k')
+    plot(daW, clSmaW, 'r', 'Marker', '.'); plot(daW, clAmaW, 'b.'); plot(daW, clRmaW, 'color', [0.70,0.70,0.70], 'Marker', '.');
+    
+    yTwo = ylim;
+    xlim([pres-200, pres+10]);
+    
+    subplot(3,1,3)
+    cla
+    hold on;
+    highlow(hiM, loM, opM, clM, 'red', daM);
+    plot(mtodayf(:,1), mtodayf(:,2), 'm', 'Marker' , '.');
+    plot(daM(1:end-1), dervM*5+meanM, 'k', 'Marker' , '.')
+    plot([daM(1,1), daM(end,1)], [meanM, meanM], 'k');
+    plot(daM, clSmaM, 'r', 'Marker', '.'); plot(daM, clAmaM, 'b.'); plot(daM, clRmaM, 'color', [0.70,0.70,0.70], 'Marker', '.');
+    
+    yThree = ylim;
+    xlim([pres-250, pres+10]);
+    
+    
+    dateWatcher = dateIndx;
+    while dateWatcher == dateIndx
+        if get(handles.movingAverage, 'Value')
+            dateIndx = dateIndx - 1
+        end
+        
+        if get(handles.accessSecondary, 'Value')
+            dateIndx = dateIndx + 1
+        end
+        
+        pause(0.1);
+    end
+    
+    set(handles.movingAverage, 'Value', 0 );
+    set(handles.accessSecondary, 'Value', 0);
+    
+    
+    if get(handles.corrCong, 'Value')
+        set(handles.corrCong, 'Value', 0);
+        break;
+    end
+    
+    %     end
+    
+    %     end
     
 end
 

@@ -173,7 +173,7 @@ while(true)
             avgData = wAll.(idx)(primaryRange,:);
             stockData2 = wAll.(stock)(secondaryRange,:);
             avgData2 = wAll.(idx)(secondaryRange,:);
-        else
+        else 
             period = 'd';
             [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, dAll);
             primaryRange = primaryRange(1:end);
@@ -183,6 +183,8 @@ while(true)
             stockData2 = dAll.(stock)(secondaryRange,:);
             avgData2 = dAll.(idx)(secondaryRange,:);
         end
+        
+        set(handles.date, 'String', datestr(stockData(1,1),2));
         
         stockBeta = beta.(stock); % Calc beta on the fly
         [hi, lo, cl, op, da] = tf.returnOHLCDarray(stockData);

@@ -7,6 +7,7 @@ stock = '^GSPC';
 
 while ~strcmp(datestr(now,15), '09:30')
     pause(5)
+    disp(['Waiting... ', datestr(now,15)]);
 end
 
 
@@ -63,7 +64,7 @@ disp('  ')
 % 
 % disp([data.data, data.textdata(5)]);
 
-pause(2)
+pause(1)
 
 
 end
