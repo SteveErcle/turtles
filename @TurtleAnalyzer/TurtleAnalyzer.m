@@ -69,11 +69,17 @@ classdef TurtleAnalyzer < handle
             
             stockStandardCl = (stockData(:,5) - mean(stockData(:,5))) ./ std(stockData(:,5));
             avgStandardCl = (avgData(:,5) - mean(avgData(:,5))) ./ std(avgData(:,5));
-            
-            rawStandardCl = stockStandardCl(end) + (stockStandardCl - avgStandardCl);
+%             rawStandardCl = stockStandardCl(end) + (stockStandardCl - avgStandardCl);
             
             stockStandardCl = flipud(tsmovavg(flipud(stockStandardCl),'e',window_size,1));
             avgStandardCl = flipud(tsmovavg(flipud(avgStandardCl),'e',window_size,1));
+%             rawStandardCl = flipud(tsmovavg(flipud(rawStandardCl),'e',window_size,1));
+            
+            cl = stockData(:,5);
+            clD = avgData(:,5);
+            
+            rawStandardCl = (cl./clD)*100;
+            rawStandardCl = (rawStandardCl - mean(rawStandardCl)) ./ std(rawStandardCl);
             rawStandardCl = flipud(tsmovavg(flipud(rawStandardCl),'e',window_size,1));
             
         end

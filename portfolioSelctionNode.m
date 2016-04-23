@@ -195,18 +195,23 @@ while(true)
         cla
         hold on
         
-        
-        
         if get(handles.standardize, 'Value')
             set(handles.movingAverage, 'Value',0);
             [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getStandardized(stockData, avgData, windSize);
-            [stockStandard2Cl, avgStandard2Cl, rawStandard2Cl] = ta.getStandardized(stockData2, avgData2, windSize);
+            [stockStandardCldw] = ta.getStandardized(stockData, avgData, windSize*2);
             
             plot(da, stockStandardCl, 'r', 'Marker', '.');
+            plot(da, stockStandardCldw, 'm', 'Marker', '.');
             plot(da, avgStandardCl, 'b', 'Marker', '.');
             plot(da, rawStandardCl, 'k', 'Marker', '.');
+%             tick_index = 1:10:length(da); % checks length of the dates with 10 steps in between.
+%             tick_label = datestr(da(tick_index), 6); % this is translated to a datestring.
+%             %Now we tell the x axis to use the parameters set before.
+%             set(gca,'XTick',tick_index);
             
             if get(handles.accessSecondary, 'Value')
+                [stockStandard2Cl, avgStandard2Cl, rawStandard2Cl] = ta.getStandardized(stockData2, avgData2, windSize);
+            
                 plot(da, stockStandard2Cl, 'm', 'Marker', '.');
                 plot(da, avgStandard2Cl, 'c', 'Marker', '.');
                 plot(da, rawStandard2Cl, 'color', [0.70,0.70,0.70], 'Marker', '.')
@@ -295,6 +300,7 @@ while(true)
     set(0,'CurrentFigure',4)
     hold off all
     cla
+    hold all
     for i = 1:12
         stock = portfolio.(market){i};
         if strcmp(period, 'm')
@@ -310,7 +316,7 @@ while(true)
         if get(handles.RSIcong, 'Value')
             set(handles.movingAverage, 'Value',0);
             [RSI, RSIma] = ta.getRSI(stockData, avgData, windSize);
-            p4(i) = plot(da,RSIma+i*.8, 'color', randColors(i,:), 'Marker', '.');
+            p4(i) = plot(da,RSIma+i*.5, 'color', randColors(i,:), 'Marker', '.');
         end 
         
         if  get(handles.corrCong, 'Value')
@@ -321,12 +327,15 @@ while(true)
             
         if get(handles.standardizeCong, 'Value')
             [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getStandardized(stockData, avgData, windSize);
+            [stockStandardCldw] = ta.getStandardized(stockData, avgData, windSize*2);
+            
             p4(i) = plot(da, stockStandardCl+i, 'color', randColors(i,:), 'Marker', '.');
+            plot(da, stockStandardCldw+i, 'color', randColors(i,:), 'Marker', '.');
+            
         end
-        
         names = [names; {stock}];
         xlim([primaryDates(1), primaryDates(2)+10]);
-        hold all
+        
     end
     
     

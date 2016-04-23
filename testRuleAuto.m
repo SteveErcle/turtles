@@ -8,11 +8,11 @@ tf = TurtleFun;
 td = TurtleData;
 ta = TurtleAnalyzer;
 
-stock = 'APD';
+stock = 'PEP';
 
-past = datenum('1/1/13');
-pres = datenum('1/2/15');
-simTo = '4/2/15';
+past = datenum('1/1/11');
+pres = datenum('3/2/13');
+simTo = '5/3/13';
 
 c = yahoo;
 dSP = fetch(c,'^GSPC',past, now, 'd');
