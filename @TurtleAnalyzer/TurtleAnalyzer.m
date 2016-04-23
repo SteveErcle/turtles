@@ -134,7 +134,13 @@ classdef TurtleAnalyzer < handle
             
             clSs = (stockData(:,5) - mean(stockData(:,5))) ./ std(stockData(:,5));
             clAs = (avgData(:,5) - mean(avgData(:,5))) ./ std(avgData(:,5));
-            clRs = clSs + (clSs - clAs);
+%             clRs = clSs + (clSs - clAs);
+    
+            
+            clRs = (stockData(:,5)./avgData(:,5))*100;
+            clRs = (clRs - mean(clRs)) ./ std(clRs);
+
+            
             
             clS = stockData(:,5);
             clA = clAs.*std(clS)+mean(clS);

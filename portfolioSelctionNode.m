@@ -108,10 +108,14 @@ primaryRange = simFrom:simTo;
 p = 0;
 
 figure(1)
-set(gcf, 'Position', [-1080,1,1079,1824]);
+% set(gcf, 'Position', [-1080,1,1079,1824]);
+set(gcf, 'Position', [1388,185,680,620]);
+
 subplot(3,2,1)
 figure(2)
-set(gcf, 'Position', [-1080,1,1079,1824]);
+% set(gcf, 'Position', [-1080,1,1079,1824]);
+set(gcf, 'Position', [2068,181,703,624]);
+
 subplot(3,2,1)
 figure(3)
 [hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(wAll.GSPC);
@@ -156,6 +160,7 @@ while(true)
         
         
         if get(handles.M, 'Value')
+            set(handles.axisLen,'Value', 800);
             period = 'm';
             [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, mAll);
             primaryRange = primaryRange(2:end);
@@ -166,6 +171,7 @@ while(true)
             avgData2 = mAll.(idx)(secondaryRange,:);    
         elseif get(handles.W, 'Value')
             period = 'w';
+            set(handles.axisLen,'Value', 200);
             [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, wAll);
             primaryRange = primaryRange(2:end);
             secondaryRange = secondaryRange(2:end);
@@ -175,6 +181,7 @@ while(true)
             avgData2 = wAll.(idx)(secondaryRange,:);
         else 
             period = 'd';
+            set(handles.axisLen,'Value', 50);
             [primaryRange, secondaryRange, primaryDates, secondaryDates] = td.setRanges(handles, dAll);
             primaryRange = primaryRange(1:end);
             secondaryRange = secondaryRange(1:end);
@@ -197,8 +204,8 @@ while(true)
         
         if get(handles.standardize, 'Value')
             set(handles.movingAverage, 'Value',0);
-            [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getStandardized(stockData, avgData, windSize);
-            [stockStandardCldw] = ta.getStandardized(stockData, avgData, windSize*2);
+            [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getMovingStandard(stockData, avgData, windSize);
+            [stockStandardCldw] = ta.getMovingStandard(stockData, avgData, windSize*2);
             
             plot(da, stockStandardCl, 'r', 'Marker', '.');
             plot(da, stockStandardCldw, 'm', 'Marker', '.');
@@ -351,6 +358,7 @@ while(true)
     
     
     pause(0.1)
+    
     
 end
 

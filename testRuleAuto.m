@@ -20,6 +20,24 @@ wSP = fetch(c,'^GSPC',past, now, 'w');
 mSP = fetch(c,'^GSPC',past, now, 'm');
 close(c)
 
+%  [hiD, loD, clD, opD, daD] = tf.returnOHLCDarray(dSP(1:100,:));
+%    
+% highlow(hiD, loD, opD, clD, 'red', daD);
+
+%This is the important date section
+
+A = [1 3 4 6 3 7 8 2 4] 
+B = [1 2 3 4 7 8 9 10 11]
+
+plot(B,A, 'ro')
+tick_index = 1:2:length(A); % checks length of the dates with 10 steps in between.
+% tick_label = datestr(daD(tick_index), 6); % this is translated to a datestring.
+% %Now we tell the x axis to use the parameters set before.
+set(gca,'XTick',tick_index); 
+% set(gca,'XTickLabel',tick_label);
+return
+    
+
 delete(slider);
 handles = guihandles(slider);
 
