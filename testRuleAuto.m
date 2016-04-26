@@ -20,6 +20,16 @@ wSP = fetch(c,'^GSPC',past, now, 'w');
 mSP = fetch(c,'^GSPC',past, now, 'm');
 close(c)
 
+
+ [hiD, loD, clD, opD, daD] = tf.returnOHLCDarray(dSP(1:20,:));
+ subplot(2,1,1)
+ highlow(hiD, loD, opD, clD, 'red', daD);
+ subplot(2,1,2)
+ candle(hiD, loD, clD, opD, 'blue', daD);
+    
+
+return
+
 %  [hiD, loD, clD, opD, daD] = tf.returnOHLCDarray(dSP(1:100,:));
 %    
 % highlow(hiD, loD, opD, clD, 'red', daD);

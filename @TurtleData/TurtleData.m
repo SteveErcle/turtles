@@ -201,6 +201,19 @@ classdef TurtleData
         end
         
         
+        function time = getAdjustedIntra(obj, time)
+            
+            time.open = time.close(1:end-1);
+            time.close = time.close(2:end);
+            time.date = time.date(1:end-1);
+            time.datestring = time.datestring(1:end-1);
+            time.volume(2) = time.volume(2) + time.volume(1);
+            time.volume = time.volume(2:end);
+            time.high = time.high(2:end);
+            time.low = time.low(2:end);
+        
+        end 
+        
     end
     
 end
