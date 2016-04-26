@@ -16,10 +16,10 @@ classdef TurtleData
             
             dCong = fetch(c,stock,simulateFrom, simulateTo, 'd');
             dCong(:,end+1) = dCong(:,1);
-       
+            
             hlcoDs = TurtleVal(dCong);
-
-             wCong = [];
+            
+            wCong = [];
             for i=1:length(hlcoDs.da)
                 disp(datestr(hlcoDs.da(i)))
                 w = fetch(c,stock,hlcoDs.da(i)-20, hlcoDs.da(i),'w');
@@ -35,9 +35,9 @@ classdef TurtleData
                 m(1,end+1) = hlcoDs.da(i);
                 mCong = [mCong; m(1,:)];
             end
-  
+            
             close(c)
-     
+            
             iAll = [];
             iAll.date = [];
             
@@ -46,18 +46,18 @@ classdef TurtleData
             prevdays = '100d';
             stockexchange = 'NYSE';
             try
-            iAll = IntraDayStockData(stock,stockexchange,interval,prevdays);
-            iAll.dateDay = datestr(iAll.date,2);
+                iAll = IntraDayStockData(stock,stockexchange,interval,prevdays);
+                iAll.dateDay = datestr(iAll.date,2);
             catch
                 disp('Failed to fetch intraday data')
-            end 
+            end
             
         end
         
         function [] = saveData(obj, stock, mAll, mCong, wAll, wCong, dAll, dCong, iAll)
             
             save(strcat(stock, 'data'), 'mAll', 'mCong', 'wAll', 'wCong', 'dAll', 'dCong', 'iAll');
-       
+            
         end
         
         function [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = loadData(obj, stock)
@@ -65,20 +65,20 @@ classdef TurtleData
             load(strcat(stock, 'data'));
             
         end
-
+        
         function [tPast] = resetPast(obj, tCong, tAll, pastDate)
-                
+            
             allDate = tCong(obj.getDateIndx(tCong(:,end), pastDate),1);
             
             dateIndx = obj.getDateIndx(tAll(:,1), allDate);
- 
+            
             tPast = tAll(dateIndx+1:end,:);
-        
+            
         end
         
         function [timePeriod, tickSize] = determineTimePeriod(obj, tCong)
             
-             for i = 1:size(tCong,1)
+            for i = 1:size(tCong,1)
                 if abs(tCong(1,1) - tCong(i,1)) ~= 0 & abs(tCong(1,1) - tCong(i,1)) < 20
                     timePeriod  = 'w';
                     tickSize = 3;
@@ -88,8 +88,8 @@ classdef TurtleData
                     tickSize = 5;
                     break
                 end
-             end    
-        end 
+            end
+        end
         
         function [ok] = checkData(obj, stock, tCong, hlcoDs, checkDateFrom, checkDateTo, isPlot, figHandle)
             
@@ -142,21 +142,21 @@ classdef TurtleData
             if isa(date, 'char')
                 date = datenum(date,'mm/dd/yyyy');
             end
-
+            
             dateIndx = find(array(:,end) == date);
             
             if isempty(dateIndx)
                 
-%                 disp('Finding Closest Date')
+                %                 disp('Finding Closest Date')
                 
                 [M dateIndx] = min( abs(array - date));
-    
-            end 
+                
+            end
             
         end
-    
-        function [primaryRange, secondaryRange, primaryDates, secondaryDates] = setRanges(obj, handles, tAll)
         
+        function [primaryRange, secondaryRange, primaryDates, secondaryDates] = setRanges(obj, handles, tAll)
+            
             
             primaryStartDate = floor(get(handles.axisView, 'Value'));
             secondaryStartDate = floor(get(handles.axisSecondary, 'Value'));
@@ -172,7 +172,7 @@ classdef TurtleData
             primaryEndIndx = obj.getDateIndx(tAll.GSPC(:,1), primaryEndDate);
             secondaryEndIndx = obj.getDateIndx(tAll.GSPC(:,1), secondaryEndDate);
             
-           
+            
             primaryRange = primaryStartIndx:primaryEndIndx;
             secondaryRange = secondaryStartIndx:secondaryEndIndx;
             
@@ -211,8 +211,26 @@ classdef TurtleData
             time.volume = time.volume(2:end);
             time.high = time.high(2:end);
             time.low = time.low(2:end);
+            
+        end
         
-        end 
+        function time = getIntraForDate(obj, timeAll, dateSelected)
+            
+            intraIndx = strmatch(dateSelected, datestr(timeAll.date,2));
+            
+            if isempty(intraIndx)
+                disp('** Intraday data not available **')
+            end
+            
+            time.high = timeAll.high(intraIndx);
+            time.low = timeAll.low(intraIndx);
+            time.close = timeAll.close(intraIndx);
+            time.volume = timeAll.volume(intraIndx);
+            time.date = timeAll.date(intraIndx);
+            time.datestring = timeAll.datestring(intraIndx);
+            
+        end
+        
         
     end
     

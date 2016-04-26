@@ -2,51 +2,173 @@
 
 clc; close all; clear all;
 
-stock = 'AMD';
+stock = 'GALE';
+dateSelected = '04/25/16';
+LEVELS = 0;
+
+
 exchange = 'NASDAQ';
 
 td = TurtleData;
 
-thirty = IntraDayStockData(stock,exchange,'1800','100d');
+levels = [1.44000000000000;1.37000000000000;1.48000000000000;1.50000000000000;1.58000000000000;1.31090000000000;1.39000000000000];
+
+thirtyAll = IntraDayStockData(stock,exchange,'1800','51d');
+fiveAll = IntraDayStockData(stock,exchange,'60','51d');
+
+hi = []; lo = []; cl = []; op = [];
+for i = [13, 14, 15, 18, 19, 20, 21, 22]
+    
+    
+    datePulled = ['04/',num2str(i),'/16'];
+    
+    thirty = td.getIntraForDate(thirtyAll, datePulled);
+    congThirty.(['A',num2str(i)]) = td.getAdjustedIntra(thirty);
+    
+    hi = [hi; congThirty.(['A',num2str(i)]).high];
+    lo = [lo; congThirty.(['A',num2str(i)]).low];
+    cl = [cl; congThirty.(['A',num2str(i)]).close];
+    op = [op; congThirty.(['A',num2str(i)]).open];
+end
+
+figure(1)
+candle(hi, lo, cl, op, 'blue')
+hold on
+xlimits = xlim;
+for i = 1:length(levels)
+    plot([xlimits(1), xlimits(2)], [levels(i), levels(i)], 'k')
+end
+
+if LEVELS == 1
+    while(true)
+        
+        xlimits = xlim;
+        h = gcf;
+        axesObjs = get(h, 'Children');
+        axesObjs = findobj(axesObjs, 'type', 'axes');
+        
+        dataTips = findall(axesObjs, 'Type', 'hggroup', 'HandleVisibility', 'off');
+        
+        if length(dataTips) > 0
+            
+            cursor = datacursormode(gcf);
+            dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
+            value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
+            levels = [levels; value];
+            
+            plot([xlimits(1), xlimits(2)], [value, value], 'k')
+            
+        end
+        
+        delete(dataTips);
+        
+        pause(0.1)
+    end
+end
+
+
+thirty = td.getIntraForDate(thirtyAll, dateSelected);
 thirty = td.getAdjustedIntra(thirty);
-five = IntraDayStockData(stock,exchange,'300','1d');
+five = td.getIntraForDate(fiveAll, dateSelected);
 five =  td.getAdjustedIntra(five);
 
+hiHold = hi;
+loHold = lo;
+clHold = cl;
+opHold = op;
 
-for finished5 = 1:length(five.date)
-    
-    
-    finished30 = max(find(five.date(finished5) >= thirty.date))
-    
-    range5 = 1:finished5;
-    range30 = 1:finished30-1;
-    
-    
-    subplot(2,1,1)
-    cla
-    if finished5 == 1
-        tickSize = 0.001;
-        hold on;
-        plot([five.date(1),five.date(1)], [five.low(1),five.high(1)]);
-        plot([five.date(1)-tickSize,five.date(1)], [five.open(1),five.open(1)]);
-        plot([five.date(1),five.date(1)+tickSize], [five.close(1),five.close(1)]);
-    else
-        candle(five.high(range5), five.low(range5), five.close(range5), five.open(range5), 'blue', five.date(range5));
-    end
-    
-    subplot(2,1,2)
-    cla
-    if finished30 == 2
-        tickSize = 0.001;
-        hold on;
-        plot([thirty.date(1),thirty.date(1)], [thirty.low(1),thirty.high(1)]);
-        plot([thirty.date(1)-tickSize,thirty.date(1)], [thirty.open(1),thirty.open(1)]);
-        plot([thirty.date(1),thirty.date(1)+tickSize], [thirty.close(1),thirty.close(1)]);
-    elseif finished30 > 2
-        candle(thirty.high(range30), thirty.low(range30), thirty.close(range30), thirty.open(range30), 'blue', thirty.date(range30));
-    end
+reset = -1;
+for i = 1:length(five.date)
     
     pause
     
-end
+    
+    finished30 = max(find(five.date(i) >= thirty.date)) - 1;
+    
+    if reset ~= finished30
+        curHi = five.high(i);
+        curLo = five.low(i);
+        curOp = five.open(i);
+        reset = finished30;
+    end
+    
+    if (five.high(i) > curHi), curHi = five.high(i); end 
+    if (five.low(i) > curLo), curLo = five.low(i); end 
+    curCl = five.close(i);
+    
+    
+    hi = [hiHold; thirty.high(1:finished30); curHi];
+    lo = [loHold; thirty.low(1:finished30); curLo];
+    cl = [clHold; thirty.close(1:finished30); curCl];
+    op = [opHold; thirty.open(1:finished30); curOp];
+    
+    
+    
+    
+    
+    cla
+    candle(hi, lo, cl, op, 'blue')
+    hold on
+    xlimits = xlim;
+    for j = 1:length(levels)
+        plot([xlimits(1), xlimits(2)], [levels(j), levels(j)], 'k')
+    end
+    
+    
+    
+end 
 
+
+
+
+
+
+% 
+% for finished5 = 1:length(five.date)
+%     
+%     
+%     finished30 = max(find(five.date(finished5) >= thirty.date))
+%     
+%     range5 = 1:finished5;
+%     range30 = 1:finished30-1;
+%     
+%     
+%     subplot(2,1,1)
+%     cla
+%     if finished5 == 1
+%         tickSize = 0.001;
+%         hold on;
+%         plot([five.date(1),five.date(1)], [five.low(1),five.high(1)]);
+%         plot([five.date(1)-tickSize,five.date(1)], [five.open(1),five.open(1)]);
+%         plot([five.date(1),five.date(1)+tickSize], [five.close(1),five.close(1)]);
+%     else
+%         candle(five.high(range5), five.low(range5), five.close(range5), five.open(range5), 'blue', five.date(range5));
+%     end
+%     
+%     xlimits = xlim;
+%     
+%     subplot(2,1,2)
+%     cla
+%     if finished30 == 2
+%         tickSize = 0.001;
+%         hold on;
+%         plot([thirty.date(1),thirty.date(1)], [thirty.low(1),thirty.high(1)]);
+%         plot([thirty.date(1)-tickSize,thirty.date(1)], [thirty.open(1),thirty.open(1)]);
+%         plot([thirty.date(1),thirty.date(1)+tickSize], [thirty.close(1),thirty.close(1)]);
+%     elseif finished30 > 2
+%         candle(thirty.high(range30), thirty.low(range30), thirty.close(range30), thirty.open(range30), 'blue', thirty.date(range30));
+%     end
+%     
+%     
+%     for j = 1:2
+%         subplot(2,1,j)
+%         for i = 1:length(levels)
+%             plot([xlimits(1), xlimits(2)], [levels(i), levels(i)], 'k')
+%         end
+%     end
+%     
+%     
+%     pause
+%     
+% end
+% 
