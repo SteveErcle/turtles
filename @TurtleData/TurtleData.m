@@ -200,7 +200,6 @@ classdef TurtleData
             
         end
         
-        
         function time = getAdjustedIntra(obj, time)
             
             time.open = time.close(1:end-1);
@@ -215,6 +214,9 @@ classdef TurtleData
         end
         
         function time = getIntraForDate(obj, timeAll, dateSelected)
+            
+            dateSelected = datenum(dateSelected);
+            dateSelected = datestr(dateSelected,2);
             
             intraIndx = strmatch(dateSelected, datestr(timeAll.date,2));
             

@@ -2,8 +2,8 @@
 
 clc; close all; clear all;
 
-stock = 'GALE';
-dateSelected = '04/25/16';
+stock = 'ZIOP';
+dateSelected = '04/26/16';
 LEVELS = 0;
 
 
@@ -11,15 +11,14 @@ exchange = 'NASDAQ';
 
 td = TurtleData;
 
-levels = [1.44000000000000;1.37000000000000;1.48000000000000;1.50000000000000;1.58000000000000;1.31090000000000;1.39000000000000];
+levels = [8.10000000000000;7.90000000000000;8.72000000000000;8.36500000000000;8.52000000000000; 7.88];
 
 thirtyAll = IntraDayStockData(stock,exchange,'1800','51d');
 fiveAll = IntraDayStockData(stock,exchange,'60','51d');
 
 hi = []; lo = []; cl = []; op = [];
-for i = [13, 14, 15, 18, 19, 20, 21, 22]
-    
-    
+for i = [04, 05, 06, 07, 08, 11, 12, 13, 14, 15, 18, 19, 20, 21, 22, 25]
+
     datePulled = ['04/',num2str(i),'/16'];
     
     thirty = td.getIntraForDate(thirtyAll, datePulled);
@@ -82,8 +81,13 @@ for i = 1:length(five.date)
     
     pause
     
+    five.datestring(i)
     
     finished30 = max(find(five.date(i) >= thirty.date)) - 1;
+    
+    if isempty(finished30)
+        finished30 = 0;
+    end 
     
     if reset ~= finished30
         curHi = five.high(i);
@@ -120,55 +124,3 @@ end
 
 
 
-
-
-
-% 
-% for finished5 = 1:length(five.date)
-%     
-%     
-%     finished30 = max(find(five.date(finished5) >= thirty.date))
-%     
-%     range5 = 1:finished5;
-%     range30 = 1:finished30-1;
-%     
-%     
-%     subplot(2,1,1)
-%     cla
-%     if finished5 == 1
-%         tickSize = 0.001;
-%         hold on;
-%         plot([five.date(1),five.date(1)], [five.low(1),five.high(1)]);
-%         plot([five.date(1)-tickSize,five.date(1)], [five.open(1),five.open(1)]);
-%         plot([five.date(1),five.date(1)+tickSize], [five.close(1),five.close(1)]);
-%     else
-%         candle(five.high(range5), five.low(range5), five.close(range5), five.open(range5), 'blue', five.date(range5));
-%     end
-%     
-%     xlimits = xlim;
-%     
-%     subplot(2,1,2)
-%     cla
-%     if finished30 == 2
-%         tickSize = 0.001;
-%         hold on;
-%         plot([thirty.date(1),thirty.date(1)], [thirty.low(1),thirty.high(1)]);
-%         plot([thirty.date(1)-tickSize,thirty.date(1)], [thirty.open(1),thirty.open(1)]);
-%         plot([thirty.date(1),thirty.date(1)+tickSize], [thirty.close(1),thirty.close(1)]);
-%     elseif finished30 > 2
-%         candle(thirty.high(range30), thirty.low(range30), thirty.close(range30), thirty.open(range30), 'blue', thirty.date(range30));
-%     end
-%     
-%     
-%     for j = 1:2
-%         subplot(2,1,j)
-%         for i = 1:length(levels)
-%             plot([xlimits(1), xlimits(2)], [levels(i), levels(i)], 'k')
-%         end
-%     end
-%     
-%     
-%     pause
-%     
-% end
-% 
