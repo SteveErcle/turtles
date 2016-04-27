@@ -2,9 +2,61 @@
 
 clc; close all; clear all;
 
-stock = 'ZIOP';
+stock = 'TSLA';
 dateSelected = '04/26/16';
 LEVELS = 0;
+
+
+c = yahoo;
+dAll = fetch(c,stock, now-50, now, 'd');
+close(c)
+
+
+cl = flipud(dAll(:,5));
+
+
+gain = [];
+loss = [];
+
+diffdata = diff(cl);
+priceChange = abs(diffdata);
+
+advances = priceChange;
+declines = priceChange;
+
+advances(diffdata < 0) = 0;
+declines(diffdata >= 0) = 0;
+
+
+tg = sum(advances(end-27:end-14));
+td = sum(declines(end-27:end-14));
+rs = tg / td 
+rsi = 100 - (100 / (1+rs));
+
+% totalGain = sum(advances((didx - (nperiods-1)):didx));
+% totalLoss = sum(declines((didx - (nperiods-1)):didx));
+% 
+% rs         = totalGain ./ totalLoss;
+% trsi(didx) = 100 - (100 / (1+rs));
+
+
+
+% for i = 1:size(dAll,1)-1
+%     
+%     change = cl(i) - cl(i+1);
+%     
+%     if change >= 0
+%         gain = [gain; change];
+%     else
+%         loss = [loss; change];
+%     end
+%    
+%     
+% end
+
+
+return;
+
 
 
 exchange = 'NASDAQ';
@@ -18,7 +70,7 @@ fiveAll = IntraDayStockData(stock,exchange,'60','51d');
 
 hi = []; lo = []; cl = []; op = [];
 for i = [04, 05, 06, 07, 08, 11, 12, 13, 14, 15, 18, 19, 20, 21, 22, 25]
-
+    
     datePulled = ['04/',num2str(i),'/16'];
     
     thirty = td.getIntraForDate(thirtyAll, datePulled);
@@ -87,7 +139,7 @@ for i = 1:length(five.date)
     
     if isempty(finished30)
         finished30 = 0;
-    end 
+    end
     
     if reset ~= finished30
         curHi = five.high(i);
@@ -96,8 +148,8 @@ for i = 1:length(five.date)
         reset = finished30;
     end
     
-    if (five.high(i) > curHi), curHi = five.high(i); end 
-    if (five.low(i) > curLo), curLo = five.low(i); end 
+    if (five.high(i) > curHi), curHi = five.high(i); end
+    if (five.low(i) > curLo), curLo = five.low(i); end
     curCl = five.close(i);
     
     
@@ -120,7 +172,7 @@ for i = 1:length(five.date)
     
     
     
-end 
+end
 
 
 
