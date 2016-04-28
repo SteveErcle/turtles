@@ -22,7 +22,7 @@ function varargout = intraDayGui(varargin)
 
 % Edit the above text to modify the response to help intraDayGui
 
-% Last Modified by GUIDE v2.5 25-Jan-2016 18:28:24
+% Last Modified by GUIDE v2.5 27-Apr-2016 21:11:21
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -103,3 +103,12 @@ function edit1_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in levSet.
+function levSet_Callback(hObject, eventdata, handles)
+% hObject    handle to levSet (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of levSet
