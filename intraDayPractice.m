@@ -7,15 +7,19 @@ clc; close all; clear all;
 delete(intraDayGui);
 handles = guihandles(intraDayGui);
 
-stockList = {'XCO', 'KERX', 'MNKD', 'SPY'};
-dateSelected = '04/19/16';
+
+stockList = {'AMRN', 'NETE', 'XCO', 'SPY'};
+dateSelected = '04/11/16';
 LEVELS = 0;
 view = 14;
 
 exchange = 'NASDAQ';
 
+
+set(handles.enterList, 'String', stockList);
 td = TurtleData;
 tf = TurtleFun;
+
 
 for i_setCharts = 1:length(stockList)
     
@@ -71,14 +75,14 @@ for i_setCharts = 1:length(stockList)
     xlimits.(stock) = xlim;
     
     levels.(stock) = [];
+    trade.(stock) = [];
     reset.(stock) = -1;
     
 end
 
-load('stockLevels');
 
 if LEVELS == 1
-    while (~get(handles.levSet,'Value'))
+    while (~get(handles.next,'Value'))
         
         for j = 1:length(stockList)
             
@@ -106,20 +110,19 @@ if LEVELS == 1
                 plot([xlimits.(stock)(1), xlimits.(stock)(2)], [value, value], 'k')
                 
                 delete(dataTips);
-                
             end
-            
         end
-        
-        pause(0.1)
+        pause(0.1);
     end
+    set(handles.next,'Value', 0);
+    try save('levels','levels'); catch, disp('Failed to save levels'); end
+else
+    try load('levels'); catch, disp('Failed to load levels'); end
 end
-
 
 
 for i = 1:length(five.(stock).date)
     
-    pause
     
     for j = 1:length(stockList)
         
@@ -160,7 +163,29 @@ for i = 1:length(five.(stock).date)
             plot([xlimits.(stock)(1), xlimits.(stock)(2)], [levels.(stock)(k), levels.(stock)(k)], 'k')
         end
         
+        if ~isempty(trade.(stock))
+            for k = 1:size(trade.(stock),1)
+                plot(trade.(stock)(k,1)+0.3, trade.(stock)(k,2), 'gx');
+            end
+        end
+        
     end
+    
+    
+    
+    while (~get(handles.next,'Value'))
+        if get(handles.execute, 'Value')
+            enterList = get(handles.enterList, 'String');
+            enterIndx = get(handles.enterList, 'Value');
+            enterSelected = enterList{enterIndx};
+            trade.(enterSelected) = [trade.(enterSelected); length(cl.(enterSelected)), cl.(enterSelected)(end)];
+            set(handles.execute, 'Value', 0);
+        end
+        
+        pause(0.1);
+    end
+    
+    set(handles.next,'Value', 0);
     
     
 end

@@ -22,7 +22,7 @@ function varargout = intraDayGui(varargin)
 
 % Edit the above text to modify the response to help intraDayGui
 
-% Last Modified by GUIDE v2.5 27-Apr-2016 21:11:21
+% Last Modified by GUIDE v2.5 28-Apr-2016 18:37:45
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -73,13 +73,13 @@ function varargout = intraDayGui_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on button press in radiobutton1.
-function radiobutton1_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton1 (see GCBO)
+% --- Executes on button press in execute.
+function execute_Callback(hObject, eventdata, handles)
+% hObject    handle to execute (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of radiobutton1
+% Hint: get(hObject,'Value') returns toggle state of execute
 
 
 
@@ -105,10 +105,33 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in levSet.
-function levSet_Callback(hObject, eventdata, handles)
-% hObject    handle to levSet (see GCBO)
+% --- Executes on button press in next.
+function next_Callback(hObject, eventdata, handles)
+% hObject    handle to next (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of levSet
+% Hint: get(hObject,'Value') returns toggle state of next
+
+
+% --- Executes on selection change in enterList.
+function enterList_Callback(hObject, eventdata, handles)
+% hObject    handle to enterList (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns enterList contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from enterList
+
+
+% --- Executes during object creation, after setting all properties.
+function enterList_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to enterList (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
