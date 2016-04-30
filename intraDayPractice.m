@@ -2,14 +2,13 @@
 
 clc; close all; clear all;
 
-
-
 delete(intraDayGui);
 handles = guihandles(intraDayGui);
 
 
 stockList = {'AMRN', 'NETE', 'XCO', 'SPY'};
-dateSelected = '04/11/16';
+% stockList = {'AMRN'};
+dateSelected = '04/12/16';
 LEVELS = 0;
 view = 14;
 
@@ -19,7 +18,7 @@ exchange = 'NASDAQ';
 set(handles.enterList, 'String', stockList);
 td = TurtleData;
 tf = TurtleFun;
-
+ta = TurtleAnalyzer;
 
 for i_setCharts = 1:length(stockList)
     
@@ -82,6 +81,30 @@ end
 
 
 if LEVELS == 1
+    
+     for j = 1:length(stockList)
+         
+         stock = stockList{j};
+         
+         stockData = [dAll.(stock)(:,2); dAll.(stock)(:,3); dAll.(stock)(:,4); dAll.(stock)(:,5)];
+         prelimLevels.(stock) = ta.getLevels(stockData);
+         stockData = [hiHold.(stock); loHold.(stock); clHold.(stock)];
+         prelimLevels.(stock) = [prelimLevels.(stock); ta.getLevels(stockData)];
+         
+         set(0, 'CurrentFigure',j)
+         
+         for k = 1:2
+             subplot(2,1,k)
+             xlimit = xlim;
+             
+             for i = 1:length(prelimLevels.(stock))
+                 plot([xlimit(1), xlimit(2)], [prelimLevels.(stock)(i), prelimLevels.(stock)(i)], 'color', [0.70,0.70,0.70]);
+             end
+         end
+         
+         
+     end 
+    
     while (~get(handles.next,'Value'))
         
         for j = 1:length(stockList)
