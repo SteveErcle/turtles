@@ -6,9 +6,9 @@ delete(intraDayGui);
 handles = guihandles(intraDayGui);
 
 
-stockList = {'AMRN', 'NETE', 'XCO', 'SPY'};
+stockList = {'XCO', 'ARNA', 'REXX', 'SPY'};
 % stockList = {'AMRN'};
-dateSelected = '04/12/16';
+dateSelected = '03/21/16';
 LEVELS = 0;
 view = 14;
 
@@ -22,7 +22,8 @@ ta = TurtleAnalyzer;
 
 for i_setCharts = 1:length(stockList)
     
-    stock = stockList{i_setCharts}
+    stock = stockList{i_setCharts};
+    disp(stock)
     
     c = yahoo;
     dAll.(stock) = fetch(c,stock,datenum(dateSelected)-170, dateSelected, 'd');
@@ -34,7 +35,7 @@ for i_setCharts = 1:length(stockList)
     uniqueDates = unique(datenum(datestr(thirtyAll.(stock).date,2)));
     simYesterday = find(datenum(dateSelected) == uniqueDates)-1;
     
-    hi.(stock) = []; lo.(stock) = []; cl.(stock) = []; op.(stock) = [];
+    hi.(stock) = []; lo.(stock) = []; cl.(stock) = []; op.(stock) = []; vo.(stock) = [];
     
     for i = simYesterday - view : simYesterday
         
@@ -46,6 +47,7 @@ for i_setCharts = 1:length(stockList)
         lo.(stock) = [lo.(stock); thirty.(stock).low];
         cl.(stock) = [cl.(stock); thirty.(stock).close];
         op.(stock) = [op.(stock); thirty.(stock).open];
+        vo.(stock) = [vo.(stock); thirty.(stock).volume];
         
     end
     
@@ -59,18 +61,21 @@ for i_setCharts = 1:length(stockList)
     loHold.(stock) = lo.(stock);
     clHold.(stock) = cl.(stock);
     opHold.(stock) = op.(stock);
+    voHold.(stock) = vo.(stock);
     
-    figure
-    subplot(2,1,1)
-    hold on
+    rsi.(stock) = rsindex(clHold.(stock));
+    
+    figure('Color',[0.1 0.1 0.1]);
+    subplot(2,1,1); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
+    cla; hold on; set(gca,'Color',[0 0 0]);
     [hiD.(stock), loD.(stock), clD.(stock), opD.(stock), daD.(stock)] = tf.returnOHLCDarray(dAll.(stock)(2:end,:));
-    candle(hiD.(stock), loD.(stock), clD.(stock), opD.(stock), 'blue', daD.(stock));
-    title({stock});
+    candle(hiD.(stock), loD.(stock), clD.(stock), opD.(stock), 'cyan', daD.(stock));
+    title({stock}, 'color', 'w');
     
-    subplot(2,1,2)
-    candle(hi.(stock), lo.(stock), cl.(stock), op.(stock), 'blue')
+    subplot(2,1,2); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
+    cla; hold on; set(gca,'Color',[0 0 0]);
+    candle(hi.(stock), lo.(stock), cl.(stock), op.(stock), 'cyan')
     title({stock});
-    hold on
     xlimits.(stock) = xlim;
     
     levels.(stock) = [];
@@ -82,28 +87,28 @@ end
 
 if LEVELS == 1
     
-     for j = 1:length(stockList)
-         
-         stock = stockList{j};
-         
-         stockData = [dAll.(stock)(:,2); dAll.(stock)(:,3); dAll.(stock)(:,4); dAll.(stock)(:,5)];
-         prelimLevels.(stock) = ta.getLevels(stockData);
-         stockData = [hiHold.(stock); loHold.(stock); clHold.(stock)];
-         prelimLevels.(stock) = [prelimLevels.(stock); ta.getLevels(stockData)];
-         
-         set(0, 'CurrentFigure',j)
-         
-         for k = 1:2
-             subplot(2,1,k)
-             xlimit = xlim;
-             
-             for i = 1:length(prelimLevels.(stock))
-                 plot([xlimit(1), xlimit(2)], [prelimLevels.(stock)(i), prelimLevels.(stock)(i)], 'color', [0.70,0.70,0.70]);
-             end
-         end
-         
-         
-     end 
+    for j = 1:length(stockList)
+        
+        stock = stockList{j};
+        
+        stockData = [dAll.(stock)(:,2); dAll.(stock)(:,3); dAll.(stock)(:,4); dAll.(stock)(:,5)];
+        prelimLevels.(stock) = ta.getLevels(stockData);
+        stockData = [hiHold.(stock); loHold.(stock); clHold.(stock)];
+        prelimLevels.(stock) = [prelimLevels.(stock); ta.getLevels(stockData)];
+        
+        set(0, 'CurrentFigure',j)
+        
+        for k = 1:2
+            subplot(2,1,k)
+            xlimit = xlim;
+            
+            for i = 1:length(prelimLevels.(stock))
+                plot([xlimit(1), xlimit(2)], [prelimLevels.(stock)(i), prelimLevels.(stock)(i)], 'color', [0.30,0.30,0.30]);
+            end
+        end
+        
+        
+    end
     
     while (~get(handles.next,'Value'))
         
@@ -128,9 +133,9 @@ if LEVELS == 1
                 
                 set(0, 'CurrentFigure',j)
                 subplot(2,1,1)
-                plot([daD.(stock)(end), daD.(stock)(1)], [value, value], 'k')
+                plot([daD.(stock)(end), daD.(stock)(1)], [value, value], 'w')
                 subplot(2,1,2)
-                plot([xlimits.(stock)(1), xlimits.(stock)(2)], [value, value], 'k')
+                plot([xlimits.(stock)(1), xlimits.(stock)(2)], [value, value], 'w')
                 
                 delete(dataTips);
             end
@@ -174,32 +179,48 @@ for i = 1:length(five.(stock).date)
         lo.(stock) = [loHold.(stock); thirty.(stock).low(1:finished30.(stock)); curLo.(stock)];
         cl.(stock) = [clHold.(stock); thirty.(stock).close(1:finished30.(stock)); curCl.(stock)];
         op.(stock) = [opHold.(stock); thirty.(stock).open(1:finished30.(stock)); curOp.(stock)];
-        
+        vo.(stock) = [voHold.(stock); thirty.(stock).volume(1:finished30.(stock))];
+        rsi.(stock) = rsindex(cl.(stock));
         
         set(0, 'CurrentFigure',j);
-        subplot(2,1,2)
-        cla
-        candle(hi.(stock), lo.(stock), cl.(stock), op.(stock), 'blue')
-        hold on
+        subplot(4,1,1:2); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
+        cla; hold on; set(gca,'Color',[0 0 0]);
+        candle(hi.(stock), lo.(stock), cl.(stock), op.(stock), 'cyan')
+        title({stock}, 'color', 'w');
+        
         xlimits.(stock) = xlim;
         for k = 1:length(levels.(stock))
-            plot([xlimits.(stock)(1), xlimits.(stock)(2)], [levels.(stock)(k), levels.(stock)(k)], 'k')
+            plot([xlimits.(stock)(1), xlimits.(stock)(2)], [levels.(stock)(k), levels.(stock)(k)], 'w')
         end
-        
         if ~isempty(trade.(stock))
             for k = 1:size(trade.(stock),1)
                 plot(trade.(stock)(k,1)+0.3, trade.(stock)(k,2), 'gx');
             end
         end
         
+        subplot(4,1,3); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
+        cla; hold on; set(gca,'Color',[0 0 0]);
+        plot(rsi.(stock), 'g')
+        xlimit = xlim;
+        plot([xlim], [70,70], 'g');
+        plot([xlim], [30,30], 'g');
+        
+        subplot(4,1,4); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
+        cla; hold on; set(gca,'Color',[0 0 0]);
+        set(gca,'Color',[0 0 0]);
+        bar(vo.(stock), 'm')
+        
     end
     
     
     
     while (~get(handles.next,'Value'))
+        enterIndx = get(handles.enterList, 'Value');
+        if get(0,'CurrentFigure') ~= enterIndx
+            figure(enterIndx);
+        end
         if get(handles.execute, 'Value')
             enterList = get(handles.enterList, 'String');
-            enterIndx = get(handles.enterList, 'Value');
             enterSelected = enterList{enterIndx};
             trade.(enterSelected) = [trade.(enterSelected); length(cl.(enterSelected)), cl.(enterSelected)(end)];
             set(handles.execute, 'Value', 0);

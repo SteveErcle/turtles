@@ -160,7 +160,7 @@ classdef TurtleAnalyzer < handle
             perN = 1 - per;
             bester = [];
             
-            for yline = min(stockData) : range(stockData)/10 : max(stockData)
+            for yline = min(stockData) : range(stockData)/25 : max(stockData)
                 
                 storeR = [];
                 storeS = [];
@@ -183,7 +183,7 @@ classdef TurtleAnalyzer < handle
                 
             end
             
-            bester = sortrows(bester,-1);
+            bester = sortrows(bester,-1)
             prelimLevels = bester(1:3,2);
             
             %             [hiD.(stock), loD.(stock), clD.(stock), opD.(stock), daD.(stock)] = obj.tf.returnOHLCDarray(dAll.(stock)(2:end,:));
