@@ -6,10 +6,10 @@ delete(intraDayGui);
 handles = guihandles(intraDayGui);
 
 
-stockList = {'XCO', 'ARNA', 'REXX', 'SPY'};
-% stockList = {'AMRN'};
-dateSelected = '03/21/16';
-LEVELS = 0;
+stockList = {'XCO', 'AMDA', 'MNKD', 'SPY'};
+% stockList = {'GEVO'};
+dateSelected = '03/30/16';
+LEVELS = 1;
 view = 14;
 
 exchange = 'NASDAQ';
@@ -84,6 +84,14 @@ for i_setCharts = 1:length(stockList)
     
 end
 
+set(0, 'CurrentFigure', 1);
+set(gcf, 'Position', [0 5 746 800]);
+set(0, 'CurrentFigure', 2);
+set(gcf, 'Position', [718 5 723 800]);
+set(0, 'CurrentFigure', 3);
+set(gcf, 'Position', [1440,933,1080,892]);
+set(0, 'CurrentFigure', 4);
+set(gcf, 'Position', [1440,5,1081,872]);
 
 if LEVELS == 1
     

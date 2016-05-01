@@ -202,23 +202,18 @@ classdef TurtleData
         
         function time = getAdjustedIntra(obj, time)
             
-            time.open = time.close(1:end-1);
-            time.high = time.high(2:end);
-            time.low = time.low(2:end);
-            time.close = time.close(2:end);
-            time.volume(2) = time.volume(2) + time.volume(1);
-            time.volume = time.volume(2:end);
-            time.date = time.date(1:end-1);
-            time.datestring = time.datestring(1:end-1);
-            
-            if length(time.date) == 77 || length(time.date) == 12
-                time.open = [time.open(1); time.high];
-                time.high = [time.open(1); time.high];
-                time.low = [time.open(1); time.low];
-                time.close = [time.open(1); time.close];
-                time.volume = [0; time.volume];
-                time.date = [0; time.date];
-                time.datestring = [{'Missing 9:30'}; time.datestring];
+            if length(time.date) == 78 || length(time.date) == 13
+                time.datestring = [{'Missing 9:30'}; time.datestring(1:end-1)];
+                time.open = [time.close(1); time.close(1:end-1)];
+            else
+                time.open = time.close(1:end-1);
+                time.high = time.high(2:end);
+                time.low = time.low(2:end);
+                time.close = time.close(2:end);
+                time.volume(2) = time.volume(2) + time.volume(1);
+                time.volume = time.volume(2:end);
+                time.date = time.date(1:end-1);
+                time.datestring = time.datestring(1:end-1);
             end
             
         end
@@ -240,7 +235,7 @@ classdef TurtleData
             time.volume = timeAll.volume(intraIndx);
             time.date = timeAll.date(intraIndx);
             time.datestring = timeAll.datestring(intraIndx);
-
+            
         end
         
         
