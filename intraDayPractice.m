@@ -6,9 +6,9 @@ delete(intraDayGui);
 handles = guihandles(intraDayGui);
 
 
-stockList = {'XCO', 'AMDA', 'MNKD', 'SPY'};
+stockList = {'CRC', 'AMRN', 'NETE', 'SPY', 'XCO'};
 % stockList = {'GEVO'};
-dateSelected = '03/30/16';
+dateSelected = '04/08/16';
 LEVELS = 1;
 view = 14;
 
@@ -230,7 +230,12 @@ for i = 1:length(five.(stock).date)
         if get(handles.execute, 'Value')
             enterList = get(handles.enterList, 'String');
             enterSelected = enterList{enterIndx};
-            trade.(enterSelected) = [trade.(enterSelected); length(cl.(enterSelected)), cl.(enterSelected)(end)];
+            trade.(enterSelected) = [trade.(enterSelected); length(cl.(enterSelected)), cl.(enterSelected)(end), 0];
+            if mod(size(trade.(enterSelected),1),2) == 0
+                trade.(enterSelected)(end,3) = 100 * (trade.(enterSelected)(end,2) - trade.(enterSelected)(end-1,2))...
+                    / trade.(enterSelected)(end-1,2)
+            end
+            
             set(handles.execute, 'Value', 0);
         end
         
