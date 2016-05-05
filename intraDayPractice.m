@@ -6,19 +6,19 @@ delete(intraDayGui);
 handles = guihandles(intraDayGui);
 
 
-stockList = {'CRC', 'AMRN', 'NETE', 'SPY', 'XCO'};
+stockList = {'MNKD', 'GALE', 'XCO', 'SPY', 'KERX'};
 % stockList = {'GEVO'};
-dateSelected = '04/08/16';
-LEVELS = 1;
+dateSelected = '4/18/16';
+LEVELS = 0;
 view = 14;
 
 exchange = 'NASDAQ';
-
 
 set(handles.enterList, 'String', stockList);
 td = TurtleData;
 tf = TurtleFun;
 ta = TurtleAnalyzer;
+tc = TurtleCall;
 
 for i_setCharts = 1:length(stockList)
     
@@ -66,6 +66,7 @@ for i_setCharts = 1:length(stockList)
     rsi.(stock) = rsindex(clHold.(stock));
     
     figure('Color',[0.1 0.1 0.1]);
+    set(gcf, 'KeyPressFcn', @tc.callKey);
     subplot(2,1,1); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
     cla; hold on; set(gca,'Color',[0 0 0]);
     [hiD.(stock), loD.(stock), clD.(stock), opD.(stock), daD.(stock)] = tf.returnOHLCDarray(dAll.(stock)(2:end,:));
@@ -79,6 +80,7 @@ for i_setCharts = 1:length(stockList)
     xlimits.(stock) = xlim;
     
     levels.(stock) = [];
+    alerts.(stock) = [];
     trade.(stock) = [];
     reset.(stock) = -1;
     
@@ -92,9 +94,9 @@ set(0, 'CurrentFigure', 3);
 set(gcf, 'Position', [1440,933,1080,892]);
 set(0, 'CurrentFigure', 4);
 set(gcf, 'Position', [1440,5,1081,872]);
+examine = 1;
 
 if LEVELS == 1
-    
     for j = 1:length(stockList)
         
         stock = stockList{j};
@@ -125,6 +127,7 @@ if LEVELS == 1
             stock = stockList{j};
             
             set(0, 'CurrentFigure',j)
+            
             h = gcf;
             axesObjs = get(h, 'Children');
             axesObjs = findobj(axesObjs, 'type', 'axes');
@@ -134,16 +137,22 @@ if LEVELS == 1
             if length(dataTips) > 0
                 
                 cursor = datacursormode(gcf);
-                dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1)
+                dateOnPlot = cursor.CurrentDataCursor.getCursorInfo.Position(1);
                 value = cursor.CurrentDataCursor.getCursorInfo.Position(2)
-                levels.(stock) = [levels.(stock); value];
                 
+                if strcmp(tc.mode, 'l')
+                    levels.(stock) = [levels.(stock); value];
+                    color = 'w';
+                elseif strcmp(tc.mode, 'a')
+                    alerts.(stock) = [alerts.(stock); value];
+                    color = 'b';
+                end
                 
                 set(0, 'CurrentFigure',j)
                 subplot(2,1,1)
-                plot([daD.(stock)(end), daD.(stock)(1)], [value, value], 'w')
+                plot([daD.(stock)(end), daD.(stock)(1)], [value, value], color)
                 subplot(2,1,2)
-                plot([xlimits.(stock)(1), xlimits.(stock)(2)], [value, value], 'w')
+                plot([xlimits.(stock)(1), xlimits.(stock)(2)], [value, value], color)
                 
                 delete(dataTips);
             end
@@ -151,9 +160,11 @@ if LEVELS == 1
         pause(0.1);
     end
     set(handles.next,'Value', 0);
-    try save('levels','levels'); catch, disp('Failed to save levels'); end
+    try save('levels','levels'); save('alerts', 'alerts');
+    catch, disp('Failed to save levels or alerts'); end
 else
-    try load('levels'); catch, disp('Failed to load levels'); end
+    try load('levels'); load('alerts');
+    catch, disp('Failed to load levels'); end
 end
 
 
@@ -177,6 +188,9 @@ for i = 1:length(five.(stock).date)
             curLo.(stock) = five.(stock).low(i);
             curOp.(stock) = five.(stock).open(i);
             reset.(stock) = finished30.(stock);
+            if j == 1
+                examine = 1;
+            end
         end
         
         if (five.(stock).high(i) > curHi.(stock)), curHi.(stock) = five.(stock).high(i); end
@@ -190,39 +204,66 @@ for i = 1:length(five.(stock).date)
         vo.(stock) = [voHold.(stock); thirty.(stock).volume(1:finished30.(stock))];
         rsi.(stock) = rsindex(cl.(stock));
         
-        set(0, 'CurrentFigure',j);
-        subplot(4,1,1:2); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
-        cla; hold on; set(gca,'Color',[0 0 0]);
-        candle(hi.(stock), lo.(stock), cl.(stock), op.(stock), 'cyan')
-        title({stock}, 'color', 'w');
-        
-        xlimits.(stock) = xlim;
-        for k = 1:length(levels.(stock))
-            plot([xlimits.(stock)(1), xlimits.(stock)(2)], [levels.(stock)(k), levels.(stock)(k)], 'w')
+        crissCross = 0;
+        if i > 1 & ~isempty(alerts.(stock))
+            firstCross = five.(stock).close(i) > alerts.(stock);
+            secondCross = five.(stock).close(i-1) < alerts.(stock);
+            crissCross = sum(firstCross == secondCross);
+            firstCross = five.(stock).close(i) < alerts.(stock);
+            secondCross = five.(stock).close(i-1) > alerts.(stock);
+            crissCross = crissCross + sum(firstCross == secondCross)
+            
+            if crissCross >= 1
+                stock
+                set(handles.examine, 'Value', 1);
+            end 
         end
-        if ~isempty(trade.(stock))
-            for k = 1:size(trade.(stock),1)
-                plot(trade.(stock)(k,1)+0.3, trade.(stock)(k,2), 'gx');
+      
+        
+        if examine == 1 || get(handles.examine, 'Value')
+            set(0, 'CurrentFigure',j);
+            subplot(4,1,1:2); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
+            cla; hold on; set(gca,'Color',[0 0 0]);
+            candle(hi.(stock), lo.(stock), cl.(stock), op.(stock), 'cyan')
+            title({stock}, 'color', 'w');
+            
+            xlimits.(stock) = xlim;
+            for k = 1:length(levels.(stock))
+                plot([xlimits.(stock)(1), xlimits.(stock)(2)], [levels.(stock)(k), levels.(stock)(k)], 'w')
             end
-        end
-        
-        subplot(4,1,3); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
-        cla; hold on; set(gca,'Color',[0 0 0]);
-        plot(rsi.(stock), 'g')
-        xlimit = xlim;
-        plot([xlim], [70,70], 'g');
-        plot([xlim], [30,30], 'g');
-        
-        subplot(4,1,4); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
-        cla; hold on; set(gca,'Color',[0 0 0]);
-        set(gca,'Color',[0 0 0]);
-        bar(vo.(stock), 'm')
+            if crissCross >= 1
+                for k = 1:length(alerts.(stock))
+                    plot([xlimits.(stock)(1), xlimits.(stock)(2)], [alerts.(stock)(k), alerts.(stock)(k)], 'b')
+                end
+            end
+            if ~isempty(trade.(stock))
+                for k = 1:size(trade.(stock),1)
+                    plot(trade.(stock)(k,1)+0.3, trade.(stock)(k,2), 'gx');
+                end
+            end
+            
+            subplot(4,1,3); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
+            cla; hold on; set(gca,'Color',[0 0 0]);
+            plot(rsi.(stock), 'g')
+            xlimit = xlim;
+            plot([xlim], [70,70], 'g');
+            plot([xlim], [30,30], 'g');
+            
+            subplot(4,1,4); set(gca, 'XColor', [0.8 0.8 0.8]); set(gca, 'YColor', [0.8 0.8 0.8]);
+            cla; hold on; set(gca,'Color',[0 0 0]);
+            set(gca,'Color',[0 0 0]);
+            bar(vo.(stock), 'm')
+        end 
+
         
     end
+
+    if examine == 1 || get(handles.examine, 'Value')
+        set(handles.next,'Value', 0);
+        examine = 0;
+    end 
     
-    
-    
-    while (~get(handles.next,'Value'))
+    while (~get(handles.next,'Value')) 
         enterIndx = get(handles.enterList, 'Value');
         if get(0,'CurrentFigure') ~= enterIndx
             figure(enterIndx);
@@ -238,11 +279,11 @@ for i = 1:length(five.(stock).date)
             
             set(handles.execute, 'Value', 0);
         end
-        
+
         pause(0.1);
     end
     
-    set(handles.next,'Value', 0);
+%     set(handles.next,'Value', 0);
     
     
 end
