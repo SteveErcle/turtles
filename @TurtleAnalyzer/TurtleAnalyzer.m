@@ -130,25 +130,41 @@ classdef TurtleAnalyzer < handle
             
         end
         
-        function [clSma, clAma, clRma] = getMovingStandard(obj, stockData, avgData, window_size)
+        function [clSma, clAma, clRma] = getMovingStandard(obj, stockData, avgData, window_size, isFlip)
             
-            clSs = (stockData(:,5) - mean(stockData(:,5))) ./ std(stockData(:,5));
-            clAs = (avgData(:,5) - mean(avgData(:,5))) ./ std(avgData(:,5));
+            if size(stockData, 2) > 1
+                stockData = stockData(:, 5);
+                avgData  = avgData(:, 5);
+            end 
+            
+            cap = min([length(stockData), length(avgData)]);
+            stockData = stockData(1:cap);
+            avgData = avgData(1:cap);
+            
+            clSs = (stockData - mean(stockData)) ./ std(stockData);
+            clAs = (avgData - mean(avgData)) ./ std(avgData);
             %             clRs = clSs + (clSs - clAs);
             
             
-            clRs = (stockData(:,5)./avgData(:,5))*100;
+            clRs = ((stockData)./avgData)*100;
             clRs = (clRs - mean(clRs)) ./ std(clRs);
             
             
             
-            clS = stockData(:,5);
+            clS = stockData;
             clA = clAs.*std(clS)+mean(clS);
             clR = clRs.*std(clS)+mean(clS);
             
-            clSma = flipud(tsmovavg(flipud(clS),'e',window_size,1));
-            clAma = flipud(tsmovavg(flipud(clA),'e',window_size,1));
-            clRma = flipud(tsmovavg(flipud(clR),'e',window_size,1));
+            if isFlip
+                clSma = flipud(tsmovavg(flipud(clS),'e',window_size,1));
+                clAma = flipud(tsmovavg(flipud(clA),'e',window_size,1));
+                clRma = flipud(tsmovavg(flipud(clR),'e',window_size,1));
+            else
+                clSma = tsmovavg(clS,'e',window_size,1);
+                clAma = tsmovavg(clA,'e',window_size,1);
+                clRma = tsmovavg(clR,'e',window_size,1);
+            end
+            
             
         end
         

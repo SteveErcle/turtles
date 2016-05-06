@@ -204,8 +204,8 @@ while(true)
         
         if get(handles.standardize, 'Value')
             set(handles.movingAverage, 'Value',0);
-            [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getMovingStandard(stockData, avgData, windSize);
-            [stockStandardCldw] = ta.getMovingStandard(stockData, avgData, windSize*2);
+            [stockStandardCl, avgStandardCl, rawStandardCl] = ta.getMovingStandard(stockData, avgData, windSize, true);
+            [stockStandardCldw] = ta.getMovingStandard(stockData, avgData, windSize*2, true);
             
             plot(da, stockStandardCl, 'r', 'Marker', '.');
             plot(da, stockStandardCldw, 'm', 'Marker', '.');

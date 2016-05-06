@@ -6,9 +6,10 @@ delete(intraDayGui);
 handles = guihandles(intraDayGui);
 
 
-stockList = {'MNKD', 'GALE', 'XCO', 'SPY', 'KERX'};
+stockList = {'MNKD', 'TERP', 'BCEI', 'SPY'};
+index = {'SPY'};
 % stockList = {'GEVO'};
-dateSelected = '4/18/16';
+dateSelected = '4/20/16';
 LEVELS = 0;
 view = 14;
 
@@ -160,6 +161,7 @@ if LEVELS == 1
         pause(0.1);
     end
     set(handles.next,'Value', 0);
+    set(handles.examine, 'Value', 1);
     try save('levels','levels'); save('alerts', 'alerts');
     catch, disp('Failed to save levels or alerts'); end
 else
@@ -203,6 +205,8 @@ for i = 1:length(five.(stock).date)
         op.(stock) = [opHold.(stock); thirty.(stock).open(1:finished30.(stock)); curOp.(stock)];
         vo.(stock) = [voHold.(stock); thirty.(stock).volume(1:finished30.(stock))];
         rsi.(stock) = rsindex(cl.(stock));
+        
+        
         
         crissCross = 0;
         if i > 1 & ~isempty(alerts.(stock))
@@ -258,6 +262,21 @@ for i = 1:length(five.(stock).date)
         
     end
 
+    for j = 1:length(stockList)
+        
+        stock = stockList{j};
+        avg = index{1};
+        
+        [clSma, clAma, clRma] = ta.getMovingStandard(cl.(stock), cl.(avg), 10, false);
+        
+        set(0, 'CurrentFigure',j);
+        subplot(4,1,1:2)
+%         plot(clRma, 'y')
+        plot(clAma, 'm')
+        plot(clSma, 'y')
+        
+    end 
+    
     if examine == 1 || get(handles.examine, 'Value')
         set(handles.next,'Value', 0);
         examine = 0;
