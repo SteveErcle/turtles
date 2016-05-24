@@ -29,7 +29,7 @@ classdef TurtleTCP < handle
             data = [];
        
 %             while(obj.t.BytesAvailable)
-                data = [data; fread(obj.t, num, precision)];
+                data = [data; fread(obj.t, num, precision)]
 %             end
             
         end
