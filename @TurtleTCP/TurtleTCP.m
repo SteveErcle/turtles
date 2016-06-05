@@ -44,11 +44,13 @@ classdef TurtleTCP < handle
                     size       = dataAS(4)/10000;
                     
                     if side == 0
-                        accumSpread.sum = accumSpread.sum - price*size
+                        accumSpread.sum = accumSpread.sum - price*size;
                         accumSpread.total = [accumSpread.total; accumSpread.sum];
+                        accumSpread.ask(position+1,:) = [price, size];
                     elseif side == 1
-                        accumSpread.sum = accumSpread.sum + price*size
+                        accumSpread.sum = accumSpread.sum + price*size;
                         accumSpread.total = [accumSpread.total; accumSpread.sum];
+                        accumSpread.bid(position+1,:) = [price, size];
                     end
                     
                     accumSpread.time = [accumSpread.time; now];
@@ -60,10 +62,10 @@ classdef TurtleTCP < handle
                     else
                         addLen = length(accumSpread.hi);
                     end 
-                    accumSpread.op(addLen) = accumSpread.total(1)'
-                    accumSpread.hi(addLen) = max(accumSpread.total)
-                    accumSpread.lo(addLen) = min(accumSpread.total)
-                    accumSpread.cl(addLen) = accumSpread.total(end)
+                    accumSpread.op(addLen) = accumSpread.total(1)';
+                    accumSpread.hi(addLen) = max(accumSpread.total);
+                    accumSpread.lo(addLen) = min(accumSpread.total);
+                    accumSpread.cl(addLen) = accumSpread.total(end);
                     
 %                     if length(accumSpread.op) == 2
 %                         accumSpread.op = accumSpread.op';
@@ -106,7 +108,7 @@ classdef TurtleTCP < handle
             
             while obj.t.BytesAvailable > 0
                 
-                dataPA = fread(obj.t, num, precision)
+                dataPA = fread(obj.t, num, precision);
                 
                 if ~isempty(dataPA)
                     
@@ -144,9 +146,7 @@ classdef TurtleTCP < handle
             end
             
         end
-        
-        
-        
+          
     end 
         
 end
