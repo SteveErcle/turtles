@@ -3,11 +3,16 @@
 
 clc; close all; clear all;
 
-stock = 'TSLA';
+delete(slider);
+handles = guihandles(slider);
+
+
+
+stock = 'TWTR';
 indx = 'SPY';
 exchange = 'NASDAQ';
 
-past = now - 250;
+past = now - 350;
 pres = now;
 
 tf = TurtleFun;
@@ -26,7 +31,9 @@ td = TurtleData;
 % [hiA, loA, clA, opA, daA] = tf.returnOHLCDarray(avgAll);
 % cl.SPY = clA;
 
-iAll.TSLA = IntraDayStockData(stock,exchange,'30','5d');
+
+
+iAll.TSLA = IntraDayStockData(stock,exchange,'300','5d');
 iAll.TSLA = td.getAdjustedIntra(iAll.TSLA);
 
 hi.TSLA = iAll.TSLA.high;
@@ -34,28 +41,45 @@ lo.TSLA = iAll.TSLA.low;
 op.TSLA = iAll.TSLA.open;
 cl.TSLA = iAll.TSLA.close;
 
-iAll.SPY = IntraDayStockData(indx,exchange,'30','5d');
+iAll.SPY = IntraDayStockData(indx,exchange,'300','5d');
 iAll.SPY = td.getAdjustedIntra(iAll.SPY);
 
 cl.SPY = iAll.SPY.close;
+
+len = length(cl.SPY);
+set(handles.axisView, 'Max', len, 'Min', 0);
+set(handles.axisView, 'SliderStep', [1/len, 10/len]);
+set(handles.axisView, 'Value', 0);
 
 
 
 [macdvec.TSLA, nineperma.TSLA] = macd(cl.TSLA);
 [macdvec.SPY, nineperma.SPY] = macd(cl.SPY);
 
-
+if length(cl.SPY) ~= length(cl.TSLA)
+    disp('Length Error')
+    return
+end
 
 macdStackLong = [];
 macdStackShort = [];
 
+B.TSLA = [NaN; diff(macdvec.TSLA)];
+B.SPY  = [NaN; diff(macdvec.SPY)];
+
+difference = [];
+
 for i = 1:length(nineperma.TSLA)
     
-    if nineperma.TSLA(i) < macdvec.TSLA(i) & nineperma.SPY(i) < macdvec.SPY(i)
+    difference = [difference; nineperma.TSLA(i) - macdvec.TSLA(i)];
+    
+    if nineperma.TSLA(i) < macdvec.TSLA(i) & nineperma.SPY(i) < macdvec.SPY(i)...
+            & B.TSLA(i) >= 0 & B.SPY(i) >= 0
         macdStackLong = [macdStackLong; i];
     end
     
-    if nineperma.TSLA(i) > macdvec.TSLA(i) & nineperma.SPY(i) > macdvec.SPY(i)
+    if nineperma.TSLA(i) > macdvec.TSLA(i) & nineperma.SPY(i) > macdvec.SPY(i)...
+            & B.TSLA(i) <= 0 & B.SPY(i) <= 0
         macdStackShort = [macdStackShort; i];
     end
     
@@ -67,9 +91,10 @@ shortStackInd = [1, shortDiff(1)];
 for i = 2:length(shortDiff)
     shortStackInd = [shortStackInd; shortDiff(i-1)+1, shortDiff(i)];
 end
+
 shortStackInd = [shortStackInd; shortDiff(i)+1, length(macdStackShort)];
 
-shortStackInd(find(shortStackInd(:,1) == shortStackInd(:,2)),:) = [];
+% shortStackInd(find(shortStackInd(:,1) == shortStackInd(:,2)),:) = [];
 
 shortStackMacd = [macdStackShort(shortStackInd(:,1)), macdStackShort(shortStackInd(:, 2))];
 
@@ -105,28 +130,103 @@ roiLong;
 disp('ROI Long');
 disp(sum(roiLong));
 
+while(true)
+    
+    subplot(4,1,[1:2])
+    cla
+    candle(hi.TSLA, lo.TSLA, cl.TSLA, op.TSLA, 'blue');
+    hold on
+    
+    
+    subplot(4,1,3)
+    cla
+    plot(macdvec.TSLA)
+    hold on
+    plot(nineperma.TSLA,'r')
+    plot(xlim, [0,0], 'k')
+    
+    
+    subplot(4,1,4)
+    cla
+    plot(macdvec.SPY)
+    hold on
+    plot(nineperma.SPY,'r')
+    plot(xlim, [0,0], 'k')
+    
+    
+    for j = 2:4
+        
+        if j == 2
+            subIndx = [1:2];
+        else
+            subIndx = j;
+        end
+        
+        subplot(4,1,subIndx)
+        hold on
+        axisView = get(handles.axisView, 'Value');
+        xlim(gca, [0+axisView, 100+axisView])
+        
+        
+        yLimits = ylim(gca);
+        yLo = yLimits(1);
+        yHi = yLimits(2);
+        
+        if j == 3
+            B = [NaN; diff(macdvec.TSLA)];
+            B = B * ((yLimits(2)/2) / max(B));
+            bp = bar(B);
+            set(get(bp,'Children'),'FaceAlpha',0.2);    
+        elseif j == 4
+            B = [NaN; diff(macdvec.SPY)];
+            B = B * ((yLimits(2)/2) / max(B));
+            bp = bar(B);
+            set(get(bp,'Children'),'FaceAlpha',0.2);
+        end
+        
+        for i = 1:length(longStackMacd)
+            xLo = longStackMacd(i,1);
+            xHi = longStackMacd(i,2);
+            
+            xLong = [xLo xHi xHi xLo];
+            yLong = [yLo yLo yHi yHi];
+            
+            hp = patch(xLong,yLong, [0.7, 1, .7], 'FaceAlpha', 0.25);
+        end
+        
+        for i = 1:length(shortStackMacd)
+            xLo = shortStackMacd(i,1);
+            xHi = shortStackMacd(i,2);
+            
+            xShort = [xLo xHi xHi xLo];
+            yShort = [yLo yLo yHi yHi];
+            
+            hp = patch(xShort,yShort, [1, .7, .7], 'FaceAlpha', 0.25);
+        end
+        
+        
+        
+        
+        
+    end
+    
+    
+    bestRoiLong = sortrows(roiLong, -1);
+    
+    subplot(4,1,[1:2])
+    for i = 1:5
+        
+        xText = mean(longStackMacd(find(bestRoiLong(i) == roiLong),:));
+        ylimits = ylim;
+        text(xText, ylimits(2), num2str(bestRoiLong(i)))
+    end
+    
+    pause(10/100)
+    
+end
 
-
-subplot(2,1,1)
-plot(macdvec.TSLA)
-hold on
-plot(nineperma.TSLA,'r')
-plot(macdStackLong, macdvec.TSLA(macdStackLong), 'go')
-
-
-
-subplot(2,1,2)
-plot(macdvec.SPY)
-hold on
-plot(nineperma.SPY,'r')
-plot(macdStackLong, macdvec.SPY(macdStackLong), 'go')
-
-figure
-candle(hi.TSLA, lo.TSLA, cl.TSLA, op.TSLA, 'blue');
-hold on
-plot(macdStackLong, cl.TSLA(macdStackLong), 'color', 'g', 'Marker', 'o', 'MarkerSize', 10)
-plot(macdStackShort, cl.TSLA(macdStackShort), 'color', 'r', 'Marker', 'o', 'MarkerSize', 10)
-
+% plot(macdStackLong, cl.TSLA(macdStackLong), 'color', 'g', 'Marker', 'o', 'MarkerSize', 10)
+% plot(macdStackShort, cl.TSLA(macdStackShort), 'color', 'r', 'Marker', 'o', 'MarkerSize', 10)
 
 
 
