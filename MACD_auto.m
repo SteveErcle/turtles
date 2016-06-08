@@ -3,21 +3,24 @@
 
 clc; close all; clear all;
 
-stock = 'MSFT';
+
+stock = 'LABU';
 indx = 'SPY';
 exchange = 'NASDAQ';
 
-slPercent = 0.5;
 
 INTRA = 1;
 DAILY = 0;
 
-past = now - 1000;
-pres = now - 500;
+past = now - 200;
+pres = now ;
 
 
 tf = TurtleFun;
 td = TurtleData;
+ta = TurtleAuto;
+
+ta.slPercent = .250;
 
 numPlots = 6;
 
@@ -56,121 +59,51 @@ if INTRA
 end
 
 
-tradeLen = 0;
-enterPrice = NaN;
-enterMarket = 0;
-stopLoss = NaN;
-inMarket = [];
-trades = [];
+
 figure
 
-i = 50-1;
+ta.ind = 50-1;
 
-while i <= len
+while ta.ind <= len
     
-    i = i + 1
-    range = 1:i;
+    
+    ta.ind = ta.ind + 1
+    range = 1:ta.ind;
     
     if INTRA
-        TA.hi.STOCK = iAll.STOCK.high(range);
-        TA.lo.STOCK = iAll.STOCK.low(range);
-        TA.op.STOCK = iAll.STOCK.open(range);
-        TA.cl.STOCK = iAll.STOCK.close(range);
-        TA.vo.STOCK = iAll.STOCK.volume(range);
+        ta.hi.STOCK = iAll.STOCK.high(range);
+        ta.lo.STOCK = iAll.STOCK.low(range);
+        ta.op.STOCK = iAll.STOCK.open(range);
+        ta.cl.STOCK = iAll.STOCK.close(range);
+        ta.vo.STOCK = iAll.STOCK.volume(range);
         
-        TA.cl.INDX = iAll.INDX.close(range);
-        TA.vo.INDX = iAll.INDX.volume(range);
+        ta.cl.INDX = iAll.INDX.close(range);
+        ta.vo.INDX = iAll.INDX.volume(range);
     end
     
     if DAILY
-        TA.hi.STOCK = hiD(range);
-        TA.lo.STOCK = loD(range);
-        TA.op.STOCK = opD(range);
-        TA.cl.STOCK = clD(range);
-        TA.vo.STOCK = voD(range);
+        ta.hi.STOCK = hiD(range);
+        ta.lo.STOCK = loD(range);
+        ta.op.STOCK = opD(range);
+        ta.cl.STOCK = clD(range);
+        ta.vo.STOCK = voD(range);
         
-        TA.cl.INDX = clA(range);
-        TA.vo.INDX = voA(range);
+        ta.cl.INDX = clA(range);
+        ta.vo.INDX = voA(range);
     end
     
     
     
+    ta.calculateData();
     
-    [TA.macdvec.STOCK, TA.nineperma.STOCK] = macd(TA.cl.STOCK);
-    [TA.macdvec.INDX, TA.nineperma.INDX] = macd(TA.cl.INDX);
+    ta.checkConditions();
     
-    TA.B.STOCK = [NaN; diff(TA.macdvec.STOCK)];
-    TA.B.INDX  = [NaN; diff(TA.macdvec.INDX)];
-    
-    if tradeLen <= 2
-        stopLoss = enterPrice*(1.00-slPercent/100);
-    else
-        stopLoss = lo.STOCK(i-2);
-    end
+    ta.executeBullTrade();
+       
+    ta.executeBearTrade();
     
     
-    for i_conditions = 1:1
-        if  nineperma.INDX(i) < macdvec.INDX(i) %&& nineperma.STOCK(i) < macdvec.STOCK(i)
-            condition.MACD_bull_cross = 1;
-        else
-            condition.MACD_bull_cross = 0;
-        end
-        
-        if B.STOCK(i) >= 0.005 && B.INDX(i) >= 0.0
-            condition.MACD_bull_derv = 1;
-        else
-            condition.MACD_bull_derv = 0;
-        end
-        
-        if lo.STOCK(i) <= stopLoss
-            condition.Not_Stopped_Out = 0;
-        else
-            condition.Not_Stopped_Out = 1;
-        end
-        
-        if vo.STOCK(i) > mean(vo.STOCK)
-            condition.Large_Volume = 1;
-        else
-            condition.Large_Volume = 0;
-        end
-   
-    end
     
-    
-    if TA.condition.MACD_bull_cross && TA.condition.MACD_bull_derv...
-            && TA.condition.Not_Stopped_Out && TA.condition.Large_Volume
-        
-        if enterMarket == 0
-            enterPrice = cl.STOCK(i);
-            trades = [trades; enterPrice, NaN, i, NaN];
-        end
-        
-        enterMarket = 1;
-        tradeLen = tradeLen + 1;
-        
-        inMarket = [inMarket; i, cl.STOCK(i)];
-        
-    else
-        
-        if enterMarket == 1
-            
-            if condition.Not_Stopped_Out
-                trades(end,2) = cl.STOCK(i);
-            else
-                trades(end,2) = stopLoss;
-            end
-            
-            trades(end,4) = i;
-            
-            i = i-1
-        end
-        
-        enterMarket = 0;
-        enterPrice = NaN;
-        tradeLen = 0;
-        stopLoss = NaN;
-        
-    end
     
     %     set(0, 'CurrentFigure', 1);
     %     cla
@@ -206,18 +139,22 @@ while i <= len
 end
 
 
-roiLong = (trades(:,2) - trades(:,1)) ./ trades(:,1) * 100;
+roiLong = (ta.trades.BULL(:,2) - ta.trades.BULL(:,1)) ./ ta.trades.BULL(:,1) * 100;
 
 sum(roiLong(~isnan(roiLong)))
 
+roiShort = (ta.trades.BEAR(:,1) - ta.trades.BEAR(:,2)) ./ ta.trades.BEAR(:,1) * 100;
 
+sum(roiShort(~isnan(roiShort)))
 
+%
+% return
 
 delete(slider);
 handles = guihandles(slider);
 
 
-len = length(cl.INDX);
+len = length(ta.cl.INDX);
 set(handles.axisView, 'Max', len, 'Min', 0);
 set(handles.axisView, 'SliderStep', [1/len, 10/len]);
 set(handles.axisView, 'Value', 0);
@@ -227,46 +164,38 @@ while(true)
     
     subplot(numPlots,1,[1:2])
     cla
-    candle(hi.STOCK, lo.STOCK, cl.STOCK, op.STOCK, 'blue');
+    candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
     hold on
     
-    %     for j = 1:size(inMarket,1)
-    %         plot(inMarket(j,1), inMarket(j,2), 'bo');
-    %     end
-    %
-    %     for j = 1:size(trades,1)
-    %         plot(trades(j,3), trades(j,1), 'go');
-    %         plot(trades(j,4), trades(j,2), 'ro');
-    %     end
     
     subplot(numPlots,1,3)
     cla
-    bp = bar(B.STOCK,'k');
+    bp = bar(ta.B.STOCK,'k');
     set(get(bp,'Children'),'FaceAlpha',0.2);
     hold on
-    plot(macdvec.STOCK)
-    plot(nineperma.STOCK,'r')
+    plot(ta.macdvec.STOCK)
+    plot(ta.nineperma.STOCK,'r')
     
     subplot(numPlots,1,4)
     cla
-    bp = bar(B.INDX,'k');
+    bp = bar(ta.B.INDX,'k');
     set(get(bp,'Children'),'FaceAlpha',0.2);
     hold on
-    plot(macdvec.INDX)
-    plot(nineperma.INDX,'r')
+    plot(ta.macdvec.INDX)
+    plot(ta.nineperma.INDX,'r')
     
     subplot(numPlots,1,5)
     cla
-    bar(vo.STOCK)
+    bar(ta.vo.STOCK)
     hold on
-    plot(xlim, [mean(vo.STOCK), mean(vo.STOCK)])
+    plot(xlim, [mean(ta.vo.STOCK), mean(ta.vo.STOCK)])
     
     
     subplot(numPlots,1,6)
     cla
-    bar(vo.INDX)
+    bar(ta.vo.INDX)
     hold on
-    plot(xlim, [mean(vo.INDX), mean(vo.INDX)])
+    plot(xlim, [mean(ta.vo.INDX), mean(ta.vo.INDX)])
     
     
     
@@ -288,15 +217,28 @@ while(true)
         yLo = yLimits(1);
         yHi = yLimits(2);
         
-        for i = 1:size(trades,1)
-            xLo = trades(i,3);
-            xHi = trades(i,4);
+        for i = 1:size(ta.trades.BEAR,1)
+            xLo = ta.trades.BEAR(i,3);
+            xHi = ta.trades.BEAR(i,4);
+            
+            xLong = [xLo xHi xHi xLo];
+            yLong = [yLo yLo yHi yHi];
+            
+            hp = patch(xLong,yLong, [1, .7, .7], 'FaceAlpha', 0.25);
+            
+        end
+        
+        
+        for i = 1:size(ta.trades.BULL,1)
+            xLo = ta.trades.BULL(i,3);
+            xHi = ta.trades.BULL(i,4);
             
             xLong = [xLo xHi xHi xLo];
             yLong = [yLo yLo yHi yHi];
             
             hp = patch(xLong,yLong, [0.7, 1, .7], 'FaceAlpha', 0.25);
         end
+        
     end
     
     pause(10/100);
