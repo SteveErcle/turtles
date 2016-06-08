@@ -8,7 +8,7 @@ handles = guihandles(slider);
 
 
 
-stock = 'TWTR';
+stock = 'TSLA';
 indx = 'SPY';
 exchange = 'NASDAQ';
 
@@ -40,6 +40,7 @@ hi.TSLA = iAll.TSLA.high;
 lo.TSLA = iAll.TSLA.low;
 op.TSLA = iAll.TSLA.open;
 cl.TSLA = iAll.TSLA.close;
+vo.TSLA = iAll.TSLA.volume;
 
 iAll.SPY = IntraDayStockData(indx,exchange,'300','5d');
 iAll.SPY = td.getAdjustedIntra(iAll.SPY);
@@ -132,13 +133,13 @@ disp(sum(roiLong));
 
 while(true)
     
-    subplot(4,1,[1:2])
+    subplot(5,1,[1:2])
     cla
     candle(hi.TSLA, lo.TSLA, cl.TSLA, op.TSLA, 'blue');
     hold on
     
     
-    subplot(4,1,3)
+    subplot(5,1,3)
     cla
     plot(macdvec.TSLA)
     hold on
@@ -146,15 +147,22 @@ while(true)
     plot(xlim, [0,0], 'k')
     
     
-    subplot(4,1,4)
+    subplot(5,1,4)
     cla
     plot(macdvec.SPY)
     hold on
     plot(nineperma.SPY,'r')
     plot(xlim, [0,0], 'k')
     
+    subplot(5,1,5)
+    cla
+    bar(vo.TSLA)
+    hold on
+    plot(xlim, [mean(vo.TSLA), mean(vo.TSLA)])
     
-    for j = 2:4
+    
+    
+    for j = 2:5
         
         if j == 2
             subIndx = [1:2];
@@ -162,7 +170,7 @@ while(true)
             subIndx = j;
         end
         
-        subplot(4,1,subIndx)
+        subplot(5,1,subIndx)
         hold on
         axisView = get(handles.axisView, 'Value');
         xlim(gca, [0+axisView, 100+axisView])
@@ -213,8 +221,8 @@ while(true)
     
     bestRoiLong = sortrows(roiLong, -1);
     
-    subplot(4,1,[1:2])
-    for i = 1:5
+    subplot(5,1,[1:2])
+    for i = 1:10
         
         xText = mean(longStackMacd(find(bestRoiLong(i) == roiLong),:));
         ylimits = ylim;

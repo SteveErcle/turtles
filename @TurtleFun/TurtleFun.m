@@ -7,8 +7,8 @@ classdef TurtleFun
     
     methods
         
-        function [hi, lo, cl, op, da] = returnOHLCDarray(obj, t)
-            hi = t(:,3); lo = t(:,4); cl = t(:,5); op = t(:,2); da = t(:,1);
+        function [hi, lo, cl, op, da, vo] = returnOHLCDarray(obj, t)
+            hi = t(:,3); lo = t(:,4); cl = t(:,5); op = t(:,2); da = t(:,1); vo = t(:,6);
         end
         
         function [figHandle, pHandle] = plotHiLoMultiple(obj, t)
