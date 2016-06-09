@@ -145,15 +145,17 @@ classdef TurtleAnalyzer < handle
             clAs = (avgData - mean(avgData)) ./ std(avgData);
             %             clRs = clSs + (clSs - clAs);
             
-            
-            clRs = ((stockData)./avgData)*100;
-            clRs = (clRs - mean(clRs)) ./ std(clRs);
+            clRs = clSs - clAs;
+%             clRs = ((stockData)./avgData)*100;
+%             clRs = (clRs - mean(clRs)) ./ std(clRs);
             
             
             
             clS = stockData;
             clA = clAs.*std(clS)+mean(clS);
             clR = clRs.*std(clS)+mean(clS);
+            
+            clR = stockData./avgData;
             
             if isFlip
                 clSma = flipud(tsmovavg(flipud(clS),'e',window_size,1));
