@@ -3,7 +3,7 @@ classdef TurtleAuto < handle
     
     properties
         
-        hi; lo; op; cl; vo;
+        hi; lo; op; cl; vo; da;
         
         macdvec;
         nineperma;
@@ -24,6 +24,9 @@ classdef TurtleAuto < handle
         slPercent;
         
         tAnalyze = TurtleAnalyzer;
+        
+        rsi;
+        vwap;
 
         
     end
@@ -82,7 +85,6 @@ classdef TurtleAuto < handle
                 obj.condition.RSI_to_indx.BULL = 0;
             end
             
-            
             if obj.RSIderv(end) < 0
                 obj.condition.RSI_to_indx.BEAR = 1;
             else
@@ -90,13 +92,26 @@ classdef TurtleAuto < handle
             end
             
             
-            if obj.B.STOCK(end) >= 0.000 && obj.B.INDX(end) >= 0.0
+            if obj.enterMarket.BULL == 1 || obj.rsi.STOCK(end) <= 50
+                obj.condition.RSI_to_stock.BULL = 1;
+            else
+                obj.condition.RSI_to_stock.BULL = 0;
+            end
+            
+            if obj.enterMarket.BEAR == 1 || obj.rsi.STOCK(end) >= 50
+                obj.condition.RSI_to_stock.BEAR = 1;
+            else
+                obj.condition.RSI_to_stock.BEAR = 0;
+            end
+            
+            
+            if obj.B.STOCK(end) >= 0.005 && obj.B.INDX(end) >= 0.0
                 obj.condition.MACD_bull_derv = 1;
             else
                 obj.condition.MACD_bull_derv = 0;
             end
             
-            if obj.B.STOCK(end) <= -0.000 && obj.B.INDX(end) <= 0.0
+            if obj.B.STOCK(end) <= -0.005 && obj.B.INDX(end) <= 0.0
                 obj.condition.MACD_bear_derv = 1;
             else
                 obj.condition.MACD_bear_derv = 0;
@@ -123,6 +138,18 @@ classdef TurtleAuto < handle
             end
             
             
+            if obj.enterMarket.BULL == 1 || obj.cl.STOCK(end) < obj.vwap(end)
+                obj.condition.vwap.BULL = 1;
+            else
+                obj.condition.vwap.BULL = 0;
+            end 
+            
+             if obj.enterMarket.BEAR == 1 || obj.cl.STOCK(end) > obj.vwap(end)
+                obj.condition.vwap.BEAR = 1;
+            else
+                obj.condition.vwap.BEAR = 0;
+            end
+            
             
         end
         
@@ -137,6 +164,10 @@ classdef TurtleAuto < handle
             obj.B.STOCK = [NaN; diff(obj.macdvec.STOCK)];
             obj.B.INDX  = [NaN; diff(obj.macdvec.INDX)];
             
+            obj.rsi.STOCK = rsindex(obj.cl.STOCK);
+                
+            obj.vwap = getVWAP(obj.cl.STOCK, obj.vo.STOCK, obj.da.STOCK);
+    
             if obj.tradeLen.BULL <= 2
                 obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercent/100);
             else
@@ -160,6 +191,8 @@ classdef TurtleAuto < handle
             if obj.condition.MACD_bull_cross && obj.condition.MACD_bull_derv...
                     && obj.condition.Not_Stopped_Out.BULL...
                     && obj.condition.Large_Volume...
+                    %&& obj.condition.vwap.BULL
+                    %&& obj.condition.RSI_to_stock.BULL
                     %&& obj.condition.MACD_Positive.BULL...
                      %&& obj.condition.RSI_to_indx.BULL
                 
@@ -204,6 +237,10 @@ classdef TurtleAuto < handle
             if obj.condition.MACD_bear_cross && obj.condition.MACD_bear_derv...
                     && obj.condition.Not_Stopped_Out.BEAR...
                     && obj.condition.Large_Volume...
+                    %&& obj.condition.vwap.BEAR
+                   
+                    
+                    %&& obj.condition.RSI_to_stock.BEAR
                     %&& obj.condition.MACD_Negative.BEAR...
                      %&& obj.condition.RSI_to_indx.BEAR
                 

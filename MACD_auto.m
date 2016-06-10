@@ -3,8 +3,8 @@
 
 clc; close all; clear all;
 
-portfolio = {'TSLA'};
-    
+portfolio = {'NUGT'}; %GEVO %NUGT %LABU %IMMU
+
 for k = 1:length(portfolio)
     
     stock = portfolio{k}
@@ -14,10 +14,10 @@ for k = 1:length(portfolio)
     exchange = 'NASDAQ';
     
     
-    INTRA = 0;
-    DAILY = 1;
+    INTRA = 1;
+    DAILY = 0;
     
-    past = now - 200;
+    past = now - 400;
     pres = now ;
     
     
@@ -25,7 +25,7 @@ for k = 1:length(portfolio)
     td = TurtleData;
     ta = TurtleAuto;
     
-    ta.slPercent = .250;
+    ta.slPercent = 0.25;
     
     numPlots = 7;
     
@@ -41,6 +41,7 @@ for k = 1:length(portfolio)
         op.STOCK = opD;
         cl.STOCK = clD;
         vo.STOCK = voD;
+        da.STOCK = daD;
         [hiA, loA, clA, opA, daA, voA] = tf.returnOHLCDarray(avgAll);
         cl.INDX = clA;
         
@@ -50,10 +51,10 @@ for k = 1:length(portfolio)
     
     
     if INTRA
-        iAll.STOCK = IntraDayStockData(stock,exchange,'600','10d');
+        iAll.STOCK = IntraDayStockData(stock,exchange,'600','30d');
         iAll.STOCK = td.getAdjustedIntra(iAll.STOCK);
         
-        iAll.INDX = IntraDayStockData(indx,exchange,'600','10d');
+        iAll.INDX = IntraDayStockData(indx,exchange,'600','30d');
         iAll.INDX = td.getAdjustedIntra(iAll.INDX);
         
         if length(iAll.STOCK.close) ~= length(iAll.INDX.close)
@@ -65,15 +66,9 @@ for k = 1:length(portfolio)
         len = length(iAll.STOCK.close)-1;
     end
     
-    
-    
-    figure
-    
     ta.ind = 50-1;
     
     while ta.ind <= len
-        
-        
         
         ta.ind = ta.ind + 1;
         range = 1:ta.ind;
@@ -84,6 +79,7 @@ for k = 1:length(portfolio)
             ta.op.STOCK = iAll.STOCK.open(range);
             ta.cl.STOCK = iAll.STOCK.close(range);
             ta.vo.STOCK = iAll.STOCK.volume(range);
+            ta.da.STOCK = iAll.STOCK.date(range);
             
             ta.cl.INDX = iAll.INDX.close(range);
             ta.vo.INDX = iAll.INDX.volume(range);
@@ -95,6 +91,7 @@ for k = 1:length(portfolio)
             ta.op.STOCK = opD(range);
             ta.cl.STOCK = clD(range);
             ta.vo.STOCK = voD(range);
+            ta.da.STOCK = daD(range);
             
             ta.cl.INDX = clA(range);
             ta.vo.INDX = voA(range);
@@ -169,14 +166,13 @@ for k = 1:length(portfolio)
     roiShort = (ta.trades.BEAR(:,1) - ta.trades.BEAR(:,2)) ./ ta.trades.BEAR(:,1) * 100;
     
     sS = sum(roiShort(~isnan(roiShort)));
-%     sS/length(ta.trades.BULL)
-disp([sL, sS])
+    %     sS/length(ta.trades.BULL)
+    disp([sL, sS])
     
-%     pause
+    %     pause
     
 end
 
-return
 
 delete(slider);
 handles = guihandles(slider);
@@ -227,7 +223,13 @@ while(true)
     
     subplot(numPlots,1,7)
     cla
-    bar(ta.RSIderv)
+    plot(ta.rsi.STOCK)
+    hold on
+    plot(xlim, [50,50])
+    plot(xlim, [70,70])
+    plot(xlim, [30,30])
+%     cla
+%     bar(ta.RSIderv)
     %     plot(clSma,'b')
     %     hold on
     %     plot(clAma, 'r')
@@ -266,7 +268,13 @@ while(true)
             xLong = [xLo xHi xHi xLo];
             yLong = [yLo yLo yHi yHi];
             
-            hp = patch(xLong,yLong, [1, .7, .7], 'FaceAlpha', 0.25);
+            if roiShort(i) < 0
+                color = [1, .7, .7];
+            else 
+                color = [0.7, 1, .7];
+            end 
+            
+            hp = patch(xLong,yLong, color, 'FaceAlpha', 0.25);
             
         end
         
@@ -282,7 +290,13 @@ while(true)
             xLong = [xLo xHi xHi xLo];
             yLong = [yLo yLo yHi yHi];
             
-            hp = patch(xLong,yLong, [0.7, 1, .7], 'FaceAlpha', 0.25);
+            if roiLong(i) < 0
+                color = [1, .7, .7];
+            else 
+                color = [0.7, 1, .7];
+            end 
+            
+            hp = patch(xLong,yLong, color, 'FaceAlpha', 0.25);
         end
         
     end
