@@ -131,7 +131,14 @@ classdef TurtleAuto < handle
             end
             
             
-            if obj.enterMarket.BULL == 1 || obj.vo.STOCK(end) > mean(obj.vo.STOCK) || obj.vo.STOCK(end-1) > mean(obj.vo.STOCK)
+            if (obj.enterMarket.BULL == 1 || obj.enterMarket.BEAR) || ...
+                    (((obj.vo.STOCK(end) > mean(obj.vo.STOCK) ||...
+                    obj.vo.STOCK(end-1) > mean(obj.vo.STOCK)))...
+                    && ((obj.vo.INDX(end) > mean(obj.vo.INDX) ||...
+                    obj.vo.INDX(end-1) > mean(obj.vo.INDX))))
+                
+                %ADDED INDX TRACKING TO VOLUME
+                
                 obj.condition.Large_Volume = 1;
             else
                 obj.condition.Large_Volume = 0;

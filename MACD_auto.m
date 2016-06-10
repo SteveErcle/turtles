@@ -3,7 +3,7 @@
 
 clc; close all; clear all;
 
-portfolio = {'NUGT'}; %GEVO %NUGT %LABU %IMMU
+portfolio = {'CCXI'}; %GEVO %NUGT %LABU %IMMU %ENDP %CCXI
 
 for k = 1:length(portfolio)
     
@@ -51,10 +51,10 @@ for k = 1:length(portfolio)
     
     
     if INTRA
-        iAll.STOCK = IntraDayStockData(stock,exchange,'600','30d');
+        iAll.STOCK = IntraDayStockData(stock,exchange,'600','20d');
         iAll.STOCK = td.getAdjustedIntra(iAll.STOCK);
         
-        iAll.INDX = IntraDayStockData(indx,exchange,'600','30d');
+        iAll.INDX = IntraDayStockData(indx,exchange,'600','20d');
         iAll.INDX = td.getAdjustedIntra(iAll.INDX);
         
         if length(iAll.STOCK.close) ~= length(iAll.INDX.close)
