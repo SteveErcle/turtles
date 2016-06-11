@@ -3,7 +3,7 @@
 
 clc; close all; clear all;
 
-portfolio = {'CCXI'}; %GEVO %NUGT %LABU %IMMU %ENDP %CCXI
+portfolio = {'GEVO'}; %GEVO %NUGT %LABU %IMMU %ENDP %CCXI
 
 for k = 1:length(portfolio)
     
@@ -51,11 +51,26 @@ for k = 1:length(portfolio)
     
     
     if INTRA
-        iAll.STOCK = IntraDayStockData(stock,exchange,'600','20d');
+        iAll.STOCK = IntraDayStockData(stock,exchange,'600','10d');
+        %
+        iAll.INDX = IntraDayStockData(indx,exchange,'600','10d');
+        %
+        %         for i_d = 1:length(iAll.INDX.date)
+        %             if iAll.STOCK.date(i_d) ~= iAll.INDX.date(i_d)
+        %                 iAll.STOCK.close = [iAll.STOCK.close(1:i_d-1); NaN; iAll.STOCK.close(i_d:end)];
+        %                 iAll.STOCK.high = [iAll.STOCK.high(1:i_d-1); NaN; iAll.STOCK.high(i_d:end)];
+        %                 iAll.STOCK.low = [iAll.STOCK.low(1:i_d-1); NaN; iAll.STOCK.low(i_d:end)];
+        %                 iAll.STOCK.volume = [iAll.STOCK.volume(1:i_d-1); NaN; iAll.STOCK.volume(i_d:end)];
+        %                 iAll.STOCK.datestring = [iAll.STOCK.datestring(1:i_d-1); NaN; iAll.STOCK.datestring(i_d:end)];
+        %                 iAll.STOCK.date = [iAll.STOCK.date(1:i_d-1); NaN; iAll.STOCK.date(i_d:end)];
+        %             end
+        %
+        %         end
+        
         iAll.STOCK = td.getAdjustedIntra(iAll.STOCK);
         
-        iAll.INDX = IntraDayStockData(indx,exchange,'600','20d');
         iAll.INDX = td.getAdjustedIntra(iAll.INDX);
+        
         
         if length(iAll.STOCK.close) ~= length(iAll.INDX.close)
             disp('Length Error')
@@ -228,8 +243,8 @@ while(true)
     plot(xlim, [50,50])
     plot(xlim, [70,70])
     plot(xlim, [30,30])
-%     cla
-%     bar(ta.RSIderv)
+    %     cla
+    %     bar(ta.RSIderv)
     %     plot(clSma,'b')
     %     hold on
     %     plot(clAma, 'r')
@@ -270,9 +285,9 @@ while(true)
             
             if roiShort(i) < 0
                 color = [1, .7, .7];
-            else 
+            else
                 color = [0.7, 1, .7];
-            end 
+            end
             
             hp = patch(xLong,yLong, color, 'FaceAlpha', 0.25);
             
@@ -292,9 +307,9 @@ while(true)
             
             if roiLong(i) < 0
                 color = [1, .7, .7];
-            else 
+            else
                 color = [0.7, 1, .7];
-            end 
+            end
             
             hp = patch(xLong,yLong, color, 'FaceAlpha', 0.25);
         end
