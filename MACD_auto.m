@@ -3,14 +3,14 @@
 
 clc; close all; clear all;
 
-as1 = ['A',num2str(150)];%1
-as2 = ['A',num2str(225)];%400
+as1 = ['A',num2str(1)];%1
+as2 = ['A',num2str(400)];%400
 
-[~,allStocks] = xlsread('allStocks', [as1, ':', as2]);
+[~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-% allStocks = {'SGY'} % QQQ ABX
-% preRange = 1:400;
-preRange = 401:799;
+% allStocks = {'NUGT'} % QQQ ABX
+preRange = 1:400;
+% preRange = 401:799;
 
 % portfolio = {'CYCC'}; %GEVO %NUGT %LABU %IMMU %ENDP %CCXI %CYCC
 roiCong = [];
@@ -38,7 +38,7 @@ for k = 1:length(allStocks)
     td = TurtleData;
     ta = TurtleAuto;
     
-    ta.slPercent = 0.25;
+    ta.slPercent = 1.5;
     
     numPlots = 7;
     
@@ -105,7 +105,21 @@ for k = 1:length(allStocks)
         len = length(iAll.STOCK.close)-1;
     end
     
-    ta.ind = 50-1;
+    range = 1:length(iAll.STOCK.close);
+    ta.hi.STOCK = iAll.STOCK.high(range);
+    ta.lo.STOCK = iAll.STOCK.low(range);
+    ta.op.STOCK = iAll.STOCK.open(range);
+    ta.cl.STOCK = iAll.STOCK.close(range);
+    ta.vo.STOCK = iAll.STOCK.volume(range);
+    ta.da.STOCK = iAll.STOCK.date(range);
+    
+    ta.cl.INDX = iAll.INDX.close(range);
+    ta.vo.INDX = iAll.INDX.volume(range);
+    
+    
+    ta.calculateData(isFlip);
+    
+    ta.ind = 30-1;
     
     while ta.ind <= len
         
@@ -136,9 +150,9 @@ for k = 1:length(allStocks)
             ta.vo.INDX = voA(range);
         end
         
-        ta.calculateData(isFlip);
+        ta.setStopLoss();
         
-        ta.checkConditions();
+        ta.checkConditionsUsingInd();
         
         ta.executeBullTrade();
         
@@ -217,8 +231,6 @@ for k = 1:length(allStocks)
     
 end
 
-
-return
 
 
 delete(slider);

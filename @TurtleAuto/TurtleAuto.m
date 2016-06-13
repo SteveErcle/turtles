@@ -133,9 +133,9 @@ classdef TurtleAuto < handle
             
             if (obj.enterMarket.BULL == 1 || obj.enterMarket.BEAR) || ...
                     (((obj.vo.STOCK(end) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK))) ||...
-                    obj.vo.STOCK(end-1) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK)))))...
-                    && ((obj.vo.INDX(end) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))) ||...
-                    obj.vo.INDX(end-1) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))))))
+                    obj.vo.STOCK(end-1) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK))))))%...
+                    %&& ((obj.vo.INDX(end) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))) ||...
+                    %obj.vo.INDX(end-1) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))))))
                 
                 %ADDED INDX TRACKING TO VOLUME
                 
@@ -160,6 +160,115 @@ classdef TurtleAuto < handle
             
         end
         
+        function checkConditionsUsingInd(obj)
+            
+            if  obj.nineperma.STOCK(obj.ind) < obj.macdvec.STOCK(obj.ind) %&& obj.nineperma.INDX(obj.ind) < obj.macdvec.INDX(obj.ind)
+                obj.condition.MACD_bull_cross = 1;
+            else
+                obj.condition.MACD_bull_cross = 0;
+            end
+            
+            if  obj.nineperma.STOCK(obj.ind) < obj.macdvec.STOCK(obj.ind) %&& obj.nineperma.INDX(obj.ind) > obj.macdvec.INDX(obj.ind) 
+                obj.condition.MACD_bear_cross = 1;
+            else
+                obj.condition.MACD_bear_cross = 0;
+            end
+            
+            
+            if obj.enterMarket.BULL == 1 || sign(obj.macdvec.STOCK(obj.ind)) == sign(obj.macdvec.INDX(obj.ind))
+                obj.condition.MACD_Positive.BULL = 1;
+            else
+                obj.condition.MACD_Positive.BULL = 0;
+            end 
+            
+            if obj.enterMarket.BEAR == 1 || sign(obj.macdvec.STOCK(obj.ind)) == sign(obj.macdvec.INDX(obj.ind))
+                obj.condition.MACD_Negative.BEAR = 1;
+            else
+                obj.condition.MACD_Negative.BEAR = 0;
+            end 
+            
+            
+            if obj.RSIderv(obj.ind) > 0
+                obj.condition.RSI_to_indx.BULL = 1;
+            else
+                obj.condition.RSI_to_indx.BULL = 0;
+            end
+            
+            if obj.RSIderv(obj.ind) < 0
+                obj.condition.RSI_to_indx.BEAR = 1;
+            else
+                obj.condition.RSI_to_indx.BEAR = 0;
+            end
+            
+            
+            if obj.enterMarket.BULL == 1 || obj.rsi.STOCK(obj.ind) <= 50
+                obj.condition.RSI_to_stock.BULL = 1;
+            else
+                obj.condition.RSI_to_stock.BULL = 0;
+            end
+            
+            if obj.enterMarket.BEAR == 1 || obj.rsi.STOCK(obj.ind) >= 50
+                obj.condition.RSI_to_stock.BEAR = 1;
+            else
+                obj.condition.RSI_to_stock.BEAR = 0;
+            end
+            
+            
+            if obj.B.STOCK(obj.ind) >= 0.000 && obj.B.INDX(obj.ind) >= 0.005
+                obj.condition.MACD_bull_derv = 1;
+            else
+                obj.condition.MACD_bull_derv = 0;
+            end
+            
+            if obj.B.STOCK(obj.ind) <= -0.000 && obj.B.INDX(obj.ind) <= -0.005
+                obj.condition.MACD_bear_derv = 1;
+            else
+                obj.condition.MACD_bear_derv = 0;
+            end
+            
+            
+            if obj.lo.STOCK(obj.ind) <= obj.stopLoss.BULL
+                obj.condition.Not_Stopped_Out.BULL = 0;
+            else
+                obj.condition.Not_Stopped_Out.BULL = 1;
+            end
+            
+            if obj.hi.STOCK(obj.ind) >= obj.stopLoss.BEAR
+                obj.condition.Not_Stopped_Out.BEAR = 0;
+            else
+                obj.condition.Not_Stopped_Out.BEAR = 1;
+            end
+            
+            
+            if (obj.enterMarket.BULL == 1 || obj.enterMarket.BEAR) || ...
+                    (((obj.vo.STOCK(obj.ind) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK))) ||...
+                    obj.vo.STOCK(obj.ind-1) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK)))))...
+                    && ((obj.vo.INDX(obj.ind) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))) ||...
+                    obj.vo.INDX(obj.ind-1) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))))))
+                
+                %ADDED INDX TRACKING TO VOLUME
+                
+                obj.condition.Large_Volume = 1;
+            else
+                obj.condition.Large_Volume = 0;
+            end
+            
+            
+            if obj.enterMarket.BULL == 1 || obj.cl.STOCK(obj.ind) < obj.vwap(end)
+                obj.condition.vwap.BULL = 1;
+            else
+                obj.condition.vwap.BULL = 0;
+            end 
+            
+             if obj.enterMarket.BEAR == 1 || obj.cl.STOCK(obj.ind) > obj.vwap(end)
+                obj.condition.vwap.BEAR = 1;
+            else
+                obj.condition.vwap.BEAR = 0;
+            end
+            
+            
+        end
+       
         function calculateData(obj, isFlip)
             
             [obj.macdvec.STOCK, obj.nineperma.STOCK] = macd(obj.cl.STOCK);
@@ -174,8 +283,12 @@ classdef TurtleAuto < handle
             obj.rsi.STOCK = rsindex(obj.cl.STOCK);
                 
             obj.vwap = getVWAP(obj.cl.STOCK, obj.vo.STOCK, obj.da.STOCK);
-    
-            if obj.tradeLen.BULL <= 2
+     
+        end
+        
+        function setStopLoss(obj)
+            
+             if obj.tradeLen.BULL <= 2
                 obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercent/100);
             else
                 if obj.lo.STOCK(end-2) > obj.stopLoss.BULL
@@ -191,7 +304,7 @@ classdef TurtleAuto < handle
                 end 
             end
             
-        end
+        end 
         
         function executeBullTrade(obj)
             
@@ -201,7 +314,7 @@ classdef TurtleAuto < handle
                     %&& obj.condition.vwap.BULL
                     %&& obj.condition.RSI_to_stock.BULL
                     %&& obj.condition.MACD_Positive.BULL...
-                     %&& obj.condition.RSI_to_indx.BULL
+                    %&& obj.condition.RSI_to_indx.BULL
                 
                 if obj.enterMarket.BULL == 0
                     obj.enterPrice.BULL = obj.cl.STOCK(end);
@@ -245,11 +358,9 @@ classdef TurtleAuto < handle
                     && obj.condition.Not_Stopped_Out.BEAR...
                     && obj.condition.Large_Volume...
                     %&& obj.condition.vwap.BEAR
-                   
-                    
                     %&& obj.condition.RSI_to_stock.BEAR
                     %&& obj.condition.MACD_Negative.BEAR...
-                     %&& obj.condition.RSI_to_indx.BEAR
+                    %&& obj.condition.RSI_to_indx.BEAR
                 
                 if obj.enterMarket.BEAR == 0
                     obj.enterPrice.BEAR = obj.cl.STOCK(end);
