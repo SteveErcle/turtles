@@ -17,7 +17,6 @@ roiCong = [];
 for k = 1:length(allStocks)
     
     
-    
     stock = allStocks{k}
     
     try
@@ -162,12 +161,10 @@ for k = 1:length(allStocks)
             
         end
         
-        
-        
         roiLong = (ta.trades.BULL(:,2) - ta.trades.BULL(:,1)) ./ ta.trades.BULL(:,1) * 100;
         sL = sum(roiLong(~isnan(roiLong)));
         
-        roiShort = (ta.trades.BEAR(:,1) - ta.trades.BEAR(:,2)) ./ ta.trades.BEAR(:,1) * 100;      
+        roiShort = (ta.trades.BEAR(:,1) - ta.trades.BEAR(:,2)) ./ ta.trades.BEAR(:,1) * 100;
         sS = sum(roiShort(~isnan(roiShort)));
         
         disp([sL, sS, length(ta.trades.BULL) + length(ta.trades.BULL)])
@@ -202,7 +199,7 @@ while(true)
     candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
     hold on
     plot(ta.clSma,'b')
-  
+    
     subplot(numPlots,1,3)
     cla
     bp = bar(ta.B.STOCK,'k');
@@ -259,7 +256,7 @@ while(true)
         else
             subIndx = j;
         end
-
+        
         subplot(numPlots,1,subIndx)
         
         hold on

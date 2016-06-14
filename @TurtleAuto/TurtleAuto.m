@@ -44,6 +44,7 @@ classdef TurtleAuto < handle
             obj.enterPrice.BULL = NaN;
             obj.enterMarket.BULL = 0;
             obj.trades.BULL = [];
+            obj.condition.Trying_to_Enter.BULL = 0;
             
             
             obj.stopLoss.BEAR = NaN;
@@ -51,6 +52,7 @@ classdef TurtleAuto < handle
             obj.enterPrice.BEAR = NaN;
             obj.enterMarket.BEAR = 0;
             obj.trades.BEAR = [];
+            obj.condition.Trying_to_Enter.BEAR = 0;
             
             
         end
@@ -276,16 +278,16 @@ classdef TurtleAuto < handle
             end
             
             
-            if obj.cl.STOCK(obj.ind) > obj.clSma(obj.ind)
+            if obj.cl.STOCK(obj.ind) > obj.clSma(obj.ind) &&  obj.cl.INDX(obj.ind) > obj.clAma(obj.ind)
                 obj.condition.Above_MA.BULL = 1;
             else
                  obj.condition.Above_MA.BULL = 0;
             end
             
-            if obj.cl.STOCK(obj.ind) < obj.clSma(obj.ind)
-                obj.condition.Above_MA.BEAR = 1;
+            if obj.cl.STOCK(obj.ind) < obj.clSma(obj.ind) && obj.cl.INDX(obj.ind) < obj.clAma(obj.ind) 
+                obj.condition.Below_MA.BEAR = 1;
             else
-                 obj.condition.Above_MA.BEAR = 0;
+                 obj.condition.Below_MA.BEAR = 0;
             end
             
             
@@ -294,6 +296,12 @@ classdef TurtleAuto < handle
             else
                 obj.condition.Not_End_of_Day = 1;
             end
+            
+            if obj.condition.Trying_to_Enter == 1
+               obj.condition.Allowed_to_Enter = 1;
+            else
+                obj.condition.Allowed_to_Enter = 0;
+            end 
             
         end
        
@@ -336,18 +344,21 @@ classdef TurtleAuto < handle
         
         function executeBullTrade(obj)
             
-            if obj.condition.Above_MA.BULL...
-                    && obj.condition.Not_Stopped_Out.BULL...
+            if obj.condition.Not_Stopped_Out.BULL...
                     && obj.condition.Large_Volume...
                     && obj.condition.Not_End_of_Day...
+                    && obj.condition.Above_MA.BULL...
                     %&& obj.condition.MACD_bull_cross...
                     %&& obj.condition.MACD_bull_derv...
+                   
                 %&& obj.condition.MACD_Positive.BULL...
                 %obj.condition.RSI_to_indx.BULL... 
                 %&& obj.condition.RSI_to_stock.BULL...
                 %&& obj.condition.vwap.BULL...
                     
-                    
+                obj.condition.Trying_to_Enter.BULL = 1;
+                
+                if obj.condition.
                 
                 if obj.enterMarket.BULL == 0
                     obj.enterPrice.BULL = obj.cl.STOCK(end);
@@ -357,8 +368,10 @@ classdef TurtleAuto < handle
                 obj.enterMarket.BULL = 1;
                 obj.tradeLen.BULL = obj.tradeLen.BULL + 1;
                 
-            else
+                else
                 
+                obj.condition.Trying_to_Enter.BULL = 0;
+                    
                 if obj.enterMarket.BULL == 1
                     
                     if obj.condition.Not_Stopped_Out.BULL
@@ -387,12 +400,13 @@ classdef TurtleAuto < handle
         
         function executeBearTrade(obj)
             
-            if obj.condition.Above_MA.BEAR...
-                && obj.condition.Not_Stopped_Out.BEAR...
+            if obj.condition.Not_Stopped_Out.BEAR...
                 && obj.condition.Large_Volume...
                 && obj.condition.Not_End_of_Day...
+                && obj.condition.Below_MA.BEAR...
                 %&& obj.condition.MACD_bear_cross...
                 %&& obj.condition.MACD_bear_derv...
+                
                     %&& obj.condition.MACD_Negative.BEAR
                     %&& obj.condition.RSI_to_indx.BEAR...
                     %&& obj.condition.RSI_to_stock.BEAR...
