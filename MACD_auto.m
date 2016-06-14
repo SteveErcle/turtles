@@ -8,7 +8,7 @@ as2 = ['A',num2str(400)];%400
 
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-% allStocks = allStocks(1) %{'NUGT'} % QQQ ABX
+% allStocks = allStocks(2) %{'NUGT'} % QQQ ABX
 % preRange = 1:799;
 % preRange = 401:799;
 
@@ -137,6 +137,7 @@ for k = 1:length(allStocks)
                 
                 ta.cl.INDX = iAll.INDX.close(range);
                 ta.vo.INDX = iAll.INDX.volume(range);
+                ta.da.INDX = iAll.INDX.date(range);
             end
             
             if DAILY
@@ -159,87 +160,30 @@ for k = 1:length(allStocks)
             
             ta.executeBearTrade();
             
-            %              if ta.ind >= 95 && ta.ind < 120
-            %
-            %                  disp([ta.ind,
-            %                      ta.condition.MACD_bear_cross,
-            %                      ta.condition.MACD_bear_derv,
-            %                      ta.condition.Not_Stopped_Out.BEAR,
-            %                      ta.condition.Large_Volume])
-            %         %         figure(1)
-            %         %         cla
-            %         %         candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
-            %         %         hold on
-            %         %         plot(xlim, [ta.stopLoss.BEAR, ta.stopLoss.BEAR])
-            %         %         pause
-            %              end
-            
-            
-            
-            
-            
-            %     set(0, 'CurrentFigure', 1);
-            %     cla
-            %     candle(hi.STOCK, lo.STOCK, cl.STOCK, op.STOCK, 'blue');
-            %     hold on
-            %
-            %     if enterMarket == 1
-            %         for j = 1:size(inMarket,1)
-            %             plot(inMarket(j,1), inMarket(j,2), 'bo');
-            %         end
-            %
-            %         for j = 1:size(trades,1)
-            %             plot(trades(j,3), trades(j,1), 'go');
-            %             plot(trades(j,4), trades(j,2), 'ro');
-            %         end
-            %
-            %         plot(xlim, [stopLoss, stopLoss]);
-            %     end
-            
-            
-            %     disp('EnterMarket: ');
-            %     disp(enterMarket);
-            %     disp('EnterPrice: ');
-            %     disp(enterPrice);
-            %     disp('tradeLen: ');
-            %     disp(tradeLen);
-            %     disp('stopLoss: ');
-            %     disp(stopLoss);
-            %     disp(' ');
-            
-            
-            
         end
         
         
         
         roiLong = (ta.trades.BULL(:,2) - ta.trades.BULL(:,1)) ./ ta.trades.BULL(:,1) * 100;
-        
         sL = sum(roiLong(~isnan(roiLong)));
         
-        sL/length(ta.trades.BULL);
-        
-        
-        
-        roiShort = (ta.trades.BEAR(:,1) - ta.trades.BEAR(:,2)) ./ ta.trades.BEAR(:,1) * 100;
-        
+        roiShort = (ta.trades.BEAR(:,1) - ta.trades.BEAR(:,2)) ./ ta.trades.BEAR(:,1) * 100;      
         sS = sum(roiShort(~isnan(roiShort)));
-        %     sS/length(ta.trades.BULL)
-        disp([sL, sS])
         
-        %     pause
+        disp([sL, sS, length(ta.trades.BULL) + length(ta.trades.BULL)])
+        
         
     catch
         sL = 0;
         sS = 0;
     end
     
-    sList = [sl, sS];
+    sList = [sL, sS];
     roiCong = [roiCong; sList];
     
 end
 
-
+sum(sum(roiCong))
 
 delete(slider);
 handles = guihandles(slider);
@@ -256,7 +200,9 @@ while(true)
     subplot(numPlots,1,[1:2])
     cla
     candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
-    
+    hold on
+    plot(ta.clSma,'b')
+  
     subplot(numPlots,1,3)
     cla
     bp = bar(ta.B.STOCK,'k');
