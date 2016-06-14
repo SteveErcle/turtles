@@ -8,7 +8,7 @@ as2 = ['A',num2str(400)];%400
 
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-% allStocks = allStocks(2) %{'NUGT'} % QQQ ABX
+% allStocks = allStocks(1) %{'NUGT'} % QQQ ABX
 % preRange = 1:799;
 % preRange = 401:799;
 
@@ -158,6 +158,21 @@ for k = 1:length(allStocks)
             ta.executeBullTrade();
             
             ta.executeBearTrade();
+            
+%             if ta.condition.Trying_to_Enter.BULL == 1
+%                 1111
+%             end 
+%             
+%             ta.enterMarket.BULL
+%             ta.enterMarket.BEAR
+%             figure(1)
+%             cla
+%             candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
+%             hold on
+%             plot(ta.clSma(1:ta.ind),'b')
+%             pause
+        
+            
             
         end
         

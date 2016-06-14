@@ -297,11 +297,18 @@ classdef TurtleAuto < handle
                 obj.condition.Not_End_of_Day = 1;
             end
             
-            if obj.condition.Trying_to_Enter == 1
-               obj.condition.Allowed_to_Enter = 1;
+            
+            if obj.condition.Trying_to_Enter.BULL == 1 && obj.lo.STOCK(obj.ind) <= obj.clSma(obj.ind-1)
+               obj.condition.Allowed_to_Enter.BULL = 1;
             else
-                obj.condition.Allowed_to_Enter = 0;
+                obj.condition.Allowed_to_Enter.BULL = 0;
             end 
+            
+            if obj.condition.Trying_to_Enter.BEAR == 1 && obj.hi.STOCK(obj.ind) >= obj.clSma(obj.ind-1)
+                obj.condition.Allowed_to_Enter.BEAR = 1;
+            else
+                obj.condition.Allowed_to_Enter.BEAR = 0;
+            end
             
         end
        
@@ -349,29 +356,31 @@ classdef TurtleAuto < handle
                     && obj.condition.Not_End_of_Day...
                     && obj.condition.Above_MA.BULL...
                     %&& obj.condition.MACD_bull_cross...
-                    %&& obj.condition.MACD_bull_derv...
-                   
+                %&& obj.condition.MACD_bull_derv...
+                
                 %&& obj.condition.MACD_Positive.BULL...
-                %obj.condition.RSI_to_indx.BULL... 
+                %obj.condition.RSI_to_indx.BULL...
                 %&& obj.condition.RSI_to_stock.BULL...
                 %&& obj.condition.vwap.BULL...
-                    
+                
                 obj.condition.Trying_to_Enter.BULL = 1;
                 
-                if obj.condition.
-                
-                if obj.enterMarket.BULL == 0
-                    obj.enterPrice.BULL = obj.cl.STOCK(end);
-                    obj.trades.BULL = [obj.trades.BULL; obj.enterPrice.BULL, NaN, length(obj.cl.STOCK), NaN];
+                if obj.condition.Allowed_to_Enter.BULL == 1
+                    
+                    if obj.enterMarket.BULL == 0
+                        obj.enterPrice.BULL = obj.clSma(obj.ind-1); %obj.cl.STOCK(end);
+                        obj.trades.BULL = [obj.trades.BULL; obj.enterPrice.BULL, NaN, length(obj.cl.STOCK), NaN];
+                    end
+                    
+                    obj.enterMarket.BULL = 1;
+                    obj.tradeLen.BULL = obj.tradeLen.BULL + 1;
+                    
                 end
                 
-                obj.enterMarket.BULL = 1;
-                obj.tradeLen.BULL = obj.tradeLen.BULL + 1;
-                
-                else
+            else
                 
                 obj.condition.Trying_to_Enter.BULL = 0;
-                    
+                
                 if obj.enterMarket.BULL == 1
                     
                     if obj.condition.Not_Stopped_Out.BULL
@@ -381,12 +390,12 @@ classdef TurtleAuto < handle
                             obj.trades.BULL(end,2) = obj.stopLoss.BULL;
                         else
                             obj.trades.BULL(end,2) = obj.op.STOCK(end);
-                        end 
+                        end
                     end
                     
                     obj.trades.BULL(end,4) = length(obj.cl.STOCK);
                     
-%                     obj.ind = obj.ind-1;
+                    %                     obj.ind = obj.ind-1;
                 end
                 
                 obj.enterMarket.BULL = 0;
@@ -412,16 +421,24 @@ classdef TurtleAuto < handle
                     %&& obj.condition.RSI_to_stock.BEAR...
                     %&& obj.condition.vwap.BEAR...
                     
-                   
-                if obj.enterMarket.BEAR == 0
-                    obj.enterPrice.BEAR = obj.cl.STOCK(end);
-                    obj.trades.BEAR = [obj.trades.BEAR; obj.enterPrice.BEAR, NaN, length(obj.cl.STOCK), NaN];
-                end
-                
-                obj.enterMarket.BEAR = 1;
-                obj.tradeLen.BEAR = obj.tradeLen.BEAR + 1;
-                
+                    obj.condition.Trying_to_Enter.BEAR = 1;
+                    
+                    if obj.condition.Allowed_to_Enter.BEAR == 1
+                        
+                        
+                        if obj.enterMarket.BEAR == 0
+                            obj.enterPrice.BEAR = obj.clSma(obj.ind-1); %obj.cl.STOCK(end);
+                            obj.trades.BEAR = [obj.trades.BEAR; obj.enterPrice.BEAR, NaN, length(obj.cl.STOCK), NaN];
+                        end
+                        
+                        obj.enterMarket.BEAR = 1;
+                        obj.tradeLen.BEAR = obj.tradeLen.BEAR + 1;
+                        
+                    end
+                    
             else
+                
+                obj.condition.Trying_to_Enter.BEAR = 0;
                 
                 if obj.enterMarket.BEAR == 1
                     
