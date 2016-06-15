@@ -151,6 +151,7 @@ for k = 1:length(allStocks)
                 ta.vo.INDX = voA(range);
             end
             
+            
             ta.setStopLoss();
             
             ta.checkConditionsUsingInd();
@@ -159,19 +160,17 @@ for k = 1:length(allStocks)
             
             ta.executeBearTrade();
             
-%             if ta.condition.Trying_to_Enter.BULL == 1
-%                 1111
-%             end 
-%             
-%             ta.enterMarket.BULL
-%             ta.enterMarket.BEAR
-%             figure(1)
-%             cla
-%             candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
-%             hold on
-%             plot(ta.clSma(1:ta.ind),'b')
-%             pause
-        
+            %             if ta.condition.Trying_to_Enter.BULL == 1
+            %                 figure(1)
+            %                 cla
+            %                 candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
+            %                 hold on
+            %                 plot(ta.clSma(1:ta.ind),'b')
+            %                 plot(xlim, [ta.stopLoss.BULL, ta.stopLoss.BULL]);
+            %                 plot(xlim, [ta.stopLoss.BEAR, ta.stopLoss.BEAR]);
+            %                 pause
+            %             end
+            
             
             
         end
