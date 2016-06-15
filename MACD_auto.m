@@ -14,6 +14,7 @@ as2 = ['A',num2str(400)];%400
 
 % portfolio = {'CYCC'}; %GEVO %NUGT %LABU %IMMU %ENDP %CCXI %CYCC
 roiCong = [];
+trackTrades = [];
 for k = 1:length(allStocks)
     
     
@@ -39,7 +40,7 @@ for k = 1:length(allStocks)
         
         ta.slPercent = 0.25;
         
-        numPlots = 8;
+        numPlots = 5;
         
         if DAILY
             c = yahoo;
@@ -115,11 +116,10 @@ for k = 1:length(allStocks)
         
         ta.cl.INDX = iAll.INDX.close(range);
         ta.vo.INDX = iAll.INDX.volume(range);
-        
-        
         ta.calculateData(isFlip);
         
-        ta.ind = 30-1;
+        
+        ta.ind = 50-1;
         
         while ta.ind <= len
             
@@ -127,6 +127,9 @@ for k = 1:length(allStocks)
             range = 1:ta.ind;
             
             if INTRA
+                
+                %%THIS DATA MAYBE BE INACCURATE OR GIVING FUTURE KNOWLEDGE
+                
                 ta.hi.STOCK = iAll.STOCK.high(range);
                 ta.lo.STOCK = iAll.STOCK.low(range);
                 ta.op.STOCK = iAll.STOCK.open(range);
@@ -134,6 +137,9 @@ for k = 1:length(allStocks)
                 ta.vo.STOCK = iAll.STOCK.volume(range);
                 ta.da.STOCK = iAll.STOCK.date(range);
                 
+                ta.hi.INDX = iAll.INDX.high(range);
+                ta.lo.INDX = iAll.INDX.low(range);
+                ta.op.INDX = iAll.INDX.open(range);
                 ta.cl.INDX = iAll.INDX.close(range);
                 ta.vo.INDX = iAll.INDX.volume(range);
                 ta.da.INDX = iAll.INDX.date(range);
@@ -151,6 +157,7 @@ for k = 1:length(allStocks)
                 ta.vo.INDX = voA(range);
             end
             
+            %             ta.calculateData(isFlip);
             
             ta.setStopLoss();
             
@@ -183,6 +190,12 @@ for k = 1:length(allStocks)
         
         disp([sL, sS, length(ta.trades.BULL) + length(ta.trades.BULL)])
         
+        trackTrades = [trackTrades; ta.trades.BULL, roiLong; ta.trades.BEAR, roiShort];
+        
+        %         figure(1)
+        %         hold on;
+        %         plot([trackTrades.(stock)(:,3), trackTrades.(stock)(:,4)], [k,k])
+        
         
     catch
         sL = 0;
@@ -194,7 +207,40 @@ for k = 1:length(allStocks)
     
 end
 
-sum(sum(roiCong))
+
+trackTrades = sortrows(trackTrades, 3)
+
+for ii = 2:size(trackTrades,1)
+    
+    
+    if trackTrades(ii,3) <= trackTrades(ii-1,4)
+        trackTrades(ii,:) = NaN;
+    end
+    
+end
+
+trackB = trackTrades;
+trackB(isnan(trackTrades(:,2)),:) = [];
+
+sum(trackB(:,5))
+length(trackB)
+
+lengther = 0;
+principal = 10000;
+for ii = 1:length(trackB)
+    
+    lengther = lengther + trackB(ii,4) - trackB(ii,3);
+    principal = principal*(1+(trackB(ii,5)/100)) - 10;
+    
+end
+
+disp(principal)
+
+% sum(sum(roiCong))
+
+% return
+
+
 
 delete(slider);
 handles = guihandles(slider);
@@ -216,48 +262,55 @@ while(true)
     
     subplot(numPlots,1,3)
     cla
-    bp = bar(ta.B.STOCK,'k');
-    set(get(bp,'Children'),'FaceAlpha',0.2);
+    candle(ta.hi.INDX, ta.lo.INDX, ta.cl.INDX, ta.op.INDX, 'red');
     hold on
-    plot(ta.macdvec.STOCK)
-    plot(ta.nineperma.STOCK,'r')
+    plot(ta.clAma,'r')
     
     subplot(numPlots,1,4)
-    cla
-    bp = bar(ta.B.INDX,'k');
-    set(get(bp,'Children'),'FaceAlpha',0.2);
-    hold on
-    plot(ta.macdvec.INDX)
-    plot(ta.nineperma.INDX,'r')
-    
-    subplot(numPlots,1,5)
     cla
     bar(ta.vo.STOCK)
     hold on
     plot(xlim, [mean(ta.vo.STOCK), mean(ta.vo.STOCK)])
     
-    
-    subplot(numPlots,1,6)
+    subplot(numPlots,1,5)
     cla
     bar(ta.vo.INDX)
     hold on
     plot(xlim, [mean(ta.vo.INDX), mean(ta.vo.INDX)])
     
-    subplot(numPlots,1,7)
-    cla
-    plot(ta.rsi.STOCK)
-    hold on
-    plot(xlim, [50,50])
-    plot(xlim, [70,70])
-    plot(xlim, [30,30])
+    %     subplot(numPlots,1,3)
+    %     cla
+    %     bp = bar(ta.B.STOCK,'k');
+    %     set(get(bp,'Children'),'FaceAlpha',0.2);
+    %     hold on
+    %     plot(ta.macdvec.STOCK)
+    %     plot(ta.nineperma.STOCK,'r')
+    
+    %     subplot(numPlots,1,4)
+    %     cla
+    %     bp = bar(ta.B.INDX,'k');
+    %     set(get(bp,'Children'),'FaceAlpha',0.2);
+    %     hold on
+    %     plot(ta.macdvec.INDX)
+    %     plot(ta.nineperma.INDX,'r')
     
     
-    subplot(numPlots,1,8)
-    cla
-    hold on
-    plot(ta.clSma,'b')
-    plot(ta.clAma, 'r')
-    plot(ta.clRma, 'k')
+    
+    %     subplot(numPlots,1,7)
+    %     cla
+    %     plot(ta.rsi.STOCK)
+    %     hold on
+    %     plot(xlim, [50,50])
+    %     plot(xlim, [70,70])
+    %     plot(xlim, [30,30])
+    
+    
+    %     subplot(numPlots,1,8)
+    %     cla
+    %     hold on
+    %     plot(ta.clSma,'b')
+    %     plot(ta.clAma, 'r')
+    %     plot(ta.clRma, 'k')
     
     
     
