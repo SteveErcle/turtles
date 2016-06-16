@@ -205,6 +205,8 @@ classdef TurtleAuto < handle
             [obj.macdvec.INDX, obj.nineperma.INDX] = macd(obj.cl.INDX);
             
             [obj.clSma, obj.clAma, obj.clRma] = obj.tAnalyze.getMovingStandard(obj.cl.STOCK, obj.cl.INDX, 12, isFlip);
+            %%%%%% TRY ENTER IN ON 26 AND EXIT ON 12
+            
             obj.RSIderv = [NaN; diff(obj.clRma)];
             
             obj.B.STOCK = [NaN; diff(obj.macdvec.STOCK)];

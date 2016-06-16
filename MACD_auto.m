@@ -8,7 +8,9 @@ as2 = ['A',num2str(400)];%400
 
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-% allStocks = allStocks(1) %{'NUGT'} % QQQ ABX
+load('equalLengthStocks');
+allStocks = equalLengthStocks;
+% allStocks = {''} %allStocks(1) %{'NUGT'} % QQQ ABX
 % preRange = 1:799;
 % preRange = 401:799;
 
@@ -68,21 +70,25 @@ for k = 1:length(allStocks)
             
             iAll.INDX = IntraDayStockData(indx,exchange,'600', '50d');
             
-            for i_d = 1:length(iAll.INDX.date)
-                if iAll.STOCK.date(i_d) ~= iAll.INDX.date(i_d)
-                    iAll.STOCK.close = [iAll.STOCK.close(1:i_d-1); NaN; iAll.STOCK.close(i_d:end)];
-                    iAll.STOCK.high = [iAll.STOCK.high(1:i_d-1); NaN; iAll.STOCK.high(i_d:end)];
-                    iAll.STOCK.low = [iAll.STOCK.low(1:i_d-1); NaN; iAll.STOCK.low(i_d:end)];
-                    iAll.STOCK.volume = [iAll.STOCK.volume(1:i_d-1); NaN; iAll.STOCK.volume(i_d:end)];
-                    iAll.STOCK.datestring = [iAll.STOCK.datestring(1:i_d-1); NaN; iAll.STOCK.datestring(i_d:end)];
-                    iAll.STOCK.date = [iAll.STOCK.date(1:i_d-1); NaN; iAll.STOCK.date(i_d:end)];
-                end
-                
-            end
+%             for i_d = 1:length(iAll.INDX.date)
+%                 if iAll.STOCK.date(i_d) ~= iAll.INDX.date(i_d)
+%                     iAll.STOCK.close = [iAll.STOCK.close(1:i_d-1); NaN; iAll.STOCK.close(i_d:end)];
+%                     iAll.STOCK.high = [iAll.STOCK.high(1:i_d-1); NaN; iAll.STOCK.high(i_d:end)];
+%                     iAll.STOCK.low = [iAll.STOCK.low(1:i_d-1); NaN; iAll.STOCK.low(i_d:end)];
+%                     iAll.STOCK.volume = [iAll.STOCK.volume(1:i_d-1); NaN; iAll.STOCK.volume(i_d:end)];
+%                     iAll.STOCK.datestring = [iAll.STOCK.datestring(1:i_d-1); NaN; iAll.STOCK.datestring(i_d:end)];
+%                     iAll.STOCK.date = [iAll.STOCK.date(1:i_d-1); NaN; iAll.STOCK.date(i_d:end)];
+%                 end
+%             end
             
             iAll.STOCK = td.getAdjustedIntra(iAll.STOCK);
             
             iAll.INDX = td.getAdjustedIntra(iAll.INDX);
+            
+            if length(iAll.STOCK.close) ~= length(iAll.INDX.close)
+                disp('Length Error')
+                return
+            end
             
             preRange = 1:length(iAll.STOCK.close);
             
@@ -97,10 +103,7 @@ for k = 1:length(allStocks)
             iAll.INDX.volume = iAll.INDX.volume(preRange);
             
             
-            if length(iAll.STOCK.close) ~= length(iAll.INDX.close)
-                disp('Length Error')
-                return
-            end
+            
             
             isFlip = 0;
             len = length(iAll.STOCK.close)-1;
@@ -226,7 +229,7 @@ sum(trackB(:,5))
 length(trackB)
 
 lengther = 0;
-principal = 10000;
+principal = 30000;
 for ii = 1:length(trackB)
     
     lengther = lengther + trackB(ii,4) - trackB(ii,3);
