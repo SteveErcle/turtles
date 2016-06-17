@@ -220,6 +220,9 @@ classdef TurtleAuto < handle
         
         function setStopLoss(obj)
             
+            
+            %NEEDS TO CHECK THE EXTREME OF THE ENTER CANDLE
+            
             if obj.tradeLen.BULL <= 2
                 obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercent/100);
             else
