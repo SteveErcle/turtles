@@ -8,9 +8,9 @@ as2 = ['A',num2str(400)];%400
 
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-load('equalLengthStocks');
-allStocks = equalLengthStocks;
-% allStocks = {''} %allStocks(1) %{'NUGT'} % QQQ ABX
+% load('equalLengthStocks');
+% allStocks = equalLengthStocks;
+allStocks = {'TSLA'} %allStocks(1) %{'NUGT'} % QQQ ABX
 % preRange = 1:799;
 % preRange = 401:799;
 
@@ -230,6 +230,7 @@ length(trackB)
 
 lengther = 0;
 principal = 30000;
+
 for ii = 1:length(trackB)
     
     lengther = lengther + trackB(ii,4) - trackB(ii,3);
