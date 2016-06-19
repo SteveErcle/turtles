@@ -32,6 +32,7 @@ classdef TurtleAuto < handle
         clAma
         clRma
         
+        savedStops
         
     end
     
@@ -248,7 +249,7 @@ classdef TurtleAuto < handle
                     && obj.condition.Not_End_of_Day...
                     && obj.condition.Above_MA.BULL...
                     %&& obj.condition.MACD_bull_cross...
-                    %&& obj.condition.MACD_bull_derv...
+                %&& obj.condition.MACD_bull_derv...
                 %&& obj.condition.MACD_Positive.BULL...
                 %obj.condition.RSI_to_indx.BULL...
                 %&& obj.condition.RSI_to_stock.BULL...
@@ -261,11 +262,14 @@ classdef TurtleAuto < handle
                     if obj.enterMarket.BULL == 0
                         obj.enterPrice.BULL = obj.clSma(obj.ind-1); %obj.cl.STOCK(end);
                         obj.trades.BULL = [obj.trades.BULL; obj.enterPrice.BULL, NaN, length(obj.cl.STOCK), NaN];
+                        obj.ind = obj.ind-1;
+                        obj.savedStops = [obj.savedStops; obj.ind, obj.enterPrice.BULL*(1.00-obj.slPercent/100)];
                     end
                     
                     obj.enterMarket.BULL = 1;
-                    obj.tradeLen.BULL = obj.tradeLen.BULL + 1;
-                    
+                    %obj.tradeLen.BULL = obj.tradeLen.BULL + 1;
+                    obj.tradeLen.BULL = length(obj.cl.STOCK) - obj.trades.BULL(end,3) + 1;
+                    %%% CHANGED TRADELEN TRACKING
                 end
                 
             else
@@ -286,8 +290,8 @@ classdef TurtleAuto < handle
                     
                     obj.trades.BULL(end,4) = length(obj.cl.STOCK);
                     
-                   %obj.ind = obj.ind-1;
-                   %%% ^^ DOES THIS ADD FUTUE KNOWLEDGE? ^^
+                    %obj.ind = obj.ind-1;
+                    %%% ^^ DOES THIS ADD FUTUE KNOWLEDGE? ^^
                 end
                 
                 obj.enterMarket.BULL = 0;
@@ -306,7 +310,7 @@ classdef TurtleAuto < handle
                     && obj.condition.Not_End_of_Day...
                     && obj.condition.Below_MA.BEAR...
                     %&& obj.condition.MACD_bear_cross...
-                    %&& obj.condition.MACD_bear_derv...
+                %&& obj.condition.MACD_bear_derv...
                 %&& obj.condition.MACD_Negative.BEAR
                 %&& obj.condition.RSI_to_indx.BEAR...
                 %&& obj.condition.RSI_to_stock.BEAR...
@@ -320,10 +324,12 @@ classdef TurtleAuto < handle
                     if obj.enterMarket.BEAR == 0
                         obj.enterPrice.BEAR = obj.clSma(obj.ind-1); %obj.cl.STOCK(end);
                         obj.trades.BEAR = [obj.trades.BEAR; obj.enterPrice.BEAR, NaN, length(obj.cl.STOCK), NaN];
+                        obj.ind = obj.ind-1;
                     end
                     
                     obj.enterMarket.BEAR = 1;
-                    obj.tradeLen.BEAR = obj.tradeLen.BEAR + 1;
+                    %obj.tradeLen.BEAR = obj.tradeLen.BEAR + 1;
+                    obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
                     
                 end
                 
@@ -345,7 +351,7 @@ classdef TurtleAuto < handle
                     
                     obj.trades.BEAR(end,4) = length(obj.cl.STOCK);
                     
-%                     obj.ind = obj.ind-1;
+                    %                     obj.ind = obj.ind-1;
                 end
                 
                 obj.enterMarket.BEAR = 0;

@@ -39,3 +39,8 @@ goodies = goodies';
 equalLengthStocks = goodies;
 
 save('equalLengthStocks', 'equalLengthStocks');
+
+
+
+
+
