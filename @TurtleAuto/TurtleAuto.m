@@ -21,16 +21,15 @@ classdef TurtleAuto < handle
         stopLoss;
         trades;
         
-        slPercent;
+        slPercentFirst; slPercentSecond;
         
         tAnalyze = TurtleAnalyzer;
         
         rsi;
         vwap;
         
-        clSma
-        clAma
-        clRma
+        clSma; clAma; clRma;
+        clSmaLarge; clAmaLarge; clRmaLarge;
         
         savedStops
         
@@ -206,6 +205,7 @@ classdef TurtleAuto < handle
             [obj.macdvec.INDX, obj.nineperma.INDX] = macd(obj.cl.INDX);
             
             [obj.clSma, obj.clAma, obj.clRma] = obj.tAnalyze.getMovingStandard(obj.cl.STOCK, obj.cl.INDX, 12, isFlip);
+            
             %%%%%% TRY ENTER IN ON 26 AND EXIT ON 12
             
             obj.RSIderv = [NaN; diff(obj.clRma)];
@@ -224,16 +224,21 @@ classdef TurtleAuto < handle
             
             %NEEDS TO CHECK THE EXTREME OF THE ENTER CANDLE
             
-            if obj.tradeLen.BULL <= 2
-                obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercent/100);
+            if obj.tradeLen.BULL <= 1
+                obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercentFirst/100);
+            elseif obj.tradeLen.BULL == 2
+                obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercentSecond/100);
             else
+                
                 if obj.lo.STOCK(end-2) > obj.stopLoss.BULL
                     obj.stopLoss.BULL = obj.lo.STOCK(end-2);
                 end
             end
             
-            if obj.tradeLen.BEAR <= 2
-                obj.stopLoss.BEAR = obj.enterPrice.BEAR*(1.00+obj.slPercent/100);
+            if obj.tradeLen.BEAR <= 1
+                obj.stopLoss.BEAR = obj.enterPrice.BEAR*(1.00+obj.slPercentFirst/100);
+            elseif obj.tradeLen.BEAR == 2
+                obj.stopLoss.BEAR = obj.enterPrice.BEAR*(1.00+obj.slPercentSecond/100);
             else
                 if  obj.hi.STOCK(end-2) < obj.stopLoss.BEAR
                     obj.stopLoss.BEAR = obj.hi.STOCK(end-2);
@@ -263,7 +268,7 @@ classdef TurtleAuto < handle
                         obj.enterPrice.BULL = obj.clSma(obj.ind-1); %obj.cl.STOCK(end);
                         obj.trades.BULL = [obj.trades.BULL; obj.enterPrice.BULL, NaN, length(obj.cl.STOCK), NaN];
                         obj.ind = obj.ind-1;
-                        obj.savedStops = [obj.savedStops; obj.ind, obj.enterPrice.BULL*(1.00-obj.slPercent/100)];
+%                         obj.savedStops = [obj.savedStops; obj.ind, obj.enterPrice.BULL*(1.00-obj.slPercent/100)];
                     end
                     
                     obj.enterMarket.BULL = 1;
