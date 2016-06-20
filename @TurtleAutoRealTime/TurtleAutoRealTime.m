@@ -139,6 +139,15 @@ classdef TurtleAutoRealTime < handle
             
             %NEEDS TO CHECK THE EXTREME OF THE ENTER CANDLE
             
+            if obj.enterMarket.BULL == 1
+                obj.tradeLen.BULL = length(obj.cl.STOCK) - obj.trades.BULL(end,3) + 1;
+            end
+            
+            if obj.enterMarket.BEAR == 1
+                obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
+            end
+            
+            
             if obj.tradeLen.BULL <= 1
                 obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercentFirst/100);
             elseif obj.tradeLen.BULL == 2
@@ -185,7 +194,7 @@ classdef TurtleAutoRealTime < handle
                     end
                     
                     obj.enterMarket.BULL = 1;
-                    obj.tradeLen.BULL = length(obj.cl.STOCK) - obj.trades.BULL(end,3) + 1;
+%                     obj.tradeLen.BULL = length(obj.cl.STOCK) - obj.trades.BULL(end,3) + 1;
                     
                 end
                 
@@ -244,7 +253,7 @@ classdef TurtleAutoRealTime < handle
                     end
                     
                     obj.enterMarket.BEAR = 1;
-                    obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
+%                     obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
                     
                 end
                 

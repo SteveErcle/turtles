@@ -6,15 +6,12 @@ clc; close all; clear all;
 as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
 
-[~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
+% [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-% load('equalLengthStocks');
-% allStocks = equalLengthStocks;
-% allStocks = {'TSLA'} %allStocks(1) %{'NUGT'} % QQQ ABX
-% preRange = 1:799;
-% preRange = 401:799;
+load('equalLengthStocks');
+allStocks = equalLengthStocks;
+% allStocks = {'MENT'} %allStocks(1) %{'NUGT'} % QQQ ABX
 
-% portfolio = {'CYCC'}; %GEVO %NUGT %LABU %IMMU %ENDP %CCXI %CYCC
 roiCong = [];
 trackTrades = [];
 for k = 1:length(allStocks)
@@ -39,7 +36,7 @@ for k = 1:length(allStocks)
         td = TurtleData;
         ta = TurtleAuto;
         
-        ta.slPercentFirst = 0.50;
+        ta.slPercentFirst = 0.75;
         ta.slPercentSecond = 0.25;
         
         numPlots = 5;
@@ -227,6 +224,7 @@ length(trackB);
 
 lengther = 0;
 principal = 30000;
+startingCap = principal;
 
 
 equityCurve = [principal];
@@ -247,17 +245,22 @@ for j = 5:100
 end
 
 winPercent = sum(trackB(:,5) >= 0) / length(trackB(:,5));
-averageLoss = mean(trackB(:,5) < 0);
-averageGain = mean(trackB(:,5) >= 0);
+averageLoss = mean(trackB((trackB(:,5) < 0), 5));
+averageGain = mean(trackB((trackB(:,5) >= 0), 5));
 
+disp('   ')
 disp('Achieved noncompounded ROI')
 disp(sum(trackB(:,5)))
-disp('Principal:')
+disp('Achieved compounded ROI')
+disp((principal - startingCap) / startingCap * 100)
+disp('Principal')
 disp(principal)
 disp('Number of trades')
 disp(length(trackB))
 disp('Time in Market')
 disp(lengther)
+disp('Percentage of Time in Market')
+disp(lengther/ length(ta.cl.STOCK))
 disp('Max Draw Down')
 disp(min(drawDown))
 disp('Percentage of Winning Trades')
@@ -266,10 +269,12 @@ disp('Average Loss')
 disp(averageLoss)
 disp('Average Gain')
 disp(averageGain)
+disp('Achieved Risk Reward Ratio')
+sprintf('%0.2f to 1', (averageGain/-averageLoss))
 disp('Total ROI of System')
 disp(sum(sum(roiCong)))
 
-return
+% return
 
 delete(slider);
 handles = guihandles(slider);
