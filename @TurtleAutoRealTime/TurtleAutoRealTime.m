@@ -21,7 +21,8 @@ classdef TurtleAutoRealTime < handle
         stopLoss;
         trades;
         
-        slPercent;
+        slPercentFirst;
+        slPercentSecond;
         
         tAnalyze = TurtleAnalyzer;
         
@@ -94,7 +95,7 @@ classdef TurtleAutoRealTime < handle
                 obj.condition.Above_MA.BULL = 0;
             end
             
-            if obj.cl.STOCK(end-1) < obj.clSma(end-1) && obj.cl.INDX(obj.ind-1) < obj.clAma(obj.ind-1)
+            if obj.cl.STOCK(end-1) < obj.clSma(end-1) && obj.cl.INDX(end-1) < obj.clAma(end-1)
                 obj.condition.Below_MA.BEAR = 1;
             else
                 obj.condition.Below_MA.BEAR = 0;
@@ -110,7 +111,7 @@ classdef TurtleAutoRealTime < handle
             %VERIFY THAT END OF DAY CONDITION IS WORKING 
             
             
-            if obj.enterMarket.BULL || (obj.condition.Trying_to_Enter.BULL == 1 && obj.cl.STOCK(end) <= obj.clSma(obj.end-1))
+            if obj.enterMarket.BULL || (obj.condition.Trying_to_Enter.BULL == 1 && obj.cl.STOCK(end) <= obj.clSma(end-1))
                 obj.condition.Allowed_to_Enter.BULL = 1;
             else
                 obj.condition.Allowed_to_Enter.BULL = 0;
@@ -136,22 +137,26 @@ classdef TurtleAutoRealTime < handle
         
         function setStopLoss(obj)
             
-            
             %NEEDS TO CHECK THE EXTREME OF THE ENTER CANDLE
             
-            if obj.tradeLen.BULL <= 2
-                obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercent/100);
+            if obj.tradeLen.BULL <= 1
+                obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercentFirst/100);
+            elseif obj.tradeLen.BULL == 2
+                obj.stopLoss.BULL = obj.enterPrice.BULL*(1.00-obj.slPercentSecond/100);
             else
-                if obj.lo.STOCK(end-3) > obj.stopLoss.BULL
-                    obj.stopLoss.BULL = obj.lo.STOCK(end-3);
+                
+                if obj.lo.STOCK(end-2) > obj.stopLoss.BULL
+                    obj.stopLoss.BULL = obj.lo.STOCK(end-2);
                 end
             end
             
-            if obj.tradeLen.BEAR <= 2
-                obj.stopLoss.BEAR = obj.enterPrice.BEAR*(1.00+obj.slPercent/100);
+            if obj.tradeLen.BEAR <= 1
+                obj.stopLoss.BEAR = obj.enterPrice.BEAR*(1.00+obj.slPercentFirst/100);
+            elseif obj.tradeLen.BEAR == 2
+                obj.stopLoss.BEAR = obj.enterPrice.BEAR*(1.00+obj.slPercentSecond/100);
             else
-                if  obj.hi.STOCK(end-3) < obj.stopLoss.BEAR
-                    obj.stopLoss.BEAR = obj.hi.STOCK(end-3);
+                if  obj.hi.STOCK(end-2) < obj.stopLoss.BEAR
+                    obj.stopLoss.BEAR = obj.hi.STOCK(end-2);
                 end
             end
             

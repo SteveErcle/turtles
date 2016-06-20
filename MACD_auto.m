@@ -288,7 +288,6 @@ while(true)
     candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
     hold on
     plot(ta.clSma,'b')
-    plot(ta.clSmaLarge, 'r')
     
     %     for i = 1:length(ta.savedStops)
     %         plot([ta.savedStops(i,1), ta.savedStops(i,2)])
