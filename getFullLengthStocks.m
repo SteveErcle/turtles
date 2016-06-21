@@ -1,9 +1,28 @@
 clc; close all; clear all;
 
-as1 = ['A',num2str(1)];%1
-as2 = ['A',num2str(400)];%400
 
-[~,allStocks] = xlsread('allStocks', [as1, ':', as2]);
+% load('roiA')
+% load('roiB')
+% 
+% 
+% roiAll = [roiB(:,1), roiA];
+% roiAll = sortrows(roiAll, -1)
+% % roiA = sortrows(roiA, -1)
+% % roiB = sortrows(roiB, -1)
+% 
+% sum(roiAll(1:30,2))
+% sum(roiAll(end-29:end,2))
+% 
+% save('roiAll', 'roiAll')
+% 
+% return
+
+
+
+as1 = ['A',num2str(1)];%1
+as2 = ['A',num2str(2000)];%400
+
+[~,allStocks] = xlsread('listOfNASDAQ', [as1, ':', as2]);
 
 indx = 'SPY';
 exchange = 'NASDAQ';
@@ -12,13 +31,13 @@ iAll.INDX = IntraDayStockData(indx,exchange,'600', '50d');
 
 goodLengthStocks = [];
 
-for k = 1:length(allStocks)
-    
+parfor k = 1:length(allStocks)
+    k
     stock = allStocks{k};
     try
-        iAll.STOCK = IntraDayStockData(stock,exchange,'600','50d');
+        stockData = IntraDayStockData(stock,exchange,'600','50d');
         
-        if length(iAll.STOCK.close) == length(iAll.INDX.close)
+        if length(stockData.close) == length(iAll.INDX.close)
             stock
             goodLengthStocks = [goodLengthStocks; k];
         end
@@ -36,11 +55,8 @@ end
 
 goodies = goodies';
 
-equalLengthStocks = goodies;
+equalLengthNasDaq = goodies;
 
-save('equalLengthStocks', 'equalLengthStocks');
-
-
-
+save('equalLengthNasDaq', 'equalLengthNasDaq');
 
 

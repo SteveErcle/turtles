@@ -77,9 +77,9 @@ classdef TurtleAutoRealTime < handle
             
             if (obj.enterMarket.BULL == 1 || obj.enterMarket.BEAR) || ...
                     (((obj.vo.STOCK(end-1) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK(1:end-1)))) ||...
-                    obj.vo.STOCK(end-2) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK(1:end-1))))))...
-                    && ((obj.vo.INDX(end-1) > mean(obj.vo.INDX(~isnan(obj.vo.INDX(1:end-1)))) ||...
-                    obj.vo.INDX(end-2) > mean(obj.vo.INDX(~isnan(obj.vo.INDX(1:end-1)))))))
+                    obj.vo.STOCK(end-2) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK(1:end-1)))))))%...
+%                     && ((obj.vo.INDX(end-1) > mean(obj.vo.INDX(~isnan(obj.vo.INDX(1:end-1)))) ||...
+%                     obj.vo.INDX(end-2) > mean(obj.vo.INDX(~isnan(obj.vo.INDX(1:end-1)))))))
                 
                 %ADDED INDX TRACKING TO VOLUME
                 
@@ -89,13 +89,13 @@ classdef TurtleAutoRealTime < handle
             end
             
            
-            if obj.cl.STOCK(end-1) > obj.clSma(end-1) &&  obj.cl.INDX(end-1) > obj.clAma(end-1)
+            if obj.cl.STOCK(end-1) > obj.clSma(end-1) %&& obj.cl.INDX(end-1) > obj.clAma(end-1)
                 obj.condition.Above_MA.BULL = 1;
             else
                 obj.condition.Above_MA.BULL = 0;
             end
             
-            if obj.cl.STOCK(end-1) < obj.clSma(end-1) && obj.cl.INDX(end-1) < obj.clAma(end-1)
+            if obj.cl.STOCK(end-1) < obj.clSma(end-1) %&& obj.cl.INDX(end-1) < obj.clAma(end-1)
                 obj.condition.Below_MA.BEAR = 1;
             else
                 obj.condition.Below_MA.BEAR = 0;

@@ -8,10 +8,16 @@ as2 = ['A',num2str(400)];%400
 
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-load('equalLengthStocks');
-allStocks = equalLengthStocks;
-% allStocks = {'MENT'} %allStocks(1) %{'NUGT'} % QQQ ABX
+% load('equalLengthStocks');
+% allStocks = equalLengthStocks;
+load('equalLengthNasDaq');
+allStocks = equalLengthNasDaq;
+% load('roiAll')
+% allStocks = allStocks(roiAll(1:20,3));
+% allStocks = {'SBUX'} %allStocks(1) %{'NUGT'} % QQQ ABX
 
+preRange = 1:999;
+           
 roiCong = [];
 trackTrades = [];
 for k = 1:length(allStocks)
@@ -84,23 +90,32 @@ for k = 1:length(allStocks)
             
             if length(iAll.STOCK.close) ~= length(iAll.INDX.close)
                 disp('Length Error')
-                return
+%                 break
+%                 return
             end
             
-            preRange = 1:length(iAll.STOCK.close);
             
-            iAll.STOCK.high = iAll.STOCK.high(preRange);
-            iAll.STOCK.low = iAll.STOCK.low(preRange);
-            iAll.STOCK.open = iAll.STOCK.open(preRange);
-            iAll.STOCK.close = iAll.STOCK.close(preRange);
-            iAll.STOCK.volume = iAll.STOCK.volume(preRange);
-            iAll.STOCK.date = iAll.STOCK.date(preRange);
-            
-            iAll.INDX.close = iAll.INDX.close(preRange);
-            iAll.INDX.volume = iAll.INDX.volume(preRange);
-            
-            
-            
+            for i_set_preRange = 1:1
+
+%                 preRange = 1:length(iAll.STOCK.close);
+     
+                iAll.STOCK.high = iAll.STOCK.high(preRange);
+                iAll.STOCK.low = iAll.STOCK.low(preRange);
+                iAll.STOCK.open = iAll.STOCK.open(preRange);
+                iAll.STOCK.close = iAll.STOCK.close(preRange);
+                iAll.STOCK.volume = iAll.STOCK.volume(preRange);
+                iAll.STOCK.date = iAll.STOCK.date(preRange);
+                
+                
+                iAll.INDX.high = iAll.INDX.high(preRange);
+                iAll.INDX.low = iAll.INDX.low(preRange);
+                iAll.INDX.open = iAll.INDX.open(preRange);
+                iAll.INDX.close = iAll.INDX.close(preRange);
+                iAll.INDX.volume = iAll.INDX.volume(preRange);
+                iAll.INDX.date = iAll.INDX.date(preRange);
+                
+                
+            end
             
             isFlip = 0;
             len = length(iAll.STOCK.close)-1;
@@ -200,9 +215,13 @@ for k = 1:length(allStocks)
     end
     
     sList = [sL, sS];
-    roiCong = [roiCong; sList];
+    roiCong = [roiCong; sList, k];
     
 end
+
+
+roiB = [sum(roiCong(:,1:2),2), roiCong(:,3)];
+save('roiB', 'roiB');
 
 
 trackTrades = sortrows(trackTrades, 3);
@@ -286,7 +305,7 @@ disp(averageGain)
 disp('Achieved Risk Reward Ratio')
 sprintf('%0.2f to 1', (averageGain/-averageLoss))
 disp('Total ROI of System')
-disp(sum(sum(roiCong)))
+disp(sum(sum(roiCong(:,1:2))))
 
 % return
 

@@ -2,7 +2,7 @@
 
 clc; close all; clear all;
 
-stock = 'LABU';
+stock = 'BABA';
 indx = 'SPY';
 exchange = 'NASDAQ';
 
@@ -16,8 +16,8 @@ taRT.slPercentSecond = 0.25;
 
 numPlots = 5;
 
-iAll.past.STOCK = IntraDayStockData(stock,exchange,'300','2d');
-iAll.past.INDX = IntraDayStockData(indx,exchange,'300', '2d');
+iAll.past.STOCK = IntraDayStockData(stock,exchange,'60','2d');
+iAll.past.INDX = IntraDayStockData(indx,exchange,'60', '2d');
 iAll.past.STOCK = td.getAdjustedIntra(iAll.past.STOCK);
 iAll.past.INDX = td.getAdjustedIntra(iAll.past.INDX);
 
@@ -40,8 +40,8 @@ while(true)
     try
         for Get_And_Organdize_Data = 1:1
             tic
-            iAll.present.STOCK = IntraDayStockData(stock,exchange,'300','1d');
-            iAll.present.INDX = IntraDayStockData(indx,exchange,'300', '1d');
+            iAll.present.STOCK = IntraDayStockData(stock,exchange,'60','1d');
+            iAll.present.INDX = IntraDayStockData(indx,exchange,'60', '1d');
             iAll.present.STOCK = td.getAdjustedIntra(iAll.present.STOCK);
             iAll.present.INDX = td.getAdjustedIntra(iAll.present.INDX);
             toc
