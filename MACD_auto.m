@@ -6,7 +6,7 @@ clc; close all; clear all;
 as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
 
-% [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
+[~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
 load('equalLengthStocks');
 allStocks = equalLengthStocks;
@@ -210,12 +210,25 @@ trackTrades = sortrows(trackTrades, 3);
 for ii = 2:size(trackTrades,1)
     
     
-    if trackTrades(ii,3) <= trackTrades(ii-1,4)
-        trackTrades(ii,:) = NaN;
-    end
+    lastTrade = trackTrades(ii-1,4);
+    
+    trackNanArr = trackTrades(:,3) <= lastTrade;
+    trackNanArr = find(trackNanArr == 1);
+    
+    trackNanArr(trackNanArr < ii) = [];
+    
+    trackTrades(trackNanArr,:) = NaN;
+    %     jj = ii;
+    %
+    %     lastTrade = trackTrades(jj-1,4)+1;
+    %
+    %     while trackTrades(jj,3) <= lastTrade
+    % %     if trackTrades(ii,3) <= trackTrades(ii-1,4)
+    %         trackTrades(jj,:) = NaN;
+    %         jj = jj + 1;
+    %     end
     
 end
-
 trackB = trackTrades;
 trackB(isnan(trackTrades(:,2)),:) = [];
 
@@ -226,13 +239,14 @@ lengther = 0;
 principal = 30000;
 startingCap = principal;
 
-
 equityCurve = [principal];
+
+commision = 20;
 
 for ii = 1:length(trackB)
     
     lengther = lengther + trackB(ii,4) - trackB(ii,3);
-    principal = principal*(1+(trackB(ii,5)/100)) - 10;
+    principal = principal*(1+(trackB(ii,5)/100)) - commision;
     equityCurve = [equityCurve; principal];
     
 end
