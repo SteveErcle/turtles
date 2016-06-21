@@ -3,6 +3,16 @@
 
 clc; close all; clear all;
 
+
+tf = TurtleFun;
+td = TurtleData;
+ta = TurtleAuto;
+
+ta.slPercentFirst = 0.75;
+ta.slPercentSecond = 0.25;
+
+numPlots = 5;
+
 as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
 
@@ -16,8 +26,8 @@ allStocks = equalLengthNasDaq;
 % allStocks = allStocks(roiAll(1:20,3));
 % allStocks = {'SBUX'} %allStocks(1) %{'NUGT'} % QQQ ABX
 
-preRange = 1:999;
-           
+preRange = 1000:1999;
+
 roiCong = [];
 trackTrades = [];
 for k = 1:length(allStocks)
@@ -34,18 +44,10 @@ for k = 1:length(allStocks)
         INTRA = 1;
         DAILY = 0;
         
-        past = now - 400;
-        pres = now ;
+        past = now - 30;
+        pres = now;
         
         
-        tf = TurtleFun;
-        td = TurtleData;
-        ta = TurtleAuto;
-        
-        ta.slPercentFirst = 0.75;
-        ta.slPercentSecond = 0.25;
-        
-        numPlots = 5;
         
         if DAILY
             c = yahoo;
@@ -61,8 +63,12 @@ for k = 1:length(allStocks)
             vo.STOCK = voD;
             da.STOCK = daD;
             [hiA, loA, clA, opA, daA, voA] = tf.returnOHLCDarray(avgAll);
+            hi.INDX = hiA;
+            lo.INDX = loA;
+            op.INDX = opA;
             cl.INDX = clA;
-            
+            vo.INDX = voA;
+            da.INDX = daA;
             isFlip = 1;
             len = length(clD)-1;
         end
@@ -90,15 +96,15 @@ for k = 1:length(allStocks)
             
             if length(iAll.STOCK.close) ~= length(iAll.INDX.close)
                 disp('Length Error')
-%                 break
-%                 return
+                %                 break
+                %                 return
             end
             
             
             for i_set_preRange = 1:1
-
-%                 preRange = 1:length(iAll.STOCK.close);
-     
+                
+                %                 preRange = 1:length(iAll.STOCK.close);
+                
                 iAll.STOCK.high = iAll.STOCK.high(preRange);
                 iAll.STOCK.low = iAll.STOCK.low(preRange);
                 iAll.STOCK.open = iAll.STOCK.open(preRange);
@@ -183,10 +189,6 @@ for k = 1:length(allStocks)
             
             ta.executeBearTrade();
             
-            %             245
-            %             1164
-            %             1364
-            
             
         end
         
@@ -208,20 +210,22 @@ for k = 1:length(allStocks)
         %         hold on;
         %         plot([trackTrades.(stock)(:,3), trackTrades.(stock)(:,4)], [k,k])
         
+        observePrice = ta.cl.STOCK(end);
         
     catch
         sL = 0;
         sS = 0;
+        observePrice = 0;
     end
     
     sList = [sL, sS];
-    roiCong = [roiCong; sList, k];
+    roiCong = [roiCong; sList, k, observePrice];
     
 end
 
 
-roiB = [sum(roiCong(:,1:2),2), roiCong(:,3)];
-save('roiB', 'roiB');
+roiA = [sum(roiCong(:,1:2),2), roiCong(:,3:4)];
+save('roiA', 'roiA');
 
 
 trackTrades = sortrows(trackTrades, 3);
