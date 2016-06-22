@@ -1,21 +1,21 @@
 clc; close all; clear all;
 
 
-% load('roiA')
-% load('roiB')
-% 
-% 
-% roiAll = [roiB(:,1), roiA];
-% roiAll = sortrows(roiAll, -1)
-% % roiA = sortrows(roiA, -1)
-% % roiB = sortrows(roiB, -1)
-% 
-% sum(roiAll(1:30,2))
-% sum(roiAll(end-29:end,2))
-% 
-% save('roiAll', 'roiAll')
-% 
-% return
+load('roiA')
+load('roiB')
+
+
+roiAll = [roiB(:,1), roiA];
+roiAll = sortrows(roiAll, -1)
+% roiA = sortrows(roiA, -1)
+% roiB = sortrows(roiB, -1)
+
+sum(roiAll(1:30,2))
+sum(roiAll(end-29:end,2))
+
+save('roiAll', 'roiAll')
+
+return
 
 
 

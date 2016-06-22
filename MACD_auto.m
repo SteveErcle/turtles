@@ -4,14 +4,6 @@
 clc; close all; clear all;
 
 
-tf = TurtleFun;
-td = TurtleData;
-ta = TurtleAuto;
-
-ta.slPercentFirst = 0.75;
-ta.slPercentSecond = 0.25;
-
-numPlots = 5;
 
 as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
@@ -23,8 +15,8 @@ as2 = ['A',num2str(400)];%400
 load('equalLengthNasDaq');
 allStocks = equalLengthNasDaq;
 % load('roiAll')
-% allStocks = allStocks(roiAll(1:20,3));
-% allStocks = {'SBUX'} %allStocks(1) %{'NUGT'} % QQQ ABX
+% allStocks = allStocks(roiAll(1:80,3));
+% allStocks = {'MENT'} %allStocks(1) %{'NUGT'} % QQQ ABX
 
 preRange = 1000:1999;
 
@@ -32,10 +24,19 @@ roiCong = [];
 trackTrades = [];
 for k = 1:length(allStocks)
     
-    
     stock = allStocks{k}
     
     try
+        
+        tf = TurtleFun;
+        td = TurtleData;
+        ta = TurtleAuto;
+        
+        ta.slPercentFirst = 0.75;
+        ta.slPercentSecond = 0.25;
+        
+        numPlots = 5;
+
         
         indx = 'SPY';
         exchange = 'NASDAQ';
@@ -44,7 +45,7 @@ for k = 1:length(allStocks)
         INTRA = 1;
         DAILY = 0;
         
-        past = now - 30;
+        past = now - 90;
         pres = now;
         
         
@@ -56,19 +57,19 @@ for k = 1:length(allStocks)
             avgAll = flipud(fetch(c,indx,past, now, 'd'));
             
             [hiD, loD, clD, opD, daD, voD] = tf.returnOHLCDarray(dAll);
-            hi.STOCK = hiD;
-            lo.STOCK = loD;
-            op.STOCK = opD;
-            cl.STOCK = clD;
-            vo.STOCK = voD;
-            da.STOCK = daD;
+            ta.hi.STOCK = hiD;
+            ta.lo.STOCK = loD;
+            ta.op.STOCK = opD;
+            ta.cl.STOCK = clD;
+            ta.vo.STOCK = voD;
+            ta.da.STOCK = daD;
             [hiA, loA, clA, opA, daA, voA] = tf.returnOHLCDarray(avgAll);
-            hi.INDX = hiA;
-            lo.INDX = loA;
-            op.INDX = opA;
-            cl.INDX = clA;
-            vo.INDX = voA;
-            da.INDX = daA;
+            ta.hi.INDX = hiA;
+            ta.lo.INDX = loA;
+            ta.op.INDX = opA;
+            ta.cl.INDX = clA;
+            ta.vo.INDX = voA;
+            ta.da.INDX = daA;
             isFlip = 1;
             len = length(clD)-1;
         end
@@ -103,7 +104,7 @@ for k = 1:length(allStocks)
             
             for i_set_preRange = 1:1
                 
-                %                 preRange = 1:length(iAll.STOCK.close);
+%                                 preRange = 1:length(iAll.STOCK.close);
                 
                 iAll.STOCK.high = iAll.STOCK.high(preRange);
                 iAll.STOCK.low = iAll.STOCK.low(preRange);
@@ -123,22 +124,26 @@ for k = 1:length(allStocks)
                 
             end
             
+            for i_set_range = 1:1
+                range = 1:length(iAll.STOCK.close);
+                ta.hi.STOCK = iAll.STOCK.high(range);
+                ta.lo.STOCK = iAll.STOCK.low(range);
+                ta.op.STOCK = iAll.STOCK.open(range);
+                ta.cl.STOCK = iAll.STOCK.close(range);
+                ta.vo.STOCK = iAll.STOCK.volume(range);
+                ta.da.STOCK = iAll.STOCK.date(range);
+                
+                ta.cl.INDX = iAll.INDX.close(range);
+                ta.vo.INDX = iAll.INDX.volume(range);
+               
+            end
+            
             isFlip = 0;
             len = length(iAll.STOCK.close)-1;
         end
         
-        range = 1:length(iAll.STOCK.close);
-        ta.hi.STOCK = iAll.STOCK.high(range);
-        ta.lo.STOCK = iAll.STOCK.low(range);
-        ta.op.STOCK = iAll.STOCK.open(range);
-        ta.cl.STOCK = iAll.STOCK.close(range);
-        ta.vo.STOCK = iAll.STOCK.volume(range);
-        ta.da.STOCK = iAll.STOCK.date(range);
-        
-        ta.cl.INDX = iAll.INDX.close(range);
-        ta.vo.INDX = iAll.INDX.volume(range);
+    
         ta.calculateData(isFlip);
-        
         
         ta.ind = 50-1;
         
@@ -147,35 +152,42 @@ for k = 1:length(allStocks)
             ta.ind = ta.ind + 1;
             range = 1:ta.ind;
             
-            if INTRA
+            for organize_data = 1:1
                 
-                %%THIS DATA MAYBE BE INACCURATE OR GIVING FUTURE KNOWLEDGE
+                if INTRA
+                  
+                    %%THIS DATA MAYBE BE INACCURATE OR GIVING FUTURE KNOWLEDGE
+                    ta.hi.STOCK = iAll.STOCK.high(range);
+                    ta.lo.STOCK = iAll.STOCK.low(range);
+                    ta.op.STOCK = iAll.STOCK.open(range);
+                    ta.cl.STOCK = iAll.STOCK.close(range);
+                    ta.vo.STOCK = iAll.STOCK.volume(range);
+                    ta.da.STOCK = iAll.STOCK.date(range);
+                    
+                    ta.hi.INDX = iAll.INDX.high(range);
+                    ta.lo.INDX = iAll.INDX.low(range);
+                    ta.op.INDX = iAll.INDX.open(range);
+                    ta.cl.INDX = iAll.INDX.close(range);
+                    ta.vo.INDX = iAll.INDX.volume(range);
+                    ta.da.INDX = iAll.INDX.date(range);
+                end
                 
-                ta.hi.STOCK = iAll.STOCK.high(range);
-                ta.lo.STOCK = iAll.STOCK.low(range);
-                ta.op.STOCK = iAll.STOCK.open(range);
-                ta.cl.STOCK = iAll.STOCK.close(range);
-                ta.vo.STOCK = iAll.STOCK.volume(range);
-                ta.da.STOCK = iAll.STOCK.date(range);
+                if DAILY
+                    ta.hi.STOCK = hiD(range);
+                    ta.lo.STOCK = loD(range);
+                    ta.op.STOCK = opD(range);
+                    ta.cl.STOCK = clD(range);
+                    ta.vo.STOCK = voD(range);
+                    ta.da.STOCK = daD(range);
+                    
+                    ta.hi.INDX = hiA(range);
+                    ta.lo.INDX = loA(range);
+                    ta.op.INDX = opA(range);
+                    ta.cl.INDX = clA(range);
+                    ta.vo.INDX = voA(range);
+                    ta.da.INDX = daA(range);  
+                end
                 
-                ta.hi.INDX = iAll.INDX.high(range);
-                ta.lo.INDX = iAll.INDX.low(range);
-                ta.op.INDX = iAll.INDX.open(range);
-                ta.cl.INDX = iAll.INDX.close(range);
-                ta.vo.INDX = iAll.INDX.volume(range);
-                ta.da.INDX = iAll.INDX.date(range);
-            end
-            
-            if DAILY
-                ta.hi.STOCK = hiD(range);
-                ta.lo.STOCK = loD(range);
-                ta.op.STOCK = opD(range);
-                ta.cl.STOCK = clD(range);
-                ta.vo.STOCK = voD(range);
-                ta.da.STOCK = daD(range);
-                
-                ta.cl.INDX = clA(range);
-                ta.vo.INDX = voA(range);
             end
             
             
@@ -311,6 +323,9 @@ sprintf('%0.2f to 1', (averageGain/-averageLoss))
 disp('Total ROI of System')
 disp(sum(sum(roiCong(:,1:2))))
 
+figure
+plot(equityCurve)
+
 % return
 
 delete(slider);
@@ -322,6 +337,7 @@ set(handles.axisView, 'Max', len, 'Min', 0);
 set(handles.axisView, 'SliderStep', [1/len, 10/len]);
 set(handles.axisView, 'Value', 0);
 
+figure
 
 while(true)
     
