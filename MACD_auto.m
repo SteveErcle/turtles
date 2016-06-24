@@ -16,9 +16,9 @@ load('equalLengthNasDaq');
 allStocks = equalLengthNasDaq;
 % load('roiAll')
 % allStocks = allStocks(roiAll(1:80,3));
-% allStocks = {'MENT'} %allStocks(1) %{'NUGT'} % QQQ ABX
+% allStocks = {'TSLA'} %allStocks(1) %{'NUGT'} % QQQ ABX
 
-preRange = 1000:1999;
+% preRange = 1000:1900;
 
 roiCong = [];
 trackTrades = [];
@@ -32,8 +32,8 @@ for k = 1:length(allStocks)
         td = TurtleData;
         ta = TurtleAuto;
         
-        ta.slPercentFirst = 0.75;
-        ta.slPercentSecond = 0.25;
+        ta.slPercentFirst = 0.85;
+        ta.slPercentSecond = 0.45;
         
         numPlots = 5;
 
@@ -76,13 +76,14 @@ for k = 1:length(allStocks)
         
         
         if INTRA
-            iAll.STOCK = IntraDayStockData(stock,exchange,'600','50d');
+            iAll.STOCK = IntraDayStockData(stock,exchange,'1200','50d');
             
-            iAll.INDX = IntraDayStockData(indx,exchange,'600', '50d');
+            iAll.INDX = IntraDayStockData(indx,exchange,'1200', '50d');
             
             for i_d = 1:length(iAll.INDX.date)
                 if iAll.STOCK.date(i_d) ~= iAll.INDX.date(i_d)
                     iAll.STOCK.close = [iAll.STOCK.close(1:i_d-1); NaN; iAll.STOCK.close(i_d:end)];
+                    iAll.STOCK.open = [iAll.STOCK.open(1:i_d-1); NaN; iAll.STOCK.open(i_d:end)];
                     iAll.STOCK.high = [iAll.STOCK.high(1:i_d-1); NaN; iAll.STOCK.high(i_d:end)];
                     iAll.STOCK.low = [iAll.STOCK.low(1:i_d-1); NaN; iAll.STOCK.low(i_d:end)];
                     iAll.STOCK.volume = [iAll.STOCK.volume(1:i_d-1); NaN; iAll.STOCK.volume(i_d:end)];
@@ -104,7 +105,7 @@ for k = 1:length(allStocks)
             
             for i_set_preRange = 1:1
                 
-%                                 preRange = 1:length(iAll.STOCK.close);
+                preRange = 1:length(iAll.STOCK.close);
                 
                 iAll.STOCK.high = iAll.STOCK.high(preRange);
                 iAll.STOCK.low = iAll.STOCK.low(preRange);

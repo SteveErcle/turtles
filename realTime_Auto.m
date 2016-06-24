@@ -2,7 +2,12 @@
 
 clc; close all; clear all;
 
-stock = 'BABA';
+ib = ibtws('',7497);
+pause(1);
+ibContract = ib.Handle.createContract;
+
+
+stock = 'TSLA';
 indx = 'SPY';
 exchange = 'NASDAQ';
 
@@ -16,8 +21,8 @@ taRT.slPercentSecond = 0.25;
 
 numPlots = 5;
 
-iAll.past.STOCK = IntraDayStockData(stock,exchange,'60','2d');
-iAll.past.INDX = IntraDayStockData(indx,exchange,'60', '2d');
+iAll.past.STOCK = IntraDayStockData(stock,exchange,'600','1d');
+iAll.past.INDX = IntraDayStockData(indx,exchange,'600', '1d');
 iAll.past.STOCK = td.getAdjustedIntra(iAll.past.STOCK);
 iAll.past.INDX = td.getAdjustedIntra(iAll.past.INDX);
 
@@ -37,11 +42,24 @@ end
 figure()
 while(true)
     
-    try
+%     try
         for Get_And_Organdize_Data = 1:1
             tic
-            iAll.present.STOCK = IntraDayStockData(stock,exchange,'60','1d');
-            iAll.present.INDX = IntraDayStockData(indx,exchange,'60', '1d');
+            iAll.present.STOCK = IntraDayStockData(stock,exchange,'600','1d');
+            iAll.present.INDX = IntraDayStockData(indx,exchange,'600', '1d');
+            
+%             for i_d = 1:length(iAll.present.INDX.date)
+%                 if iAll.present.STOCK.date(i_d) ~= iAll.INDX.date(i_d)
+%                     iAll.present.STOCK.close = [iAll.STOCK.close(1:i_d-1); NaN; iAll.STOCK.close(i_d:end)];
+%                     iAll.present.STOCK.open = [iAll.STOCK.open(1:i_d-1); NaN; iAll.STOCK.open(i_d:end)];
+%                     iAll.present.STOCK.high = [iAll.STOCK.high(1:i_d-1); NaN; iAll.STOCK.high(i_d:end)];
+%                     iAll.present.STOCK.low = [iAll.STOCK.low(1:i_d-1); NaN; iAll.STOCK.low(i_d:end)];
+%                     iAll.present.STOCK.volume = [iAll.STOCK.volume(1:i_d-1); NaN; iAll.STOCK.volume(i_d:end)];
+%                     iAll.present.STOCK.datestring = [iAll.STOCK.datestring(1:i_d-1); NaN; iAll.STOCK.datestring(i_d:end)];
+%                     iAll.present.STOCK.date = [iAll.STOCK.date(1:i_d-1); NaN; iAll.STOCK.date(i_d:end)];
+%                 end
+%             end
+            
             iAll.present.STOCK = td.getAdjustedIntra(iAll.present.STOCK);
             iAll.present.INDX = td.getAdjustedIntra(iAll.present.INDX);
             toc
@@ -63,14 +81,15 @@ while(true)
             toc
             
         end
-    catch
-    end
+%     catch
+%     end
     
     taRT.cl.STOCK(end)
     
     taRT.calculateData(isFlip);
     taRT.setStopLoss();
     taRT.checkConditions();
+%     taRT.condition.Large_Volume = 1;
     taRT.executeBullTrade();
     taRT.executeBearTrade();
     
@@ -100,6 +119,7 @@ while(true)
     candle(taRT.hi.STOCK, taRT.lo.STOCK, taRT.cl.STOCK, taRT.op.STOCK, 'blue');
     hold on
     plot(taRT.clSma,'b')
+    xlim(gca, [length(taRT.cl.STOCK)-99, length(taRT.cl.STOCK)]+5);
     
     
     subplot(numPlots,1,3)
@@ -107,19 +127,23 @@ while(true)
     candle(taRT.hi.INDX, taRT.lo.INDX, taRT.cl.INDX, taRT.op.INDX, 'red');
     hold on
     plot(taRT.clAma,'r')
+    xlim(gca, [length(taRT.cl.STOCK)-99, length(taRT.cl.STOCK)+5]);
+    
     
     subplot(numPlots,1,4)
     cla
     bar(taRT.vo.STOCK)
     hold on
     plot(xlim, [mean(taRT.vo.STOCK), mean(taRT.vo.STOCK)])
+    xlim(gca, [length(taRT.cl.STOCK)-99, length(taRT.cl.STOCK)+5]);
+    
     
     subplot(numPlots,1,5)
     cla
     bar(taRT.vo.INDX)
     hold on
     plot(xlim, [mean(taRT.vo.INDX), mean(taRT.vo.INDX)])
-    
+    xlim(gca, [length(taRT.cl.STOCK)-99, length(taRT.cl.STOCK)+5]);
     
     
     pause(1)
