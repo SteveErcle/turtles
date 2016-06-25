@@ -11,6 +11,12 @@ stock = 'TSLA';
 indx = 'SPY';
 exchange = 'NASDAQ';
 
+ibContract.symbol = 'TSLA';
+ibContract.secType = 'STK';
+ibContract.exchange = 'SMART';
+ibContract.primaryExchange = 'NASDAQ';
+ibContract.currency = 'USD';
+
 tf = TurtleFun;
 td = TurtleData;
 taRT = TurtleAutoRealTime;
