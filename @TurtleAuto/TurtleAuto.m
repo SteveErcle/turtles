@@ -57,6 +57,27 @@ classdef TurtleAuto < handle
             
         end
         
+        function  organizeDataIB(obj, ib_stock, ib_indx)
+        
+            td = TurtleData;
+            [daIB, opIB, hiIB, loIB, clIB, voIB] = td.organizeDataIB(ib_stock);
+            obj.hi.STOCK = hiIB;
+            obj.lo.STOCK = loIB;
+            obj.op.STOCK = opIB;
+            obj.cl.STOCK = clIB;
+            obj.vo.STOCK = voIB;
+            obj.da.STOCK = daIB;
+            
+            [daIB, opIB, hiIB, loIB, clIB, voIB] = td.organizeDataIB(ib_indx);
+            obj.hi.INDX = hiIB;
+            obj.lo.INDX = loIB;
+            obj.op.INDX = opIB;
+            obj.cl.INDX = clIB;
+            obj.vo.INDX = voIB;
+            obj.da.INDX = daIB;
+
+        end 
+            
         function checkConditionsUsingInd(obj)
             
             if  obj.nineperma.STOCK(obj.ind) < obj.macdvec.STOCK(obj.ind) %&& obj.nineperma.INDX(obj.ind) < obj.macdvec.INDX(obj.ind)
@@ -177,7 +198,7 @@ classdef TurtleAuto < handle
             end
             
             
-            if strcmp(datestr(obj.da.INDX(obj.ind),15), '16:00')
+            if strcmp(datestr(obj.da.INDX(obj.ind),15), '15:50')
                 obj.condition.Not_End_of_Day = 0;
             else
                 obj.condition.Not_End_of_Day = 1;

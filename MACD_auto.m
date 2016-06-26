@@ -32,8 +32,8 @@ for k = 1:length(allStocks)
         td = TurtleData;
         ta = TurtleAuto;
         
-        ta.slPercentFirst = 0.85;
-        ta.slPercentSecond = 0.45;
+        ta.slPercentFirst = 0.75;
+        ta.slPercentSecond = 0.25;
         
         numPlots = 5;
 
@@ -76,14 +76,13 @@ for k = 1:length(allStocks)
         
         
         if INTRA
-            iAll.STOCK = IntraDayStockData(stock,exchange,'1200','50d');
+            iAll.STOCK = IntraDayStockData(stock,exchange,'600','5d');
             
-            iAll.INDX = IntraDayStockData(indx,exchange,'1200', '50d');
+            iAll.INDX = IntraDayStockData(indx,exchange,'600', '5d');
             
             for i_d = 1:length(iAll.INDX.date)
                 if iAll.STOCK.date(i_d) ~= iAll.INDX.date(i_d)
                     iAll.STOCK.close = [iAll.STOCK.close(1:i_d-1); NaN; iAll.STOCK.close(i_d:end)];
-                    iAll.STOCK.open = [iAll.STOCK.open(1:i_d-1); NaN; iAll.STOCK.open(i_d:end)];
                     iAll.STOCK.high = [iAll.STOCK.high(1:i_d-1); NaN; iAll.STOCK.high(i_d:end)];
                     iAll.STOCK.low = [iAll.STOCK.low(1:i_d-1); NaN; iAll.STOCK.low(i_d:end)];
                     iAll.STOCK.volume = [iAll.STOCK.volume(1:i_d-1); NaN; iAll.STOCK.volume(i_d:end)];

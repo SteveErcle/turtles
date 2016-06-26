@@ -238,6 +238,19 @@ classdef TurtleData
             
         end
         
+        function [da, op, hi, lo, cl, vo, bar_count, weighted_avg_price, gap_flag] = organizeDataIB(obj, ib_data)
+            
+            da = ib_data(:,1);
+            op = ib_data(:,2);
+            hi = ib_data(:,3);
+            lo = ib_data(:,4);
+            cl = ib_data(:,5);
+            vo = ib_data(:,6);
+            bar_count          = ib_data(:,7);
+            weighted_avg_price = ib_data(:,8);
+            gap_flag           = ib_data(:,9);
+            
+        end
         
     end
     
