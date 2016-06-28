@@ -1,57 +1,57 @@
 clc; close all; clear all;
 
-% addpath('\\psf\Home\Documents\turtles\intraData')
-% load('intraTSLA')
-% load('intraSPY')
-% 
-% intraPreStock = ib_intra;
-% 
-% dailyDates = unique(floor(intraSPY(:,1)));
-% intraSTOCK = [];
-% intraINDX = [];
-% 
-% for i = 1:length(dailyDates)
-%     
-%     found = find(floor(intraPreStock(:,1)) == dailyDates(i));
-%     
-%     if ~isempty(found)
-%         intraSTOCK = [intraSTOCK; intraPreStock(found,:)];
-%         
-%         found = find(floor(intraSPY(:,1)) == dailyDates(i));
-%         intraINDX = [intraINDX; intraSPY(found,:)];
-%         
-%     end
-%     
-% end
-% 
-% mean(intraINDX(:,1) == intraSTOCK(:,1))
-% 
-% return
-% 
-% 
-% 
-% load('intraHBAN')
-% datestr(ib_intra(1,1))
-% datestr(ib_intra(end,1))
-% length(ib_intra)
-% 
-% load('intraHYGS')
-% datestr(ib_intra(1,1))
-% datestr(ib_intra(end,1))
-% length(ib_intra)
-% 
-% load('intraINFN')
-% datestr(ib_intra(1,1))
-% datestr(ib_intra(end,1))
-% length(ib_intra)
-% 
-% load('intraTSLA')
-% datestr(ib_intra(1,1))
-% datestr(ib_intra(end,1))
-% length(ib_intra)
-% 
-% 
-% return
+addpath('\\psf\Home\Documents\turtles\intraData')
+load('intraASNA')
+datestr(intraASNA(1,1))
+datestr(intraASNA(end,1))
+length(intraASNA)
+
+load('intraSPY')
+datestr(intraSPY(1,1))
+datestr(intraSPY(end,1))
+length(intraSPY)
+
+
+dailyDates = unique(floor(intraSPY(:,1)))
+intraSTOCK = [];
+
+for i = 1:length(dailyDates)
+    
+    found = find(floor(intraASNA(:,1)) == dailyDates(i))
+    
+    if ~isempty(found)
+        intraSTOCK = [intraSTOCK; intraASNA(found,:)];
+    end
+    
+end
+
+
+return
+
+
+
+load('intraHBAN')
+datestr(ib_intra(1,1))
+datestr(ib_intra(end,1))
+length(ib_intra)
+
+load('intraHYGS')
+datestr(ib_intra(1,1))
+datestr(ib_intra(end,1))
+length(ib_intra)
+
+load('intraINFN')
+datestr(ib_intra(1,1))
+datestr(ib_intra(end,1))
+length(ib_intra)
+
+load('intraTSLA')
+datestr(ib_intra(1,1))
+datestr(ib_intra(end,1))
+length(ib_intra)
+
+
+return
 
 ib = ibtws('',7497);
 
@@ -61,7 +61,7 @@ ibBuiltInErrMsg
 
 load('equalLengthNasDaq');
 stock = equalLengthNasDaq{27};
-stock = 'GOOG';
+stock = 'ASNA';
 
 ibContract = ib.Handle.createContract;
 ibContract.symbol = 'SPY';

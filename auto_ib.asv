@@ -9,10 +9,10 @@ as2 = ['A',num2str(400)];%400
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
 load('equalLengthNasDaq');
-allStocks = equalLengthNasDaq(1);
+allStocks = equalLengthNasDaq;
 
 addpath('\\psf\Home\Documents\turtles\intraData');
-load('intraGOOG');
+load('intraTSLA');
 load('intraSPY');
 
 if PULL == 1
@@ -42,7 +42,7 @@ for k = 1:length(allStocks)
     
     stock = allStocks{k}
     
-%     try
+    try
         
         tf = TurtleFun;
         td = TurtleData;
@@ -88,15 +88,17 @@ for k = 1:length(allStocks)
             
             mean(intraINDX(:,1) == intraSTOCK(:,1))
             ib_stock = intraSTOCK;
-            ib_indx = intraINDX;
+            ib_indx = intraINDX
+            ta.organizeDataIB(intraSTOCK, intraINDX);
         end
         
         isFlip = 0;
-        ta.organizeDataIB(ib_stock, ib_indx);
+        
+        len = length(ta.cl.STOCK)-1;
+        
         ta.calculateData(isFlip);
         
         ta.ind = 50-1;
-        len = length(ta.cl.STOCK)-1;
         
         while ta.ind <= len
             
@@ -134,11 +136,11 @@ for k = 1:length(allStocks)
         
         observePrice = ta.cl.STOCK(end);
         
-%     catch
-%         sL = 0;
-%         sS = 0;
-%         observePrice = 0;
-%     end
+    catch
+        sL = 0;
+        sS = 0;
+        observePrice = 0;
+    end
     
     sList = [sL, sS];
     roiCong = [roiCong; sList, k, observePrice];

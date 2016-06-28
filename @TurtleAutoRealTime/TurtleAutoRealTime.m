@@ -102,7 +102,7 @@ classdef TurtleAutoRealTime < handle
             end
             
             
-            if obj.currentTime > 1556 %strcmp(datestr(obj.da.INDX(obj.ind),15), '16:00')
+            if obj.currentTime >= 1555 %strcmp(datestr(obj.da.INDX(obj.ind),15), '16:00')
                 obj.condition.Not_End_of_Day = 0;
             else
                 obj.condition.Not_End_of_Day = 1;
