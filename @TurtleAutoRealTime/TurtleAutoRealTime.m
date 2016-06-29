@@ -35,6 +35,10 @@ classdef TurtleAutoRealTime < handle
         
         currentTime;
         
+        td = TurtleData;
+        
+        stock;
+        enteredStock;
         
     end
     
@@ -59,6 +63,40 @@ classdef TurtleAutoRealTime < handle
             
             
         end
+        
+        function  organizeDataIB(obj, ib_data, stockOrIndx)
+            
+            if strcmp(stockOrIndx,'stock')
+                
+                [daIB, opIB, hiIB, loIB, clIB, voIB] = obj.td.organizeDataIB(ib_data);
+                obj.hi.STOCK = hiIB;
+                obj.lo.STOCK = loIB;
+                obj.op.STOCK = opIB;
+                obj.cl.STOCK = clIB;
+                obj.vo.STOCK = voIB;
+                obj.da.STOCK = daIB;
+                
+            elseif strcmp(stockOrIndx,'indx')
+                [daIB, opIB, hiIB, loIB, clIB, voIB] = obj.td.organizeDataIB(ib_data);
+                obj.hi.INDX = hiIB;
+                obj.lo.INDX = loIB;
+                obj.op.INDX = opIB;
+                obj.cl.INDX = clIB;
+                obj.vo.INDX = voIB;
+                obj.da.INDX = daIB;
+                
+            else
+                disp('Second argument must be string "stock" or "indx"')
+                
+            end
+            
+        end
+        
+        function setStock(obj, stock)
+            
+            obj.stock = stock;
+            
+        end 
         
         function checkConditions(obj)
 
@@ -194,6 +232,7 @@ classdef TurtleAutoRealTime < handle
                     end
                     
                     obj.enterMarket.BULL = 1;
+                    obj.enteredStock = obj.stock;
 %                     obj.tradeLen.BULL = length(obj.cl.STOCK) - obj.trades.BULL(end,3) + 1;
                     
                 end
@@ -253,6 +292,7 @@ classdef TurtleAutoRealTime < handle
                     end
                     
                     obj.enterMarket.BEAR = 1;
+                    obj.enteredStock = obj.stock;
 %                     obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
                     
                 end

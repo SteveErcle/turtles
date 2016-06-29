@@ -103,7 +103,7 @@ classdef TurtleCall < handle
                     
             end
             
-            obj.data
+            obj.data;
             
         end
         

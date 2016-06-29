@@ -2,14 +2,14 @@
 
 clc; close all; clear all;
 
-PULL = 0;
+PULL = 1;
 
 as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-load('equalLengthNasDaq');
-allStocks = equalLengthNasDaq(1);
+% load('equalLengthNasDaq');
+% allStocks = equalLengthNasDaq;
 
 addpath('\\psf\Home\Documents\turtles\intraData');
 load('intraGOOG');
@@ -41,8 +41,9 @@ trackTrades = [];
 for k = 1:length(allStocks)
     
     stock = allStocks{k}
+    k
     
-%     try
+    try
         
         tf = TurtleFun;
         td = TurtleData;
@@ -134,11 +135,11 @@ for k = 1:length(allStocks)
         
         observePrice = ta.cl.STOCK(end);
         
-%     catch
-%         sL = 0;
-%         sS = 0;
-%         observePrice = 0;
-%     end
+    catch
+        sL = 0;
+        sS = 0;
+        observePrice = 0;
+    end
     
     sList = [sL, sS];
     roiCong = [roiCong; sList, k, observePrice];

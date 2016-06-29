@@ -31,7 +31,9 @@ classdef TurtleAuto < handle
         clSma; clAma; clRma;
         clSmaLarge; clAmaLarge; clRmaLarge;
         
-        savedStops
+        stock;
+        enteredStock;
+        
         
     end
     
@@ -78,6 +80,12 @@ classdef TurtleAuto < handle
 
         end 
             
+        function setStock(obj, stock)
+            
+            obj.stock = stock;
+            
+        end
+        
         function checkConditionsUsingInd(obj)
             
             if  obj.nineperma.STOCK(obj.ind) < obj.macdvec.STOCK(obj.ind) %&& obj.nineperma.INDX(obj.ind) < obj.macdvec.INDX(obj.ind)
@@ -160,9 +168,9 @@ classdef TurtleAuto < handle
             
             if (obj.enterMarket.BULL == 1 || obj.enterMarket.BEAR) || ...
                     (((obj.vo.STOCK(obj.ind) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK))) ||...
-                    obj.vo.STOCK(obj.ind-1) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK)))))...
-                    && ((obj.vo.INDX(obj.ind) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))) ||...
-                    obj.vo.INDX(obj.ind-1) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))))))
+                    obj.vo.STOCK(obj.ind-1) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK))))))%...
+                    %&& ((obj.vo.INDX(obj.ind) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))) ||...
+                    %obj.vo.INDX(obj.ind-1) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))))))
                 
                 %ADDED INDX TRACKING TO VOLUME
                 
@@ -303,6 +311,7 @@ classdef TurtleAuto < handle
                     end
                     
                     obj.enterMarket.BULL = 1;
+                    obj.enteredStock = obj.stock;
                     %obj.tradeLen.BULL = obj.tradeLen.BULL + 1;
 %                     obj.tradeLen.BULL = length(obj.cl.STOCK) - obj.trades.BULL(end,3) + 1;
                     %%% CHANGED TRADELEN TRACKING
@@ -335,6 +344,10 @@ classdef TurtleAuto < handle
                 obj.tradeLen.BULL = 0;
                 obj.stopLoss.BULL = NaN;
                 
+                 if ~obj.enterMarket.BEAR && ~obj.enterMarket.BULL
+                    obj.enteredStock = [];
+                end 
+                
             end
             
         end
@@ -364,6 +377,7 @@ classdef TurtleAuto < handle
                     end
                     
                     obj.enterMarket.BEAR = 1;
+                    obj.enteredStock = obj.stock;
                     %obj.tradeLen.BEAR = obj.tradeLen.BEAR + 1;
 %                    obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
                     
@@ -394,6 +408,10 @@ classdef TurtleAuto < handle
                 obj.enterPrice.BEAR = NaN;
                 obj.tradeLen.BEAR = 0;
                 obj.stopLoss.BEAR = NaN;
+                
+                if ~obj.enterMarket.BEAR && ~obj.enterMarket.BULL
+                    obj.enteredStock = [];
+                end 
                 
             end
             
