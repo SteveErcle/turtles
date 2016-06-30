@@ -254,7 +254,7 @@ classdef TurtleData
         
         function ten = genTen(obj, ten, data, i, tenTimes)
             
-            datestr(data(i,1),15)
+            datestr(data(i,1),15);
             [da, op, hi, lo, cl, vo] = obj.organizeDataIB(data(i,:));
             
             if hi > ten.Hi || isnan(ten.Hi)
@@ -266,17 +266,18 @@ classdef TurtleData
             end
             
             currentTime = datestr(da,15);
-            if sum(str2double(currentTime(1,[1:2,4:5])) == tenTimes)
-                ten.data = [ten.data; nan,nan,nan,nan];
+            currentTime = str2double(currentTime(1,[1:2,4:5]));
+            if sum(currentTime == tenTimes)
+                ten.data = [ten.data; currentTime, nan,nan,nan,nan,nan];
                 ten.Op = op;
             end
             
             ten.Cl = cl;
             ten.Vo = ten.Vo + vo;
             
-            ten.data(end,:) = [ten.Op, ten.Hi, ten.Lo, ten.Cl]
+            ten.data(end,:) = [ten.data(end,1), ten.Op, ten.Hi, ten.Lo, ten.Cl, ten.Vo];
             
-            if sum(str2double(currentTime(1,[1:2,4:5])) == tenTimes+9)
+            if sum(currentTime == tenTimes+9)
                 ten.Hi = nan;
                 ten.Lo = nan;
                 ten.Op = nan;

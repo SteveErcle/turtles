@@ -21,8 +21,8 @@ classdef TurtleAutoRealTime < handle
         stopLoss;
         trades;
         
-        slPercentFirst;
-        slPercentSecond;
+        slPercentFirst = 0.75;
+        slPercentSecond = 0.25;
         
         tAnalyze = TurtleAnalyzer;
         
@@ -65,6 +65,11 @@ classdef TurtleAutoRealTime < handle
         end
         
         function  organizeDataIB(obj, ib_data, stockOrIndx)
+            
+            if size(ib_data,2) == 6
+                nanPad = nan(size(ib_data,1),3);
+                ib_data(:,7:9) = nanPad;
+            end 
             
             if strcmp(stockOrIndx,'stock')
                 
@@ -127,20 +132,20 @@ classdef TurtleAutoRealTime < handle
             end
             
            
-            if obj.cl.STOCK(end-1) > obj.clSma(end-1) %&& obj.cl.INDX(end-1) > obj.clAma(end-1)
+            if obj.cl.STOCK(end-1) > obj.clSma(end-1) && obj.cl.INDX(end-1) > obj.clAma(end-1)
                 obj.condition.Above_MA.BULL = 1;
             else
                 obj.condition.Above_MA.BULL = 0;
             end
             
-            if obj.cl.STOCK(end-1) < obj.clSma(end-1) %&& obj.cl.INDX(end-1) < obj.clAma(end-1)
+            if obj.cl.STOCK(end-1) < obj.clSma(end-1) && obj.cl.INDX(end-1) < obj.clAma(end-1)
                 obj.condition.Below_MA.BEAR = 1;
             else
                 obj.condition.Below_MA.BEAR = 0;
             end
             
             
-            if obj.currentTime >= 1555 %strcmp(datestr(obj.da.INDX(obj.ind),15), '16:00')
+            if obj.currentTime >= 1550 %strcmp(datestr(obj.da.INDX(obj.ind),15), '16:00')
                 obj.condition.Not_End_of_Day = 0;
             else
                 obj.condition.Not_End_of_Day = 1;
@@ -166,11 +171,16 @@ classdef TurtleAutoRealTime < handle
         
         function calculateData(obj, isFlip)
             
-             [obj.clSma, obj.clAma, obj.clRma] = obj.tAnalyze.getMovingStandard(obj.cl.STOCK, obj.cl.INDX, 12, isFlip);
-             %%%%%% TRY ENTER IN ON 26 AND EXIT ON 12
-             
-             obj.currentTime = datestr(now,15); obj.currentTime(3) = [];
-  
+            [obj.clSma, obj.clAma, obj.clRma] = obj.tAnalyze.getMovingStandard(obj.cl.STOCK, obj.cl.INDX, 12, isFlip);
+            %%%%%% TRY ENTER IN ON 26 AND EXIT ON 12
+            
+            
+            
+            % NOT USING REAL CURRENT TIME
+            %             obj.currentTime = datestr(now,15); obj.currentTime(3) = [];
+            %             obj.currentTime = str2double(obj.currentTime);
+            obj.currentTime = obj.da.STOCK(end);
+            
         end
         
         function setStopLoss(obj)
@@ -263,6 +273,10 @@ classdef TurtleAutoRealTime < handle
                 obj.enterPrice.BULL = NaN;
                 obj.tradeLen.BULL = 0;
                 obj.stopLoss.BULL = NaN;
+                 
+                 if ~obj.enterMarket.BULL && ~obj.enterMarket.BEAR
+                    obj.enteredStock = [];
+                end 
                 
             end
             
@@ -322,6 +336,10 @@ classdef TurtleAutoRealTime < handle
                 obj.enterPrice.BEAR = NaN;
                 obj.tradeLen.BEAR = 0;
                 obj.stopLoss.BEAR = NaN;
+                
+                if ~obj.enterMarket.BEAR && ~obj.enterMarket.BULL
+                    obj.enteredStock = [];
+                end
                 
             end
             

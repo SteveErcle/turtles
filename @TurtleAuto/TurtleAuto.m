@@ -21,7 +21,7 @@ classdef TurtleAuto < handle
         stopLoss;
         trades;
         
-        slPercentFirst; slPercentSecond;
+        slPercentFirst = 0.75; slPercentSecond = 0.25;
         
         tAnalyze = TurtleAnalyzer;
         
