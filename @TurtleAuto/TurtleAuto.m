@@ -193,7 +193,7 @@ classdef TurtleAuto < handle
             end
             
             
-            if obj.cl.STOCK(obj.ind) > obj.clSma(obj.ind) &&  obj.cl.INDX(obj.ind) > obj.clAma(obj.ind)
+            if obj.cl.STOCK(obj.ind) > obj.clSma(obj.ind) && obj.cl.INDX(obj.ind) > obj.clAma(obj.ind)
                 obj.condition.Above_MA.BULL = 1;
             else
                 obj.condition.Above_MA.BULL = 0;

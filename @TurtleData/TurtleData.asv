@@ -3,7 +3,16 @@ classdef TurtleData
     properties
         
     end
-        
+    
+    properties (Access = private)
+        tenHi = nan;
+        tenLo = nan;
+        tenOp = nan;
+        tenCl = nan;
+        tenVo = 0;
+        tenly = [];
+    end 
+    
     methods
         
         function [mAll, mCong, wAll, wCong, dAll, dCong, iAll] = getData(obj, stock, past, simulateFrom, simulateTo)
@@ -252,36 +261,36 @@ classdef TurtleData
             
         end
         
-        function ten = genTen(obj, ten, data, i, tenTimes)
+        function genTen(obj, data, i)
             
             datestr(data(i,1),15)
             [da, op, hi, lo, cl, vo] = obj.organizeDataIB(data(i,:));
             
-            if hi > ten.Hi || isnan(ten.Hi)
-                ten.Hi = hi;
+            if hi > obj.tenHi || isnan(obj.tenHi)
+                obj.tenHi = hi;
             end
             
-            if lo < ten.Lo || isnan(ten.Lo)
-                ten.Lo = lo;
+            if lo < obj.tenLo || isnan(obj.tenLo)
+                obj.tenLo = lo;
             end
             
             currentTime = datestr(da,15);
             if sum(str2double(currentTime(1,[1:2,4:5])) == tenTimes)
-                ten.data = [ten.data; nan,nan,nan,nan];
-                ten.Op = op;
+                obj.tenly = [obj.tenly; nan,nan,nan,nan];
+                obj.tenOp = op;
             end
             
-            ten.Cl = cl;
-            ten.Vo = ten.Vo + vo;
+            obj.tenCl = cl;
+            obj.tenVo = obj.tenVo + vo;
             
-            ten.data(end,:) = [ten.Op, ten.Hi, ten.Lo, ten.Cl]
+            tenly(end,:) = [tenOp, tenHi, tenLo, tenCl]
             
             if sum(str2double(currentTime(1,[1:2,4:5])) == tenTimes+9)
-                ten.Hi = nan;
-                ten.Lo = nan;
-                ten.Op = nan;
-                ten.Cl = nan;
-                ten.Vo = 0;
+                tenHi = nan;
+                tenLo = nan;
+                tenOp = nan;
+                tenCl = nan;
+                tenVo = 0;
             end
         end 
         

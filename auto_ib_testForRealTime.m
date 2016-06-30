@@ -1,7 +1,5 @@
 % auto_ib_testForRealTime
 
-% auto_ib
-
 clc; close all; clear all;
 
 
@@ -24,8 +22,9 @@ ibContract.currency = 'USD';
 
 ibContract.symbol = 'SPY';
 
-startDate = datenum('06/20');
-endDate   = datenum('06/24');
+load('weeklyDates')
+startDate = weeklyDates(end-4)-4;%datenum('06/20');
+endDate   = weeklyDates(end-4)
 
 data.SPY = timeseries(ib, ibContract, startDate, endDate, '10 mins' , '', true);
 if ~isnumeric(data.SPY(1))
@@ -48,6 +47,7 @@ for k = 1:length(allStocks)
     
 end
 
+ta = TurtleAuto;
 len = size(data.SPY,1)-1;
 ta.ind = 50-1;
 
