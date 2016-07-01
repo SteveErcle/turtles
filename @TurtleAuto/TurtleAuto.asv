@@ -1,4 +1,4 @@
-classdef TurtleAutoRealTime < handle
+classdef TurtleAuto < handle
     
     
     properties
@@ -21,35 +21,25 @@ classdef TurtleAutoRealTime < handle
         stopLoss;
         trades;
         
-        slPercentFirst = 0.75;
-        slPercentSecond = 0.25;
+        slPercentFirst = 0.75; slPercentSecond = 0.25;
         
         tAnalyze = TurtleAnalyzer;
         
         rsi;
         vwap;
         
-        clSma;
-        clAma;
-        clRma;
-        
-        currentTime;
-        lastTradeTime = nan;
-        
-        td = TurtleData;
+        clSma; clAma; clRma;
+        clSmaLarge; clAmaLarge; clRmaLarge;
         
         stock;
         enteredStock;
         
-        cross_MA; cross_MA_prev;
-       
-        voAvg;
         
     end
     
     methods
         
-        function obj = TurtleAutoRealTime()
+        function obj = TurtleAuto()
             
             obj.stopLoss.BULL = NaN;
             obj.tradeLen.BULL = 0;
@@ -57,7 +47,6 @@ classdef TurtleAutoRealTime < handle
             obj.enterMarket.BULL = 0;
             obj.trades.BULL = [];
             obj.condition.Trying_to_Enter.BULL = 0;
-            obj.cross_MA.BULL = nan;
             
             
             obj.stopLoss.BEAR = NaN;
@@ -66,59 +55,113 @@ classdef TurtleAutoRealTime < handle
             obj.enterMarket.BEAR = 0;
             obj.trades.BEAR = [];
             obj.condition.Trying_to_Enter.BEAR = 0;
-            obj.cross_MA.BEAR = nan;
             
             
         end
         
-        function  organizeDataIB(obj, ib_data, stockOrIndx)
+        function  organizeDataIB(obj, ib_stock, ib_indx)
+        
+            td = TurtleData;
+            [daIB, opIB, hiIB, loIB, clIB, voIB] = td.organizeDataIB(ib_stock);
+            obj.hi.STOCK = hiIB;
+            obj.lo.STOCK = loIB;
+            obj.op.STOCK = opIB;
+            obj.cl.STOCK = clIB;
+            obj.vo.STOCK = voIB;
+            obj.da.STOCK = daIB;
             
-            if size(ib_data,2) == 6
-                nanPad = nan(size(ib_data,1),3);
-                ib_data(:,7:9) = nanPad;
-            end 
-            
-            if strcmp(stockOrIndx,'stock')
-                
-                [daIB, opIB, hiIB, loIB, clIB, voIB] = obj.td.organizeDataIB(ib_data);
-                obj.hi.STOCK = hiIB;
-                obj.lo.STOCK = loIB;
-                obj.op.STOCK = opIB;
-                obj.cl.STOCK = clIB;
-                obj.vo.STOCK = voIB;
-                obj.da.STOCK = daIB;
-                
-            elseif strcmp(stockOrIndx,'indx')
-                [daIB, opIB, hiIB, loIB, clIB, voIB] = obj.td.organizeDataIB(ib_data);
-                obj.hi.INDX = hiIB;
-                obj.lo.INDX = loIB;
-                obj.op.INDX = opIB;
-                obj.cl.INDX = clIB;
-                obj.vo.INDX = voIB;
-                obj.da.INDX = daIB;
-                
-            else
-                disp('Second argument must be string "stock" or "indx"')
-                
-            end
-            
-        end
+            [daIB, opIB, hiIB, loIB, clIB, voIB] = td.organizeDataIB(ib_indx);
+            obj.hi.INDX = hiIB;
+            obj.lo.INDX = loIB;
+            obj.op.INDX = opIB;
+            obj.cl.INDX = clIB;
+            obj.vo.INDX = voIB;
+            obj.da.INDX = daIB;
+
+        end 
+        
+        function organizeDataGoog(ob
         
         function setStock(obj, stock)
             
             obj.stock = stock;
             
-        end 
+        end
         
-        function checkConditions(obj)
-
-            if obj.cl.STOCK(end) <= obj.stopLoss.BULL
+        function checkConditionsUsingInd(obj)
+            
+            if  obj.nineperma.STOCK(obj.ind) < obj.macdvec.STOCK(obj.ind) %&& obj.nineperma.INDX(obj.ind) < obj.macdvec.INDX(obj.ind)
+                obj.condition.MACD_bull_cross = 1;
+            else
+                obj.condition.MACD_bull_cross = 0;
+            end
+            
+            if  obj.nineperma.STOCK(obj.ind) > obj.macdvec.STOCK(obj.ind) %&& obj.nineperma.INDX(obj.ind) > obj.macdvec.INDX(obj.ind)
+                obj.condition.MACD_bear_cross = 1;
+            else
+                obj.condition.MACD_bear_cross = 0;
+            end
+            
+            
+            if obj.enterMarket.BULL == 1 || sign(obj.macdvec.STOCK(obj.ind)) == sign(obj.macdvec.INDX(obj.ind))
+                obj.condition.MACD_Positive.BULL = 1;
+            else
+                obj.condition.MACD_Positive.BULL = 0;
+            end
+            
+            if obj.enterMarket.BEAR == 1 || sign(obj.macdvec.STOCK(obj.ind)) == sign(obj.macdvec.INDX(obj.ind))
+                obj.condition.MACD_Negative.BEAR = 1;
+            else
+                obj.condition.MACD_Negative.BEAR = 0;
+            end
+            
+            
+            if obj.RSIderv(obj.ind) > 0
+                obj.condition.RSI_to_indx.BULL = 1;
+            else
+                obj.condition.RSI_to_indx.BULL = 0;
+            end
+            
+            if obj.RSIderv(obj.ind) < 0
+                obj.condition.RSI_to_indx.BEAR = 1;
+            else
+                obj.condition.RSI_to_indx.BEAR = 0;
+            end
+            
+            
+            if obj.enterMarket.BULL == 1 || obj.rsi.STOCK(obj.ind) <= 50
+                obj.condition.RSI_to_stock.BULL = 1;
+            else
+                obj.condition.RSI_to_stock.BULL = 0;
+            end
+            
+            if obj.enterMarket.BEAR == 1 || obj.rsi.STOCK(obj.ind) >= 50
+                obj.condition.RSI_to_stock.BEAR = 1;
+            else
+                obj.condition.RSI_to_stock.BEAR = 0;
+            end
+            
+            
+            if obj.B.STOCK(obj.ind) >= 0.000 && obj.B.INDX(obj.ind) >= 0.005
+                obj.condition.MACD_bull_derv = 1;
+            else
+                obj.condition.MACD_bull_derv = 0;
+            end
+            
+            if obj.B.STOCK(obj.ind) <= -0.000 && obj.B.INDX(obj.ind) <= -0.005
+                obj.condition.MACD_bear_derv = 1;
+            else
+                obj.condition.MACD_bear_derv = 0;
+            end
+            
+            
+            if obj.lo.STOCK(obj.ind) <= obj.stopLoss.BULL
                 obj.condition.Not_Stopped_Out.BULL = 0;
             else
                 obj.condition.Not_Stopped_Out.BULL = 1;
             end
             
-            if obj.cl.STOCK(end) >= obj.stopLoss.BEAR
+            if obj.hi.STOCK(obj.ind) >= obj.stopLoss.BEAR
                 obj.condition.Not_Stopped_Out.BEAR = 0;
             else
                 obj.condition.Not_Stopped_Out.BEAR = 1;
@@ -126,13 +169,10 @@ classdef TurtleAutoRealTime < handle
             
             
             if (obj.enterMarket.BULL == 1 || obj.enterMarket.BEAR) || ...
-                    obj.vo.STOCK(end-1) > obj.voAvg ||...
-                    obj.vo.STOCK(end-2) > obj.voAvg
-                
-%                 obj.vo.STOCK(end) > obj.voAvg ||...
-            
-                % && ((obj.vo.INDX(end-1) > mean(obj.vo.INDX(~isnan(obj.vo.INDX(1:end-1)))) ||...
-                % obj.vo.INDX(end-2) > mean(obj.vo.INDX(~isnan(obj.vo.INDX(1:end-1)))))))
+                    (((obj.vo.STOCK(obj.ind) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK))) ||...
+                    obj.vo.STOCK(obj.ind-1) > mean(obj.vo.STOCK(~isnan(obj.vo.STOCK))))))%...
+                    %&& ((obj.vo.INDX(obj.ind) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))) ||...
+                    %obj.vo.INDX(obj.ind-1) > mean(obj.vo.INDX(~isnan(obj.vo.INDX))))))
                 
                 %ADDED INDX TRACKING TO VOLUME
                 
@@ -141,45 +181,50 @@ classdef TurtleAutoRealTime < handle
                 obj.condition.Large_Volume = 0;
             end
             
-           
-            if obj.cl.STOCK(end-1) > obj.clSma(end-1) && obj.cl.INDX(end-1) > obj.clAma(end-1)
+            
+            if obj.enterMarket.BULL == 1 || obj.cl.STOCK(obj.ind) < obj.vwap(end)
+                obj.condition.vwap.BULL = 1;
+            else
+                obj.condition.vwap.BULL = 0;
+            end
+            
+            if obj.enterMarket.BEAR == 1 || obj.cl.STOCK(obj.ind) > obj.vwap(end)
+                obj.condition.vwap.BEAR = 1;
+            else
+                obj.condition.vwap.BEAR = 0;
+            end
+            
+            
+            if obj.cl.STOCK(obj.ind) > obj.clSma(obj.ind) && obj.cl.INDX(obj.ind) > obj.clAma(obj.ind)
                 obj.condition.Above_MA.BULL = 1;
             else
                 obj.condition.Above_MA.BULL = 0;
             end
             
-            if obj.cl.STOCK(end-1) < obj.clSma(end-1) && obj.cl.INDX(end-1) < obj.clAma(end-1)
+            if obj.cl.STOCK(obj.ind) < obj.clSma(obj.ind) && obj.cl.INDX(obj.ind) < obj.clAma(obj.ind)
                 obj.condition.Below_MA.BEAR = 1;
             else
                 obj.condition.Below_MA.BEAR = 0;
             end
             
             
-            if obj.currentTime >= 1550 %strcmp(datestr(obj.da.INDX(obj.ind),15), '16:00')
+            if strcmp(datestr(obj.da.INDX(obj.ind),15), '15:50')
                 obj.condition.Not_End_of_Day = 0;
             else
                 obj.condition.Not_End_of_Day = 1;
             end
             
-            %VERIFY THAT END OF DAY CONDITION IS WORKING 
             
-            
-            if obj.enterMarket.BULL || (obj.condition.Trying_to_Enter.BULL == 1 && obj.cross_MA.BULL && ~obj.cross_MA_prev.BULL) %obj.cl.STOCK(end) <= obj.clSma(end-1))
+            if obj.enterMarket.BULL || (obj.condition.Trying_to_Enter.BULL == 1 && obj.lo.STOCK(obj.ind) <= obj.clSma(obj.ind-1))
                 obj.condition.Allowed_to_Enter.BULL = 1;
             else
                 obj.condition.Allowed_to_Enter.BULL = 0;
             end
             
-            if obj.enterMarket.BEAR || (obj.condition.Trying_to_Enter.BEAR == 1 && obj.cross_MA.BEAR && ~obj.cross_MA_prev.BEAR) %obj.cl.STOCK(end) >= obj.clSma(end-1))
+            if obj.enterMarket.BEAR || (obj.condition.Trying_to_Enter.BEAR == 1 && obj.hi.STOCK(obj.ind) >= obj.clSma(obj.ind-1))
                 obj.condition.Allowed_to_Enter.BEAR = 1;
             else
                 obj.condition.Allowed_to_Enter.BEAR = 0;
-            end
-            
-            if  obj.lastTradeTime ~= obj.currentTime
-                obj.condition.Not_Same_Candle_Trade = 1;
-            else
-                obj.condition.Not_Same_Candle_Trade = 0;
             end
             
             
@@ -187,45 +232,36 @@ classdef TurtleAutoRealTime < handle
         
         function calculateData(obj, isFlip)
             
+            [obj.macdvec.STOCK, obj.nineperma.STOCK] = macd(obj.cl.STOCK);
+            [obj.macdvec.INDX, obj.nineperma.INDX] = macd(obj.cl.INDX);
+            
             [obj.clSma, obj.clAma, obj.clRma] = obj.tAnalyze.getMovingStandard(obj.cl.STOCK, obj.cl.INDX, 12, isFlip);
+            
             %%%%%% TRY ENTER IN ON 26 AND EXIT ON 12
             
-            obj.voAvg = mean(obj.vo.STOCK(~isnan(obj.vo.STOCK(1:end-1))));  
+            obj.RSIderv = [NaN; diff(obj.clRma)];
             
-            % NOT USING REAL CURRENT TIME
-            %             obj.currentTime = datestr(now,15); obj.currentTime(3) = [];
-            %             obj.currentTime = str2double(obj.currentTime);
-            obj.currentTime = obj.da.STOCK(end);
+            obj.B.STOCK = [NaN; diff(obj.macdvec.STOCK)];
+            obj.B.INDX  = [NaN; diff(obj.macdvec.INDX)];
             
-            obj.cross_MA_prev.lo.BULL = obj.cross_MA.BULL;
-            obj.cross_MA_prev.BEAR = obj.cross_MA.BEAR;
+            obj.rsi.STOCK = rsindex(obj.cl.STOCK);
             
-            if obj.cl.STOCK(end) >= obj.clSma(end-1)
-                obj.cross_MA.cl.BULL = 1;
-            else
-                obj.cross_MA.cl.BULL = 0;
-            end
-            
-             if obj.cl.STOCK(end) <= obj.clSma(end-1)
-                obj.cross_MA.cl.BEAR = 1;
-            else
-                obj.cross_MA.cl.BEAR = 0;
-            end
-            
+            obj.vwap = getVWAP(obj.cl.STOCK, obj.vo.STOCK, obj.da.STOCK);
             
         end
         
         function setStopLoss(obj)
             
-            %NEEDS TO CHECK THE EXTREME OF THE ENTER CANDLE
             
+            %NEEDS TO CHECK THE EXTREME OF THE ENTER CANDLE
             if obj.enterMarket.BULL == 1
                 obj.tradeLen.BULL = length(obj.cl.STOCK) - obj.trades.BULL(end,3) + 1;
-            end
+            end 
             
             if obj.enterMarket.BEAR == 1
                 obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
             end
+            
             
             
             if obj.tradeLen.BULL <= 1
@@ -238,6 +274,7 @@ classdef TurtleAutoRealTime < handle
                     obj.stopLoss.BULL = obj.lo.STOCK(end-2);
                 end
             end
+            
             
             if obj.tradeLen.BEAR <= 1
                 obj.stopLoss.BEAR = obj.enterPrice.BEAR*(1.00+obj.slPercentFirst/100);
@@ -256,22 +293,30 @@ classdef TurtleAutoRealTime < handle
             if obj.condition.Not_Stopped_Out.BULL...
                     && obj.condition.Large_Volume...
                     && obj.condition.Not_End_of_Day...
-                    && obj.condition.Not_Same_Candle_Trade...
                     && obj.condition.Above_MA.BULL...
-                    
+                    %&& obj.condition.MACD_bull_cross...
+                %&& obj.condition.MACD_bull_derv...
+                %&& obj.condition.MACD_Positive.BULL...
+                %obj.condition.RSI_to_indx.BULL...
+                %&& obj.condition.RSI_to_stock.BULL...
+                %&& obj.condition.vwap.BULL...
+                
                 obj.condition.Trying_to_Enter.BULL = 1;
                 
                 if obj.condition.Allowed_to_Enter.BULL == 1
                     
                     if obj.enterMarket.BULL == 0
-                        obj.enterPrice.BULL = obj.cl.STOCK(end);
+                        obj.enterPrice.BULL = obj.clSma(obj.ind-1); %obj.cl.STOCK(end);
                         obj.trades.BULL = [obj.trades.BULL; obj.enterPrice.BULL, NaN, length(obj.cl.STOCK), NaN];
+                        obj.ind = obj.ind-1;
+%                         obj.savedStops = [obj.savedStops; obj.ind, obj.enterPrice.BULL*(1.00-obj.slPercent/100)];
                     end
                     
                     obj.enterMarket.BULL = 1;
                     obj.enteredStock = obj.stock;
+                    %obj.tradeLen.BULL = obj.tradeLen.BULL + 1;
 %                     obj.tradeLen.BULL = length(obj.cl.STOCK) - obj.trades.BULL(end,3) + 1;
-                    
+                    %%% CHANGED TRADELEN TRACKING
                 end
                 
             else
@@ -291,7 +336,6 @@ classdef TurtleAutoRealTime < handle
                     end
                     
                     obj.trades.BULL(end,4) = length(obj.cl.STOCK);
-                    obj.lastTradeTime = obj.currentTime;
                     
                     %obj.ind = obj.ind-1;
                     %%% ^^ DOES THIS ADD FUTUE KNOWLEDGE? ^^
@@ -301,8 +345,8 @@ classdef TurtleAutoRealTime < handle
                 obj.enterPrice.BULL = NaN;
                 obj.tradeLen.BULL = 0;
                 obj.stopLoss.BULL = NaN;
-                 
-                 if ~obj.enterMarket.BULL && ~obj.enterMarket.BEAR
+                
+                 if ~obj.enterMarket.BEAR && ~obj.enterMarket.BULL
                     obj.enteredStock = [];
                 end 
                 
@@ -315,22 +359,29 @@ classdef TurtleAutoRealTime < handle
             if obj.condition.Not_Stopped_Out.BEAR...
                     && obj.condition.Large_Volume...
                     && obj.condition.Not_End_of_Day...
-                    && obj.condition.Not_Same_Candle_Trade...
                     && obj.condition.Below_MA.BEAR...
-               
+                    %&& obj.condition.MACD_bear_cross...
+                %&& obj.condition.MACD_bear_derv...
+                %&& obj.condition.MACD_Negative.BEAR
+                %&& obj.condition.RSI_to_indx.BEAR...
+                %&& obj.condition.RSI_to_stock.BEAR...
+                %&& obj.condition.vwap.BEAR...
+                
                 obj.condition.Trying_to_Enter.BEAR = 1;
                 
                 if obj.condition.Allowed_to_Enter.BEAR == 1
                     
                     
                     if obj.enterMarket.BEAR == 0
-                        obj.enterPrice.BEAR = obj.cl.STOCK(end);
+                        obj.enterPrice.BEAR = obj.clSma(obj.ind-1); %obj.cl.STOCK(end);
                         obj.trades.BEAR = [obj.trades.BEAR; obj.enterPrice.BEAR, NaN, length(obj.cl.STOCK), NaN];
+                        obj.ind = obj.ind-1;
                     end
                     
                     obj.enterMarket.BEAR = 1;
                     obj.enteredStock = obj.stock;
-%                     obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
+                    %obj.tradeLen.BEAR = obj.tradeLen.BEAR + 1;
+%                    obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
                     
                 end
                 
@@ -351,7 +402,6 @@ classdef TurtleAutoRealTime < handle
                     end
                     
                     obj.trades.BEAR(end,4) = length(obj.cl.STOCK);
-                    obj.lastTradeTime = obj.currentTime;
                     
                     %                     obj.ind = obj.ind-1;
                 end
@@ -363,7 +413,7 @@ classdef TurtleAutoRealTime < handle
                 
                 if ~obj.enterMarket.BEAR && ~obj.enterMarket.BULL
                     obj.enteredStock = [];
-                end
+                end 
                 
             end
             
