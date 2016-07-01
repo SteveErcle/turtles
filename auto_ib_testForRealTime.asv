@@ -1,18 +1,13 @@
 % auto_ib_testForRealTime
-try
-    close(ib)
-catch
-end
 
 clc; close all; clear all;
 
-WATCH = 0;
 
 as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
-[~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
+[~,allStocks] = xlsread('allStocks', [as1, ':', as2]);
 
-allStocks = allStocks([45]);
+allStocks = allStocks([:]);
 % allStocks = {'HALO'};
 
 delete(watchConditions);
@@ -42,7 +37,7 @@ data.SPY = timeseries(ib, ibContract, startDate, endDate, '10 mins' , '', true);
 if ~isnumeric(data.SPY(1))
     disp('Service Error')
     return
-end
+end 
 
 for k = 1:length(allStocks)
     
@@ -71,9 +66,9 @@ while ta.ind <= len
     range = 1:ta.ind;
     
     disp(ta.ind)
- 
+    
     for k = 1:length(allStocks)
-        
+
         if ta.enterMarket.BULL || ta.enterMarket.BEAR
             stock = ta.enteredStock
         else
@@ -94,96 +89,84 @@ while ta.ind <= len
             break
         end
         
-        disp(ta.ind)
-        
     end
     
     
-        conditions = [ta.condition.Not_Stopped_Out.BULL,...
-            ta.condition.Large_Volume,...
-            ta.condition.Not_End_of_Day,...
-            ta.condition.Above_MA.BULL,...
-            ta.condition.Below_MA.BEAR,...
-            ta.condition.Trying_to_Enter.BULL,...
-            ta.condition.Trying_to_Enter.BEAR];
+    conditions = [ta.condition.Not_Stopped_Out.BULL,...
+        ta.condition.Large_Volume,...
+        ta.condition.Not_End_of_Day,...
+        ta.condition.Above_MA.BULL,...
+        ta.condition.Below_MA.BEAR,...
+        ta.condition.Trying_to_Enter.BULL,...
+        ta.condition.Trying_to_Enter.BEAR];
     
-        set(handles.enterMarketBull, 'String', num2str(ta.enterMarket.BULL))
-        set(handles.enterMarketBear, 'String', num2str(ta.enterMarket.BEAR))
-        set(handles.stopLossBull, 'String', num2str(ta.stopLoss.BULL))
-        set(handles.stopLossBear, 'String', num2str(ta.stopLoss.BEAR))
-        set(handles.conditions, 'String', num2str(conditions))
-        set(handles.index, 'String', num2str(i))
+    set(handles.enterMarketBull, 'String', num2str(ta.enterMarket.BULL))
+    set(handles.enterMarketBear, 'String', num2str(ta.enterMarket.BEAR))
+    set(handles.stopLossBull, 'String', num2str(ta.stopLoss.BULL))
+    set(handles.stopLossBear, 'String', num2str(ta.stopLoss.BEAR))
+    set(handles.conditions, 'String', num2str(conditions))
+    set(handles.index, 'String', num2str(i))
+
     
-    
-            if ta.condition.Trying_to_Enter.BULL || ta.condition.Trying_to_Enter.BULL
-                set(handles.watch, 'Value', WATCH);
-            end
-    
-            if get(handles.watch, 'Value')
-    
-                subplot(numPlots,1,[1:2])
-                cla
-                candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
-                hold on
-                plot(ta.clSma,'b')
-                for jj = 1:size(ta.trades.BULL,1)
-                    plot(ta.trades.BULL(jj,3), ta.trades.BULL(jj,1), 'go')
-                    plot(ta.trades.BULL(jj,4), ta.trades.BULL(jj,2), 'ko')
-                end
-                for jj = 1:size(ta.trades.BEAR,1)
-                    plot(ta.trades.BEAR(jj,3), ta.trades.BEAR(jj,1), 'ro')
-                    plot(ta.trades.BEAR(jj,4), ta.trades.BEAR(jj,2), 'ko')
-                end
-    
-                subplot(numPlots,1,3)
-                cla
-                candle(ta.hi.INDX, ta.lo.INDX, ta.cl.INDX, ta.op.INDX, 'red');
-                hold on
-                plot(ta.clAma,'r')
-    
-                subplot(numPlots,1,4)
-                cla
-                bar(ta.vo.STOCK)
-                hold on
-                plot(xlim, [mean(ta.vo.STOCK), mean(ta.vo.STOCK)])
-    
-                subplot(numPlots,1,5)
-                cla
-                bar(ta.vo.INDX)
-                hold on
-                plot(xlim, [mean(ta.vo.INDX), mean(ta.vo.INDX)])
-    
-                pause
-            end
+        if ta.condition.Trying_to_Enter.BULL || ta.condition.Trying_to_Enter.BULL
+            set(handles.watch, 'Value', 1);
+        end 
+        
+%         if get(handles.watch, 'Value')
+%             
+%             subplot(numPlots,1,[1:2])
+%             cla
+%             candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
+%             hold on
+%             plot(ta.clSma,'b')
+%             for jj = 1:size(ta.trades.BULL,1)
+%                 plot(ta.trades.BULL(jj,3), ta.trades.BULL(jj,1), 'go')
+%                 plot(ta.trades.BULL(jj,4), ta.trades.BULL(jj,2), 'ko')
+%             end
+%             for jj = 1:size(ta.trades.BEAR,1)
+%                 plot(ta.trades.BEAR(jj,3), ta.trades.BEAR(jj,1), 'ro')
+%                 plot(ta.trades.BEAR(jj,4), ta.trades.BEAR(jj,2), 'ko')
+%             end
+%             
+%             subplot(numPlots,1,3)
+%             cla
+%             candle(ta.hi.INDX, ta.lo.INDX, ta.cl.INDX, ta.op.INDX, 'red');
+%             hold on
+%             plot(ta.clAma,'r')
+%             
+%             subplot(numPlots,1,4)
+%             cla
+%             bar(ta.vo.STOCK)
+%             hold on
+%             plot(xlim, [mean(ta.vo.STOCK), mean(ta.vo.STOCK)])
+%             
+%             subplot(numPlots,1,5)
+%             cla
+%             bar(ta.vo.INDX)
+%             hold on
+%             plot(xlim, [mean(ta.vo.INDX), mean(ta.vo.INDX)])
+%        
+%             pause
+%         end 
     
     
     
 end
 
-try
-    roiLong = (ta.trades.BULL(:,2) - ta.trades.BULL(:,1)) ./ ta.trades.BULL(:,1) * 100;
-    sL = sum(roiLong);
-catch
-    roiLong = 0;
-    sL = 0;
-end
+roiLong = (ta.trades.BULL(:,2) - ta.trades.BULL(:,1)) ./ ta.trades.BULL(:,1) * 100;
+sL = sum(roiLong);
 
-try
-    roiShort = (ta.trades.BEAR(:,1) - ta.trades.BEAR(:,2)) ./ ta.trades.BEAR(:,1) * 100;
-    sS = sum(roiShort);
-catch
-    roiShort = 0;
-    sS = 0;
-end
+roiShort = (ta.trades.BEAR(:,1) - ta.trades.BEAR(:,2)) ./ ta.trades.BEAR(:,1) * 100;
+sS = sum(roiShort);
 
-disp([sL, sS, size(ta.trades.BULL,1) + size(ta.trades.BEAR,1)])
-
+disp([sL, sS, length(ta.trades.BULL) + length(ta.trades.BEAR)])
+        
 principal = 20000;
 principal = principal*(1+(sL+sS)/100) - (size(ta.trades.BULL,1) + size(ta.trades.BEAR,1))*20;
 
 disp(principal)
 
-return
+
 
 delete(slider);
 handles = guihandles(slider);
@@ -204,7 +187,7 @@ while(true)
     hold on
     plot(ta.clSma,'b')
     
-    
+
     
     subplot(numPlots,1,3)
     cla
