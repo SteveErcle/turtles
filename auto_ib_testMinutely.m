@@ -8,7 +8,7 @@ as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-allStocks = allStocks([45]);
+allStocks = allStocks([50]);
 % allStocks = {'HALO'}
 
 ta = TurtleAutoRealTime;
@@ -76,6 +76,9 @@ for i = 1:length(allData.SPY)
     ten.SPY = td.genTen(ten.SPY, allData.SPY, i, tenTimes);
     ten.(stock) = td.genTen(ten.(stock), allData.(stock), i, tenTimes);
     
+    if size(ten.SPY.data,1) == 113
+        ta.lastTradeTime
+    end 
     
     if size(ten.SPY.data,1) >= 50
         
@@ -180,7 +183,7 @@ principal = principal*(1+(sL+sS)/100) - (size(ta.trades.BULL,1) + size(ta.trades
 
 disp(principal)
 
-return
+% return
 
 
 % stock = 'ACHN'

@@ -233,7 +233,7 @@ classdef TurtleAutoRealTime < handle
             else
                 
                 if obj.lo.STOCK(end-2) > obj.stopLoss.BULL
-                    obj.stopLoss.BULL = obj.lo.STOCK(end-2);
+                    obj.stopLoss.BULL = obj.lo.STOCK(end-2); %obj.enterPrice.BULL; %
                 end
             end
             
@@ -243,7 +243,7 @@ classdef TurtleAutoRealTime < handle
                 obj.stopLoss.BEAR = obj.enterPrice.BEAR*(1.00+obj.slPercentSecond/100);
             else
                 if  obj.hi.STOCK(end-2) < obj.stopLoss.BEAR
-                    obj.stopLoss.BEAR = obj.hi.STOCK(end-2);
+                    obj.stopLoss.BEAR = obj.hi.STOCK(end-2); % obj.enterPrice.BEAR; %
                 end
             end
             
@@ -268,6 +268,7 @@ classdef TurtleAutoRealTime < handle
                     
                     obj.enterMarket.BULL = 1;
                     obj.enteredStock = obj.stock;
+                    obj.lastTradeTime = nan;
 %                     obj.tradeLen.BULL = length(obj.cl.STOCK) - obj.trades.BULL(end,3) + 1;
                     
                 end
@@ -328,6 +329,7 @@ classdef TurtleAutoRealTime < handle
                     
                     obj.enterMarket.BEAR = 1;
                     obj.enteredStock = obj.stock;
+                    obj.lastTradeTime = nan;
 %                     obj.tradeLen.BEAR = length(obj.cl.STOCK) - obj.trades.BEAR(end,3) + 1;
                     
                 end

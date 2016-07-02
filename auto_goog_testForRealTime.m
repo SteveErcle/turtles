@@ -11,7 +11,7 @@ as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-allStocks = allStocks([1:20]);
+% allStocks = allStocks([1:20]);
 % allStocks = {'HALO'};
 
 % delete(watchConditions);
@@ -21,8 +21,8 @@ allStocks = allStocks([1:20]);
 ta = TurtleAuto;
 td = TurtleData;
 
-slPercentFirst = 0.75; 
-slPercentSecond = 0.25;
+% ta.slPercentFirst = nan; 
+% ta.slPercentSecond = nan;
 
 numPlots = 5;
 exchange = 'NASDAQ';
@@ -45,31 +45,44 @@ if PULL == 1
         else
             stock = allStocks{k}
             
-            temp = IntraDayStockData(stock,exchange,'600','5d');
-            
-            %         for i_d = 1:length(iAll.INDX.date)
-            %             if iAll.STOCK.date(i_d) ~= iAll.INDX.date(i_d)
-            %                 iAll.STOCK.close = [iAll.STOCK.close(1:i_d-1); NaN; iAll.STOCK.close(i_d:end)];
-            %                 iAll.STOCK.high = [iAll.STOCK.high(1:i_d-1); NaN; iAll.STOCK.high(i_d:end)];
-            %                 iAll.STOCK.low = [iAll.STOCK.low(1:i_d-1); NaN; iAll.STOCK.low(i_d:end)];
-            %                 iAll.STOCK.volume = [iAll.STOCK.volume(1:i_d-1); NaN; iAll.STOCK.volume(i_d:end)];
-            %                 iAll.STOCK.datestring = [iAll.STOCK.datestring(1:i_d-1); NaN; iAll.STOCK.datestring(i_d:end)];
-            %                 iAll.STOCK.date = [iAll.STOCK.date(1:i_d-1); NaN; iAll.STOCK.date(i_d:end)];
-            %             end
-            %         end
-            
-            temp = td.getAdjustedIntra(temp);
-            
-            if length(temp.close) ~= length(allData.SPY.close)
-                disp('Length Error')
-            else
-                allData.(stock) = temp;
-            end
+            try
+                temp = IntraDayStockData(stock,exchange,'600','5d');
+                
+                %         for i_d = 1:length(iAll.INDX.date)
+                %             if iAll.STOCK.date(i_d) ~= iAll.INDX.date(i_d)
+                %                 iAll.STOCK.close = [iAll.STOCK.close(1:i_d-1); NaN; iAll.STOCK.close(i_d:end)];
+                %                 iAll.STOCK.high = [iAll.STOCK.high(1:i_d-1); NaN; iAll.STOCK.high(i_d:end)];
+                %                 iAll.STOCK.low = [iAll.STOCK.low(1:i_d-1); NaN; iAll.STOCK.low(i_d:end)];
+                %                 iAll.STOCK.volume = [iAll.STOCK.volume(1:i_d-1); NaN; iAll.STOCK.volume(i_d:end)];
+                %                 iAll.STOCK.datestring = [iAll.STOCK.datestring(1:i_d-1); NaN; iAll.STOCK.datestring(i_d:end)];
+                %                 iAll.STOCK.date = [iAll.STOCK.date(1:i_d-1); NaN; iAll.STOCK.date(i_d:end)];
+                %             end
+                %         end
+                
+                temp = td.getAdjustedIntra(temp);
+                
+                if length(temp.close) ~= length(allData.SPY.close)
+                    disp('Length Error')
+                else
+                    allData.(stock) = temp;
+                end
+                
+            catch
+                disp('Failed to pull stock data')
+            end 
         end
     end
 else
     load('allData')
 end
+
+% stock = 'AMKR'
+% temp.STOCK = allData.(stock);
+% temp.INDX = allData.SPY;
+% clear allData;
+% allData = [];
+% allData.SPY = temp.INDX;
+% allData.(stock) = temp.STOCK;
 
 
 allStocks = fieldnames(allData); allStocks = allStocks(2:end);
@@ -83,11 +96,7 @@ while ta.ind <= len
     range = 1:ta.ind;
     
     disp(ta.ind)
-    
-    if ta.ind == 149
-        111
-    end 
-    
+        
     for k = 1:length(allStocks)
         
         if ta.enterMarket.BULL || ta.enterMarket.BEAR
@@ -101,6 +110,7 @@ while ta.ind <= len
         ta.setStock(stock);
         ta.calculateData(0);
         ta.setStopLoss();
+        %BREAK EVEN STOP
         ta.checkConditionsUsingInd();
         ta.executeBullTrade();
         ta.executeBearTrade();
@@ -120,7 +130,6 @@ while ta.ind <= len
     
     
 end
-
 
 
 
