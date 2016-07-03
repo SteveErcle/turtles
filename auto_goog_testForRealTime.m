@@ -5,6 +5,7 @@
 clc; close all; clear all;
 
 WATCH = 0;
+VIEW  = 0;
 PULL  = 0;
 
 as1 = ['A',num2str(1)];%1
@@ -14,15 +15,16 @@ as2 = ['A',num2str(400)];%400
 % allStocks = allStocks([1:20]);
 % allStocks = {'HALO'};
 
-% delete(watchConditions);
-% handles = guihandles(watchConditions);
-
+delete(watchConditions);
+handles = guihandles(watchConditions);
 
 ta = TurtleAuto;
 td = TurtleData;
 
-% ta.slPercentFirst = nan; 
-% ta.slPercentSecond = nan;
+stopType = 'follow';
+ta.slPercentFirst = nan;
+ta.slPercentSecond = nan;
+ta.levelPercent = 0.25;
 
 numPlots = 5;
 exchange = 'NASDAQ';
@@ -69,20 +71,21 @@ if PULL == 1
                 
             catch
                 disp('Failed to pull stock data')
-            end 
+            end
         end
     end
 else
     load('allData')
 end
 
-% stock = 'AMKR'
-% temp.STOCK = allData.(stock);
-% temp.INDX = allData.SPY;
-% clear allData;
-% allData = [];
-% allData.SPY = temp.INDX;
-% allData.(stock) = temp.STOCK;
+fields = fieldnames(allData);
+stock = fields{10}
+temp.STOCK = allData.(stock);
+temp.INDX = allData.SPY;
+clear allData;
+allData = [];
+allData.SPY = temp.INDX;
+allData.(stock) = temp.STOCK;
 
 
 allStocks = fieldnames(allData); allStocks = allStocks(2:end);
@@ -96,7 +99,7 @@ while ta.ind <= len
     range = 1:ta.ind;
     
     disp(ta.ind)
-        
+    
     for k = 1:length(allStocks)
         
         if ta.enterMarket.BULL || ta.enterMarket.BEAR
@@ -109,8 +112,7 @@ while ta.ind <= len
         
         ta.setStock(stock);
         ta.calculateData(0);
-        ta.setStopLoss();
-        %BREAK EVEN STOP
+        ta.setStopLoss(stopType);
         ta.checkConditionsUsingInd();
         ta.executeBullTrade();
         ta.executeBearTrade();
@@ -120,14 +122,66 @@ while ta.ind <= len
             break
         end
         
-%         disp(ta.ind)
+        %         disp(ta.ind)
         
     end
     
-%     if ta.condition.Not_Stopped_Out.BULL == 0 || ta.condition.Not_Stopped_Out.BEAR == 0
-%         ta.ind = ta.ind + 1;
-%     end 
+    conditions = [ta.condition.Not_Stopped_Out.BULL,...
+        ta.condition.Not_End_of_Day,...
+        ta.condition.Trying_to_Enter.BULL,...
+        ta.condition.Trying_to_Enter.BEAR...
+        ta.condition.Above_MA.BULL,...
+        ta.condition.Below_MA.BEAR]
+%         ta.condition.Within_Level.BULL,...
+%         ta.condition.Within_Level.BEAR,...
+        
+        
+    set(handles.enterMarketBull, 'String', num2str(ta.enterMarket.BULL))
+    set(handles.enterMarketBear, 'String', num2str(ta.enterMarket.BEAR))
+    set(handles.stopLossBull, 'String', num2str(ta.stopLoss.BULL))
+    set(handles.stopLossBear, 'String', num2str(ta.stopLoss.BEAR))
+    set(handles.conditions, 'String', num2str(conditions))
     
+    if ta.condition.Trying_to_Enter.BULL || ta.condition.Trying_to_Enter.BULL
+        set(handles.watch, 'Value', WATCH);
+    end
+    
+    if get(handles.watch, 'Value')
+        
+        subplot(numPlots,1,[1:2])
+        cla
+        candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
+        hold on
+        plot(ta.clSma,'b')
+        for jj = 1:size(ta.trades.BULL,1)
+            plot(ta.trades.BULL(jj,3), ta.trades.BULL(jj,1), 'go')
+            plot(ta.trades.BULL(jj,4), ta.trades.BULL(jj,2), 'ko')
+        end
+        for jj = 1:size(ta.trades.BEAR,1)
+            plot(ta.trades.BEAR(jj,3), ta.trades.BEAR(jj,1), 'ro')
+            plot(ta.trades.BEAR(jj,4), ta.trades.BEAR(jj,2), 'ko')
+        end
+        
+        subplot(numPlots,1,3)
+        cla
+        candle(ta.hi.INDX, ta.lo.INDX, ta.cl.INDX, ta.op.INDX, 'red');
+        hold on
+        plot(ta.clAma,'r')
+        
+        subplot(numPlots,1,4)
+        cla
+        bar(ta.vo.STOCK)
+        hold on
+        plot(xlim, [mean(ta.vo.STOCK), mean(ta.vo.STOCK)])
+        
+        subplot(numPlots,1,5)
+        cla
+        bar(ta.vo.INDX)
+        hold on
+        plot(xlim, [mean(ta.vo.INDX), mean(ta.vo.INDX)])
+        
+        pause
+    end
     
 end
 
@@ -156,7 +210,9 @@ principal = principal*(1+(sL+sS)/100) - (size(ta.trades.BULL,1) + size(ta.trades
 
 disp(principal)
 
-return
+if VIEW == 0
+    return
+end
 
 delete(slider);
 handles = guihandles(slider);
@@ -176,8 +232,6 @@ while(true)
     candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
     hold on
     plot(ta.clSma,'b')
-    
-    
     
     subplot(numPlots,1,3)
     cla
