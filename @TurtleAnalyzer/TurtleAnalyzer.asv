@@ -236,19 +236,10 @@ classdef TurtleAnalyzer < handle
      
         end
         
-        function atrAvg = getAtrAvg(obj, atr, hi, lo, cl)
+        
+        
+        function atrAvg = getAtrAvg(obj, ta.hi.STOCK, ta.lo.STOCK, ta.
             
-            atrAvg = [];
-            atrAvg.STOCK = [];
-            atrAvg.INDX = [];
-            
-            for i = 1:length(cl.STOCK)
-                
-                atrAvg.STOCK = [atrAvg.STOCK; mean(atr.STOCK(1:i))];
-                atrAvg.INDX = [atrAvg.INDX; mean(atr.INDX(1:i))];
-                
-            end
- 
         end
         
     end
