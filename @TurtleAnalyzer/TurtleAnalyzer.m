@@ -251,6 +251,14 @@ classdef TurtleAnalyzer < handle
  
         end
         
+        function percentDiff = percentDifference(obj, first, second)
+            
+            percentDiff =  (second - first) ./ first * 100;
+            
+        end
+        
+        
+        
     end
     
 end
