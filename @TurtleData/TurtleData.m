@@ -286,6 +286,53 @@ classdef TurtleData
             end
         end 
         
+        function allData = pullData(obj, numStocks, lenOfData, candleLen)
+            
+            as1 = ['A',num2str(1)];%1
+            as2 = ['A',num2str(400)];%400
+            [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
+            allStocks = allStocks(numStocks);
+            
+            exchange = 'NASDAQ';
+            
+            for k = 0:length(allStocks)
+                
+                if k == 0
+                    stock = 'SPY'
+                    allData.SPY = IntraDayStockData(stock,exchange, candleLen,lenOfData);
+                    allData.SPY = obj.getAdjustedIntra(allData.SPY);
+                    
+                else
+                    stock = allStocks{k}
+                    try
+                        temp = IntraDayStockData(stock,exchange, candleLen,lenOfData);
+                        
+                        %         for i_d = 1:length(iAll.INDX.date)
+                        %             if iAll.STOCK.date(i_d) ~= iAll.INDX.date(i_d)
+                        %                 iAll.STOCK.close = [iAll.STOCK.close(1:i_d-1); NaN; iAll.STOCK.close(i_d:end)];
+                        %                 iAll.STOCK.high = [iAll.STOCK.high(1:i_d-1); NaN; iAll.STOCK.high(i_d:end)];
+                        %                 iAll.STOCK.low = [iAll.STOCK.low(1:i_d-1); NaN; iAll.STOCK.low(i_d:end)];
+                        %                 iAll.STOCK.volume = [iAll.STOCK.volume(1:i_d-1); NaN; iAll.STOCK.volume(i_d:end)];
+                        %                 iAll.STOCK.datestring = [iAll.STOCK.datestring(1:i_d-1); NaN; iAll.STOCK.datestring(i_d:end)];
+                        %                 iAll.STOCK.date = [iAll.STOCK.date(1:i_d-1); NaN; iAll.STOCK.date(i_d:end)];
+                        %             end
+                        %         end
+                        
+                        temp = obj.getAdjustedIntra(temp);
+                        
+                        if length(temp.close) ~= length(allData.SPY.close)
+                            disp('Length Error')
+                        else
+                            allData.(stock) = temp;
+                        end
+                        
+                    catch
+                        disp('Failed to pull stock data')
+                    end
+                end
+            end
+            
+        end
         
     end
     

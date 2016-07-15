@@ -12,7 +12,7 @@ as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-allStocks = allStocks([30]);
+allStocks = allStocks([34]);
 % allStocks = {'HALO'};
 
 delete(watchConditions);
@@ -22,13 +22,13 @@ ta = TurtleAuto;
 td = TurtleData;
 
 stopType = 'follow';
-% ta.slPercentFirst = nan
-% ta.slPercentSecond = nan
+ta.slPercentFirst = nan
+ta.slPercentSecond = nan
 ta.levelPercent = 0.0;
 
 numPlots = 5;
 exchange = 'NASDAQ';
-lenOfData = '10d'
+lenOfData = '50d'
 
 
 load('weeklyDates')
@@ -93,8 +93,8 @@ allStocks = fieldnames(allData); allStocks = allStocks(2:end);
 len = size(allData.SPY.close,1)-1;
 ta.ind = 50-1;
 
-% ta.organizeDataGoog(allData.(stock), allData.SPY, 1:399);
-% ta.calculateData(0);
+ta.organizeDataGoog(allData.(stock), allData.SPY, 1:1999);
+ta.calculateData(0);
 
 while ta.ind <= len
     
@@ -102,6 +102,10 @@ while ta.ind <= len
     range = 1:ta.ind;
     
         disp(ta.ind)
+        
+        if ta.ind == 123
+            111
+        end 
     
     for k = 1:length(allStocks)
         
@@ -114,7 +118,7 @@ while ta.ind <= len
         ta.organizeDataGoog(allData.(stock), allData.SPY, range);
         
         ta.setStock(stock);
-        ta.calculateData(0);
+%         ta.calculateData(0);
         ta.setStopLoss(stopType);
         ta.checkConditionsUsingInd();
         ta.executeBullTrade();
@@ -129,10 +133,14 @@ while ta.ind <= len
     
     conditions = [ta.condition.Not_Stopped_Out.BULL,...
         ta.condition.Not_End_of_Day,...
+        ta.condition.Large_Volume,...
         ta.condition.Above_MA.BULL,...
         ta.condition.Above_MA_prev.BULL,...
-        ta.condition.Below_MA.BEAR...
+        ta.condition.dip_MA.BULL,...
+        ta.condition.Below_MA.BEAR,...
+        ta.condition.dip_MA.BEAR,...
         ta.condition.Below_MA_prev.BEAR];
+    
     %         ta.condition.Within_Level.BULL,...
     %         ta.condition.Within_Level.BEAR,...
     
@@ -148,6 +156,7 @@ while ta.ind <= len
     end
     
     
+     set(handles.watch, 'Value', WATCH);
     if get(handles.watch, 'Value')
         
         subplot(numPlots,1,[1:2])
