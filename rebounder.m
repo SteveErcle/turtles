@@ -6,21 +6,34 @@ clc; close all; clear all;
 td = TurtleData;
 ta = TurtleAnalyzer;
 
-allData = td.pullData(21, '50d', '600');
+allData = td.pullData(11, '5d', '600');
 
 
 % STANDARDIZE IN REAL TIME
 
-allData.ENDP.stand = (allData.ENDP.close - mean(allData.ENDP.close)) ./ std(allData.ENDP.close);
+field = fieldnames(allData);
+
+allData.STOCK = allData.(field{2});
+
+
+allData.STOCK.stand = (allData.STOCK.close - mean(allData.STOCK.close)) ./ std(allData.STOCK.close);
 allData.SPY.stand = (allData.SPY.close - mean(allData.SPY.close)) ./ std(allData.SPY.close);
 
-rebound = allData.ENDP.stand - allData.SPY.stand;
+
 
 window_size = 12;
 
-ma.ENDP = tsmovavg(allData.ENDP.stand,'e',window_size,1);
+ma.STOCK = tsmovavg(allData.STOCK.stand,'e',window_size,1);
 ma.SPY = tsmovavg(allData.SPY.stand,'e',window_size,1);
+
+rebound = allData.STOCK.stand - allData.SPY.stand;
 ma.REBD = tsmovavg(rebound,'e',9,1);
+
+% rebound = ma.STOCK-ma.SPY;
+% ma.REBD = tsmovavg(rebound(~isnan(rebound)),'e',9,1);
+% 
+% numNan = length(rebound) - length(ma.REBD);
+% ma.REBD = [nan(numNan,1);  ma.REBD];
 
 upper =[];
 lower = [];
@@ -36,66 +49,34 @@ for i = 1:length(rebound)
 end
 
 B = [nan; diff(upper)];
-enter = 0;
 setterUpper = [];
-
 x = B;
 z = find(x~= 1);
-
 setterUpper = [];
 for i = 1:length(z)-1
     setterUpper = [setterUpper; upper(z(i)), upper(z(i+1)-1)];
 end 
 
-% for i = 2:length(upper)-1
-%     
-%     if B(i) ~= 1
-%         setterUpper = [setterUpper; upper(i), nan];
-%         enter = 1;
-%     end
-%     
-%     if B(i+1) ~= 1 && enter == 1
-%         setterUpper(end,2) = upper(i);
-%         enter = 0;
-%     end
-%     
-% end
-
 
 B = [nan; diff(lower)];
-enter = 0;
 setterLower = [];
-
 x = B;
 z = find(x~= 1);
-
 setterLower = [];
 for i = 1:length(z)-1
     setterLower = [setterLower; lower(z(i)), lower(z(i+1)-1)];
 end 
-% for i = 2:length(lower)-1
-%     
-%     if B(i) ~= 1
-%         setterLower = [setterLower; lower(i), nan];
-%         enter = 1;
-%     end
-%     
-%     if B(i+1) ~= 1 && enter == 1
-%         setterLower(end,2) = lower(i);
-%         enter = 0;
-%     end
-%     
-% end
 
 
 figure
-% plot(ma.ENDP, 'b')
+% plot(ma.STOCK, 'b')
 % plot(ma.SPY, 'r')
 % plot(ma.REBD, 'k')
 subplot(2,1,1)
-hold on
-plot(allData.ENDP.stand,'b')
-plot(allData.SPY.stand,'r')
+hold 
+candle(allData.STOCK.high, allData.STOCK.low, allData.STOCK.close, allData.STOCK.open, 'blue');
+% plot(allData.STOCK.stand,'b')
+% plot(allData.SPY.stand,'r')
 subplot(2,1,2)
 hold on
 plot(rebound, 'c')
@@ -110,8 +91,8 @@ for k = 1:2
         xLo = setterUpper(i,1);
         xHi = setterUpper(i,2);
         ylimits = ylim;
-        yLo = ylimits(1);
-        yHi = ylimits(2);
+        yLo = allData.STOCK.close(xLo);
+        yHi = allData.STOCK.close(xHi);
         
         xShort = [xLo xHi xHi xLo];
         yShort = [yLo yLo yHi yHi];
@@ -125,8 +106,8 @@ for k = 1:2
         xLo = setterLower(i,1);
         xHi = setterLower(i,2);
         ylimits = ylim;
-        yLo = ylimits(1);
-        yHi = ylimits(2);
+        yLo = allData.STOCK.close(xLo);
+        yHi = allData.STOCK.close(xHi);
         
         xShort = [xLo xHi xHi xLo];
         yShort = [yLo yLo yHi yHi];
@@ -142,8 +123,8 @@ roi.BULL = [];
 for i = 1:size(setterUpper,1)
     
     
-    first = allData.ENDP.close(setterUpper(i,1));
-    second = allData.ENDP.close(setterUpper(i,2));
+    first = allData.STOCK.close(setterUpper(i,1));
+    second = allData.STOCK.close(setterUpper(i,2));
     
     if first == nan || second == nan
         i
@@ -157,8 +138,8 @@ roi.BEAR = [];
 for i = 1:size(setterLower,1)
     
     
-    first = allData.ENDP.close(setterLower(i,1));
-    second = allData.ENDP.close(setterLower(i,2));
+    first = allData.STOCK.close(setterLower(i,1));
+    second = allData.STOCK.close(setterLower(i,2));
     
      if first == nan || second == nan
         i
@@ -169,6 +150,8 @@ for i = 1:size(setterLower,1)
     
 end 
     
+
+disp([sum(roi.BULL), sum(roi.BEAR)])
     
     
 
