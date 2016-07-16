@@ -1,12 +1,15 @@
 clc; close all; clear all;
 
+
+
+
 td = TurtleData;
 ta = TurtleAnalyzer;
 
 allData = td.pullData(21, '50d', '600');
 
 
-
+% STANDARDIZE IN REAL TIME
 
 allData.ENDP.stand = (allData.ENDP.close - mean(allData.ENDP.close)) ./ std(allData.ENDP.close);
 allData.SPY.stand = (allData.SPY.close - mean(allData.SPY.close)) ./ std(allData.SPY.close);
@@ -24,7 +27,7 @@ lower = [];
 
 for i = 1:length(rebound)
     
-    if ma.REBD(i) > rebound(i)
+    if rebound(i) > ma.REBD(i) 
         upper = [upper; i];
     else
         lower  = [lower; i];
@@ -35,36 +38,54 @@ end
 B = [nan; diff(upper)];
 enter = 0;
 setterUpper = [];
-for i = 2:length(upper)-1
-    
-    if B(i) ~= 1
-        setterUpper = [setterUpper; upper(i), nan];
-        enter = 1;
-    end
-    
-    if B(i+1) ~= 1 && enter == 1
-        setterUpper(end,2) = upper(i);
-        enter = 0;
-    end
-    
-end
+
+x = B;
+z = find(x~= 1);
+
+setterUpper = [];
+for i = 1:length(z)-1
+    setterUpper = [setterUpper; upper(z(i)), upper(z(i+1)-1)];
+end 
+
+% for i = 2:length(upper)-1
+%     
+%     if B(i) ~= 1
+%         setterUpper = [setterUpper; upper(i), nan];
+%         enter = 1;
+%     end
+%     
+%     if B(i+1) ~= 1 && enter == 1
+%         setterUpper(end,2) = upper(i);
+%         enter = 0;
+%     end
+%     
+% end
+
 
 B = [nan; diff(lower)];
 enter = 0;
 setterLower = [];
-for i = 2:length(lower)-1
-    
-    if B(i) ~= 1
-        setterLower = [setterLower; lower(i), nan];
-        enter = 1;
-    end
-    
-    if B(i+1) ~= 1 && enter == 1
-        setterLower(end,2) = lower(i);
-        enter = 0;
-    end
-    
-end
+
+x = B;
+z = find(x~= 1);
+
+setterLower = [];
+for i = 1:length(z)-1
+    setterLower = [setterLower; lower(z(i)), lower(z(i+1)-1)];
+end 
+% for i = 2:length(lower)-1
+%     
+%     if B(i) ~= 1
+%         setterLower = [setterLower; lower(i), nan];
+%         enter = 1;
+%     end
+%     
+%     if B(i+1) ~= 1 && enter == 1
+%         setterLower(end,2) = lower(i);
+%         enter = 0;
+%     end
+%     
+% end
 
 
 figure
@@ -116,19 +137,37 @@ for k = 1:2
     
 end
 
-roi = [];
+roi.BULL = [];
+
+for i = 1:size(setterUpper,1)
+    
+    
+    first = allData.ENDP.close(setterUpper(i,1));
+    second = allData.ENDP.close(setterUpper(i,2));
+    
+    if first == nan || second == nan
+        i
+    end 
+    
+    roi.BULL = [roi.BULL; ta.percentDifference(first, second)];
+    
+end 
+
+roi.BEAR = [];
 for i = 1:size(setterLower,1)
     
     
     first = allData.ENDP.close(setterLower(i,1));
     second = allData.ENDP.close(setterLower(i,2));
     
-    roi = [roi; ta.percentDifference(first, second)];
+     if first == nan || second == nan
+        i
+    end 
     
     
+    roi.BEAR = [roi.BEAR; -ta.percentDifference(first, second)];
     
 end 
-
     
     
     
