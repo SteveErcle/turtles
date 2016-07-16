@@ -12,7 +12,7 @@ as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-allStocks = allStocks([34]);
+allStocks = allStocks([11]);
 % allStocks = {'HALO'};
 
 delete(watchConditions);
@@ -22,13 +22,13 @@ ta = TurtleAuto;
 td = TurtleData;
 
 stopType = 'follow';
-ta.slPercentFirst = nan
-ta.slPercentSecond = nan
+ta.slPercentFirst = 1;
+ta.slPercentSecond = 1;
 ta.levelPercent = 0.0;
 
 numPlots = 5;
 exchange = 'NASDAQ';
-lenOfData = '50d'
+lenOfData = '10d'
 
 
 load('weeklyDates')
@@ -93,111 +93,108 @@ allStocks = fieldnames(allData); allStocks = allStocks(2:end);
 len = size(allData.SPY.close,1)-1;
 ta.ind = 50-1;
 
-ta.organizeDataGoog(allData.(stock), allData.SPY, 1:1999);
-ta.calculateData(0);
+% ta.organizeDataGoog(allData.(stock), allData.SPY, 1:1999);
+% ta.calculateData(0);
 
 while ta.ind <= len
     
     ta.ind = ta.ind + 1;
     range = 1:ta.ind;
     
-        disp(ta.ind)
-        
-        if ta.ind == 123
-            111
-        end 
+    disp(ta.ind)
+   
     
-    for k = 1:length(allStocks)
-        
-        if ta.enterMarket.BULL || ta.enterMarket.BEAR
-            stock = ta.enteredStock;
-        else
-            stock = allStocks{k};
-        end
+%     for k = 1:length(allStocks)
+%         
+%         if ta.enterMarket.BULL || ta.enterMarket.BEAR
+%             stock = ta.enteredStock;
+%         else
+%             stock = allStocks{k};
+%         end
         
         ta.organizeDataGoog(allData.(stock), allData.SPY, range);
         
         ta.setStock(stock);
-%         ta.calculateData(0);
+        ta.calculateData(0);
         ta.setStopLoss(stopType);
         ta.checkConditionsUsingInd();
         ta.executeBullTrade();
         ta.executeBearTrade();
         
         
-        if ta.enterMarket.BULL || ta.enterMarket.BEAR
-            break
-        end
+%         if ta.enterMarket.BULL || ta.enterMarket.BEAR
+%             break
+%         end
         
-    end
+%     end
     
-    conditions = [ta.condition.Not_Stopped_Out.BULL,...
-        ta.condition.Not_End_of_Day,...
-        ta.condition.Large_Volume,...
-        ta.condition.Above_MA.BULL,...
-        ta.condition.Above_MA_prev.BULL,...
-        ta.condition.dip_MA.BULL,...
-        ta.condition.Below_MA.BEAR,...
-        ta.condition.dip_MA.BEAR,...
-        ta.condition.Below_MA_prev.BEAR];
-    
-    %         ta.condition.Within_Level.BULL,...
-    %         ta.condition.Within_Level.BEAR,...
-    
-    
-    set(handles.enterMarketBull, 'String', num2str(ta.enterMarket.BULL))
-    set(handles.enterMarketBear, 'String', num2str(ta.enterMarket.BEAR))
-    set(handles.stopLossBull, 'String', num2str(ta.stopLoss.BULL))
-    set(handles.stopLossBear, 'String', num2str(ta.stopLoss.BEAR))
-    set(handles.conditions, 'String', num2str(conditions))
-    
-    if ta.condition.Trying_to_Enter.BULL || ta.condition.Trying_to_Enter.BULL
-        set(handles.watch, 'Value', WATCH);
-    end
-    
-    
-     set(handles.watch, 'Value', WATCH);
-    if get(handles.watch, 'Value')
-        
-        subplot(numPlots,1,[1:2])
-        cla
-        candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
-        hold on
-        plot(ta.clSma,'b')
-        xlim(gca, [0, 200])
-        for jj = 1:size(ta.trades.BULL,1)
-            plot(ta.trades.BULL(jj,3), ta.trades.BULL(jj,1), 'go')
-            plot(ta.trades.BULL(jj,4), ta.trades.BULL(jj,2), 'ko')
-        end
-        for jj = 1:size(ta.trades.BEAR,1)
-            plot(ta.trades.BEAR(jj,3), ta.trades.BEAR(jj,1), 'ro')
-            plot(ta.trades.BEAR(jj,4), ta.trades.BEAR(jj,2), 'ko')
-        end
-        
-        subplot(numPlots,1,3)
-        cla
-        candle(ta.hi.INDX, ta.lo.INDX, ta.cl.INDX, ta.op.INDX, 'red');
-        hold on
-        plot(ta.clAma,'r')
-        xlim(gca, [0, 200])
-        
-        subplot(numPlots,1,4)
-        cla
-        bar(ta.vo.STOCK)
-        hold on
-        plot(xlim, [mean(ta.vo.STOCK), mean(ta.vo.STOCK)])
-        xlim(gca, [0, 200])
-        
-        subplot(numPlots,1,5)
-        cla
-        bar(ta.vo.INDX)
-        hold on
-        plot(xlim, [mean(ta.vo.INDX), mean(ta.vo.INDX)])
-        xlim(gca, [0, 200])
-        
-        pause
-        
-    end
+%     conditions = [ta.condition.Not_Stopped_Out.BULL,...
+%         ta.condition.Not_End_of_Day,...
+%         ta.condition.Large_Volume,...
+%         ta.condition.Above_MA.BULL,...
+%         ta.condition.Above_MA_prev.BULL,...
+%         ta.condition.dip_MA.BULL,...
+%         ta.condition.Below_MA.BEAR,...
+%         ta.condition.dip_MA.BEAR,...
+%         ta.condition.Below_MA_prev.BEAR];
+%     
+%     %         ta.condition.Within_Level.BULL,...
+%     %         ta.condition.Within_Level.BEAR,...
+%     
+%     
+%     set(handles.enterMarketBull, 'String', num2str(ta.enterMarket.BULL))
+%     set(handles.enterMarketBear, 'String', num2str(ta.enterMarket.BEAR))
+%     set(handles.stopLossBull, 'String', num2str(ta.stopLoss.BULL))
+%     set(handles.stopLossBear, 'String', num2str(ta.stopLoss.BEAR))
+%     set(handles.conditions, 'String', num2str(conditions))
+%     
+%     if ta.condition.Trying_to_Enter.BULL || ta.condition.Trying_to_Enter.BULL
+%         set(handles.watch, 'Value', WATCH);
+%     end
+%     
+%     
+%      set(handles.watch, 'Value', WATCH);
+%     if get(handles.watch, 'Value')
+%         
+%         subplot(numPlots,1,[1:2])
+%         cla
+%         candle(ta.hi.STOCK, ta.lo.STOCK, ta.cl.STOCK, ta.op.STOCK, 'blue');
+%         hold on
+%         plot(ta.clSma,'b')
+%         xlim(gca, [0, 200])
+%         for jj = 1:size(ta.trades.BULL,1)
+%             plot(ta.trades.BULL(jj,3), ta.trades.BULL(jj,1), 'go')
+%             plot(ta.trades.BULL(jj,4), ta.trades.BULL(jj,2), 'ko')
+%         end
+%         for jj = 1:size(ta.trades.BEAR,1)
+%             plot(ta.trades.BEAR(jj,3), ta.trades.BEAR(jj,1), 'ro')
+%             plot(ta.trades.BEAR(jj,4), ta.trades.BEAR(jj,2), 'ko')
+%         end
+%         
+%         subplot(numPlots,1,3)
+%         cla
+%         candle(ta.hi.INDX, ta.lo.INDX, ta.cl.INDX, ta.op.INDX, 'red');
+%         hold on
+%         plot(ta.clAma,'r')
+%         xlim(gca, [0, 200])
+%         
+%         subplot(numPlots,1,4)
+%         cla
+%         bar(ta.vo.STOCK)
+%         hold on
+%         plot(xlim, [mean(ta.vo.STOCK), mean(ta.vo.STOCK)])
+%         xlim(gca, [0, 200])
+%         
+%         subplot(numPlots,1,5)
+%         cla
+%         bar(ta.vo.INDX)
+%         hold on
+%         plot(xlim, [mean(ta.vo.INDX), mean(ta.vo.INDX)])
+%         xlim(gca, [0, 200])
+%         
+%         pause
+%         
+%     end
     
 end
 
