@@ -57,7 +57,7 @@ x = B;
 z = find(x~= 1);
 setterUpper = [];
 for i = 1:length(z)-1
-    setterUpper = [setterUpper; upper(z(i)), upper(z(i+1))];
+    setterUpper = [setterUpper; upper(z(i)), upper(z(i+1)-1)+1];
 end 
 
 B = [nan; diff(lower)];
@@ -66,7 +66,7 @@ x = B;
 z = find(x~= 1);
 setterLower = [];
 for i = 1:length(z)-1
-    setterLower = [setterLower; lower(z(i)), lower(z(i+1))];
+    setterLower = [setterLower; lower(z(i)), lower(z(i+1)-1)+1];
 end 
 
 figure
@@ -124,7 +124,7 @@ for i = 1:size(setterUpper,1)
         i
     end 
     
-    roi.BULL = [roi.BULL; tAn.percentDifference(first, second)];
+    roi.BULL = [roi.BULL; -tAn.percentDifference(first, second)];
     
 end 
 
@@ -140,7 +140,7 @@ for i = 1:size(setterLower,1)
     end 
     
     
-    roi.BEAR = [roi.BEAR; -tAn.percentDifference(first, second)];
+    roi.BEAR = [roi.BEAR; tAn.percentDifference(first, second)];
     
 end
 

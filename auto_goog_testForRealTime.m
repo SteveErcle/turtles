@@ -12,7 +12,7 @@ as1 = ['A',num2str(1)];%1
 as2 = ['A',num2str(400)];%400
 [~,allStocks] = xlsread('listOfStocks', [as1, ':', as2]);
 
-allStocks = allStocks([11]);
+allStocks = allStocks([32]);
 % allStocks = {'HALO'};
 
 delete(watchConditions);
@@ -22,13 +22,13 @@ ta = TurtleAuto;
 td = TurtleData;
 
 stopType = 'follow';
-ta.slPercentFirst = 1;
-ta.slPercentSecond = 1;
+% ta.slPercentFirst = nan;
+% ta.slPercentSecond = nan;
 ta.levelPercent = 0.0;
 
 numPlots = 5;
 exchange = 'NASDAQ';
-lenOfData = '10d'
+lenOfData = '50d'
 
 
 load('weeklyDates')
@@ -93,8 +93,8 @@ allStocks = fieldnames(allData); allStocks = allStocks(2:end);
 len = size(allData.SPY.close,1)-1;
 ta.ind = 50-1;
 
-% ta.organizeDataGoog(allData.(stock), allData.SPY, 1:1999);
-% ta.calculateData(0);
+ta.organizeDataGoog(allData.(stock), allData.SPY, 1:1999);
+ta.calculateData(0);
 
 while ta.ind <= len
     
@@ -115,7 +115,7 @@ while ta.ind <= len
         ta.organizeDataGoog(allData.(stock), allData.SPY, range);
         
         ta.setStock(stock);
-        ta.calculateData(0);
+%         ta.calculateData(0);
         ta.setStopLoss(stopType);
         ta.checkConditionsUsingInd();
         ta.executeBullTrade();
